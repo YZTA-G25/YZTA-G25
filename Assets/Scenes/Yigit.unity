@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 753375226}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.194, z: -0.523}
+  m_LocalPosition: {x: 0, y: 1.518, z: -0.523}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -522,9 +522,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5078872276336370758, guid: 010c40c889cc42245986eefdb84e61ef, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5616273594931699614, guid: 010c40c889cc42245986eefdb84e61ef, type: 3}
       propertyPath: m_Name
       value: EyePlayerCameraRef
+      objectReference: {fileID: 0}
+    - target: {fileID: 6031058187929186432, guid: 010c40c889cc42245986eefdb84e61ef, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7901595026693441802, guid: 010c40c889cc42245986eefdb84e61ef, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.596
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
