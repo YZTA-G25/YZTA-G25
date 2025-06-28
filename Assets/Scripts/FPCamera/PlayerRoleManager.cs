@@ -1,57 +1,81 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
+    [Tooltip("El Oyuncusu'nun kontrollerini yöneten script.")]
     [SerializeField] private HandController handController;
-    [SerializeField] private FPController fpController;
-    [SerializeField] private FPCamera fpCamera;
-    [SerializeField] private GameObject cameraSystem; // Kamera objesini içeren parent obje
 
+    [Tooltip("Göz Oyuncusu'nun kamera dönüþünü yöneten script.")]
+    [SerializeField] private CameraController cameraController;
+
+    [Tooltip("Tüm inputlarý alýp ilgili controllere daðýtan script.")]
+    [SerializeField] private PlayerInputHandler playerInputHandler;
+
+    [Tooltip("Unity'nin Input System bileþeni.")]
+    [SerializeField] private PlayerInput playerInput;
+
+    [Header("Camera System")]
+    [Tooltip("Ýçinde Camera ve Cinemachine Brain olan ana kamera objesi.")]
+    [SerializeField] private GameObject cameraSystemObject;
+
+    // OnNetworkSpawn, obje að üzerinde oluþtuðunda sadece bir kez çalýþýr.
     public override void OnNetworkSpawn()
     {
-        // Bu kodun sadece bu bilgisayardaki oyuncu için çalýþmasýný saðla
+        // Eðer bu script'in üzerinde olduðu Player objesi BÝZE AÝT DEÐÝLSE (yani diðer oyuncunun kopyasýysa):
         if (!IsOwner)
         {
-            // Eðer bu nesne bize ait deðilse, kamerasýný kapatalým ki
-            // diðer oyuncunun gözünden görmeyelim.
-            if (cameraSystem != null)
-            {
-                cameraSystem.SetActive(false);
-            }
+            // Diðer oyuncunun gözünden görmemek için onun kamera sistemini kapat.
+            if (cameraSystemObject != null) cameraSystemObject.SetActive(false);
+
+            // Bu script'in gereksiz yere çalýþmasýný engelle.
+            this.enabled = false;
             return;
         }
 
-        // Rol atamasýný yap
+        // Eðer obje BÝZE AÝTSE, rol atamasýný yap ve imleci ayarla.
         AssignRole();
+        LockCursor();
     }
 
     private void AssignRole()
     {
-        // Eðer bu oyuncu HOST ise, Göz Oyuncusu'dur.
+        // Eðer bu oyuncu oyunu kuran kiþi ise (HOST), o zaman GÖZ OYUNCUSU'dur.
         if (IsHost)
         {
-            Debug.Log("Assigning Role: EYE PLAYER (Host)");
+            Debug.Log("Rol Atandý: GÖZ OYUNCUSU (Host)");
 
-            // Göz Oyuncusu'nun bileþenlerini aktive et
-            if (fpController) fpController.enabled = true;
-            if (fpCamera) fpCamera.enabled = true;
+            // Göz Oyuncusu için gerekli bileþenleri AÇ:
+            cameraSystemObject.SetActive(true);      // Kamerasý görsün
+            playerInput.enabled = true;              // Inputlarý alsýn
+            playerInputHandler.enabled = true;       // Inputlarý daðýtsýn
+            cameraController.enabled = true;         // Kamera dönsün
 
-            // El Oyuncusu'nun bileþenlerini devre dýþý býrak
-            if (handController) handController.enabled = false;
+            // El Oyuncusu'na ait bileþeni KAPAT:
+            handController.enabled = false;
         }
-        // Eðer HOST deðilse, o zaman bir CLIENT'tir ve El Oyuncusu'dur.
+        // Eðer bu oyuncu oyuna sonradan katýlan kiþi ise (CLIENT), o zaman EL OYUNCUSU'dur.
         else
         {
-            Debug.Log("Assigning Role: HAND PLAYER (Client)");
+            Debug.Log("Rol Atandý: EL OYUNCUSU (Client)");
 
-            // El Oyuncusu'nun bileþenlerini aktive et
-            if (handController) handController.enabled = true;
+            // El Oyuncusu için gerekli bileþeni AÇ:
+            handController.enabled = true;
 
-            // Göz Oyuncusu'nun bileþenlerini devre dýþý býrak
-            if (fpController) fpController.enabled = false;
-            if (fpCamera) fpCamera.enabled = false;
+            // Göz Oyuncusu'na ait bileþenleri ve görme yeteneðini KAPAT:
+            cameraSystemObject.SetActive(false);      // Kamerasý görmesin (ekraný kararacak)
+            playerInput.enabled = false;
+            playerInputHandler.enabled = false;
+            cameraController.enabled = false;
         }
+    }
+
+    private void LockCursor()
+    {
+        // Rolü ne olursa olsun, oyuna giren oyuncunun imleci kilitlenir.
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }
