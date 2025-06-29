@@ -1,57 +1,63 @@
+// PlayerRoleManager.cs (NÝHAÝ VE TAM HALÝ)
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
     [SerializeField] private HandController handController;
-    [SerializeField] private FPController fpController;
-    [SerializeField] private FPCamera fpCamera;
-    [SerializeField] private GameObject cameraSystem; // Kamera objesini içeren parent obje
+    [SerializeField] private CameraController cameraController;
+    [SerializeField] private PlayerInputHandler playerInputHandler;
+    [SerializeField] private PlayerInput playerInput;
+    [SerializeField] private HandInteractor handInteractor; // YENÝ: HandInteractor referansý eklendi.
+
+    [Header("Camera System")]
+    [SerializeField] private GameObject cameraSystemObject;
 
     public override void OnNetworkSpawn()
     {
-        // Bu kodun sadece bu bilgisayardaki oyuncu için çalýþmasýný saðla
         if (!IsOwner)
         {
-            // Eðer bu nesne bize ait deðilse, kamerasýný kapatalým ki
-            // diðer oyuncunun gözünden görmeyelim.
-            if (cameraSystem != null)
-            {
-                cameraSystem.SetActive(false);
-            }
+            if (cameraSystemObject != null) cameraSystemObject.SetActive(false);
+            this.enabled = false;
             return;
         }
 
-        // Rol atamasýný yap
+        playerInput.enabled = true;
+        playerInputHandler.enabled = true;
+
         AssignRole();
+        LockCursor();
     }
 
     private void AssignRole()
     {
-        // Eðer bu oyuncu HOST ise, Göz Oyuncusu'dur.
-        if (IsHost)
+        if (IsHost) // Göz Oyuncusu ise...
         {
-            Debug.Log("Assigning Role: EYE PLAYER (Host)");
+            Debug.Log("Rol Atandý: GÖZ OYUNCUSU (Host)");
+            cameraSystemObject.SetActive(true);
+            cameraController.enabled = true;
 
-            // Göz Oyuncusu'nun bileþenlerini aktive et
-            if (fpController) fpController.enabled = true;
-            if (fpCamera) fpCamera.enabled = true;
-
-            // El Oyuncusu'nun bileþenlerini devre dýþý býrak
-            if (handController) handController.enabled = false;
+            // El Oyuncusu'nun kontrolcülerini KAPAT.
+            handController.enabled = false;
+            handInteractor.enabled = false; // YENÝ: HandInteractor'ý Göz Oyuncusu için kapatýyoruz.
         }
-        // Eðer HOST deðilse, o zaman bir CLIENT'tir ve El Oyuncusu'dur.
-        else
+        else // El Oyuncusu ise...
         {
-            Debug.Log("Assigning Role: HAND PLAYER (Client)");
+            Debug.Log("Rol Atandý: EL OYUNCUSU (Client)");
+            cameraSystemObject.SetActive(false);
+            cameraController.enabled = false;
 
-            // El Oyuncusu'nun bileþenlerini aktive et
-            if (handController) handController.enabled = true;
-
-            // Göz Oyuncusu'nun bileþenlerini devre dýþý býrak
-            if (fpController) fpController.enabled = false;
-            if (fpCamera) fpCamera.enabled = false;
+            // El Oyuncusu'nun kontrolcülerini AÇ.
+            handController.enabled = true;
+            handInteractor.enabled = true; // YENÝ: HandInteractor'ý El Oyuncusu için açýyoruz.
         }
+    }
+
+    private void LockCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }
