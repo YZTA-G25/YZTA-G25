@@ -277,8 +277,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraPitchController: {fileID: 476621738010960961}
-  lookSensitivity: 1
-  pitchLimit: 85
+  lookSensitivity: 10.05
+  pitchLimit: 45
+  moveSpeed: 5
 --- !u!114 &3402852609114427806
 MonoBehaviour:
   m_ObjectHideFlags: 0

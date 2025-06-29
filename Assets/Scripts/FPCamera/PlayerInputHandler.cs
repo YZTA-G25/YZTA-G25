@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     private CameraController cameraController;
-    private HandController handController; // Ýleride gerekebilir diye referans
+    private HandController handController;
 
     private void Awake()
     {
@@ -13,20 +13,31 @@ public class PlayerInputHandler : MonoBehaviour
         handController = GetComponent<HandController>();
     }
 
-    // PlayerInput bileþeninin "Player" event'lerinden "Look" eylemine baðlanýr.
     public void OnLook(InputAction.CallbackContext context)
     {
-        if (cameraController != null)
+        // Bu kýsým zaten doðru çalýþýyor
+        if (cameraController != null && cameraController.enabled)
         {
             cameraController.SetLookInput(context.ReadValue<Vector2>());
         }
     }
 
-    // PlayerInput bileþeninin "Player" event'lerinden "Move" eylemine baðlanýr.
     public void OnMove(InputAction.CallbackContext context)
     {
-        // HandController'a hareket verisini bu þekilde yollayabiliriz.
-        // Bunun için HandController'da public bir metot oluþturmak gerekir.
-        // handController.SetMoveInput(context.ReadValue<Vector2>());
+        // Yorum satýrlarýný kaldýrýp kodu aktive ediyoruz
+        Vector2 input = context.ReadValue<Vector2>();
+
+        // Eðer CameraController aktifse, hareketi ona yolla
+        if (cameraController != null && cameraController.enabled)
+        {
+            cameraController.SetMoveInput(input);
+        }
+
+        // Eðer HandController aktifse, hareketi ona yolla
+        // (HandController'da da SetMoveInput adýnda bir public metot oluþturmanýz gerekir)
+        if (handController != null && handController.enabled)
+        {
+            // handController.SetMoveInput(input);
+        }
     }
 }
