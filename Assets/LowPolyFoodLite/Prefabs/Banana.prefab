@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 429129613116869983}
   - component: {fileID: 4916021887616468903}
   - component: {fileID: -3905354454407299224}
-  - component: {fileID: -8652938658862143551}
   m_Layer: 14
   m_Name: Banana
   m_TagString: Untagged
@@ -137,16 +136,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-8652938658862143551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2230530226155236490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996a0708a16e6a846bf4b2bef732cbc4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionPrompt: "Etkile\u015Fime Gir"
