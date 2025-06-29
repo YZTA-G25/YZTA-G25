@@ -1,4 +1,4 @@
-// Scripts/Player/PlayerInteractor.cs
+// Scripts/Player/PlayerInteractor.cs (YENÝ VE TEMÝZ HALÝ)
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,11 +6,8 @@ public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private float interactionDistance = 3f;
     [SerializeField] private LayerMask interactionLayer;
-    [SerializeField] private Transform handHoldPoint; // Malzemenin tutulacaðý nokta
-
     private Camera _camera;
     private Interactable _itemInRange;
-    private GameObject _heldItem;
 
     void Start()
     {
@@ -19,16 +16,10 @@ public class PlayerInteractor : MonoBehaviour
 
     void Update()
     {
-        // Elimiz bir þey tutmuyorsa, etkileþimli nesne ara.
-        if (_heldItem == null)
-        {
-            FindInteractable();
-        }
-        else
-        {
-            _itemInRange = null; // Elimiz doluyken baþka nesneyle etkileþime giremeyiz.
-        }
-        // TODO: UI'da _itemInRange.interactionPrompt'u göster.
+        // Bu script artýk sadece "bakarak etkileþim" için kullanýlacak.
+        // Þimdilik sadece objeyi bulsun ama bir þey yapmasýn.
+        // Fiziksel etkileþimleri buradan YÖNETMÝYORUZ.
+        FindInteractable();
     }
 
     void FindInteractable()
@@ -37,67 +28,15 @@ public class PlayerInteractor : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionLayer))
         {
             hit.collider.TryGetComponent(out _itemInRange);
-
-            // EÐER BÝR ÞEY GÖRÜYORSA KONSOLA YAZDIR
             if (_itemInRange != null)
             {
-                Debug.Log("Görülen obje: " + _itemInRange.gameObject.name);
+                // Sadece ne gördüðümüzü bilsin, bir þey yapmasýn.
+                // Debug.Log("Kamera görüyor: " + _itemInRange.gameObject.name);
             }
         }
         else
         {
             _itemInRange = null;
         }
-    }
-
-    // PlayerInteractor.cs - Yeni Hali
-    public void OnInteract(InputAction.CallbackContext context)
-    {
-        // Tuþa basýldýðýnda (performed)...
-        if (context.performed)
-        {
-            // ...ve elimiz boþsa ve bir nesnenin menzilindeysek, onu tut.
-            if (_heldItem == null && _itemInRange != null)
-            {
-                _itemInRange.Interact(this);
-            }
-        }
-        // Tuþ býrakýldýðýnda (canceled)...
-        else if (context.canceled)
-        {
-            // ...ve elimiz doluysa, onu býrak.
-            if (_heldItem != null)
-            {
-                ReleaseItem();
-            }
-        }
-    }
-
-    // PlayerInteractor.cs içindeki HoldItem metodu
-
-    public void HoldItem(GameObject item)
-    {
-        _heldItem = item;
-
-        // ANAHTAR SATIR: Tuttuðumuz objenin ebeveynini (parent),
-        // Inspector'dan az önce atadýðýmýz 'handHoldPoint' olarak ayarlýyoruz.
-        _heldItem.transform.SetParent(handHoldPoint);
-
-        // Objenin pozisyonunu ve rotasyonunu tutma noktasýna göre sýfýrlýyoruz ki tam otursun.
-        _heldItem.transform.localPosition = Vector3.zero;
-        _heldItem.transform.localRotation = Quaternion.identity;
-
-        // Fiziðini kapatýyoruz ki elimizdeyken titremesin veya düþmesin.
-        if (_heldItem.TryGetComponent(out Rigidbody rb)) rb.isKinematic = true;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = false;
-    }
-
-    private void ReleaseItem()
-    {
-        if (_heldItem.TryGetComponent(out Rigidbody rb)) rb.isKinematic = false;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = true;
-
-        _heldItem.transform.SetParent(null);
-        _heldItem = null;
     }
 }

@@ -1,41 +1,34 @@
-// GrabbableCloner.cs
+// GrabbableCloner.cs (GÜNCELLENMÝÞ HALÝ)
+using System.Collections.Generic; // Listeler için bu satýr gerekli
 using UnityEngine;
 
-// Bu script, dolapta duran ve oyuncunun ilk etkileþime girdiði "görsel" objeye eklenir.
-// Kendisi de etkileþime girilebilir olmalýdýr.
 public class GrabbableCloner : Interactable
 {
-    // Klonlanacak olan malzemenin bilgisi (private, dýþarýdan eriþilmez)
-    private Ingredient _ingredientToClone;
+    // Artýk tek bir malzeme deðil, bir malzeme listesi tutuyor
+    private List<Ingredient> _ingredientsToCloneFrom;
 
-    // CabinetController bu metodu çaðýrarak hangi malzemenin klonlanacaðýný ayarlar.
-    // 'Setup' metodunu eklediðimiz için diðer script'teki hata düzelecek.
-    public void Setup(Ingredient ingredient)
+    // CabinetController bu metodu çaðýrarak klonlanabilecek malzemelerin listesini verir.
+    public void Setup(List<Ingredient> ingredients)
     {
-        _ingredientToClone = ingredient;
+        _ingredientsToCloneFrom = ingredients;
     }
 
-    // Oyuncu bu görsel objeyi "almaya" çalýþtýðýnda bu metot çalýþýr.
-    public override void Interact(PlayerInteractor interactor)
+    public override void Interact(HandInteractor interactor)
     {
-        Debug.Log("GrabbableCloner.Interact metodu tetiklendi!");
-        // Eðer klonlanacak malzeme bilgisi yoksa, bir hata mesajý ver ve iþlemi durdur.
-        if (_ingredientToClone == null || _ingredientToClone.prefab == null)
+        if (_ingredientsToCloneFrom == null || _ingredientsToCloneFrom.Count == 0)
         {
-            Debug.LogError("Klonlanacak malzeme bilgisi ayarlanmamýþ!");
+            Debug.LogError("Klonlanacak malzeme listesi boþ!");
             return;
         }
 
-        Debug.Log($"Klonlama talebi alýndý: {_ingredientToClone.ingredientName}");
+        // Listeden rastgele bir malzeme seç
+        Ingredient randomIngredient = _ingredientsToCloneFrom[Random.Range(0, _ingredientsToCloneFrom.Count)];
 
-        // Malzemenin prefab'ýndan YENÝ BÝR KOPYA (klon) oluþtur.
-        GameObject clone = Instantiate(_ingredientToClone.prefab);
+        Debug.Log($"Klonlama talebi alýndý, rastgele seçilen: {randomIngredient.ingredientName}");
 
-        // Bu yeni kopyaya, yere býrakýldýðýnda tekrar alýnabilmesi için
-        // normal bir "tutulabilir" script'i ekle.
+        // Seçilen rastgele malzemenin prefab'ýndan YENÝ BÝR KOPYA (klon) oluþtur.
+        GameObject clone = Instantiate(randomIngredient.prefab);
         clone.AddComponent<GrabbableItem>();
-
-        // Yeni kopyayý (klonu) oyuncunun eline ver.
         interactor.HoldItem(clone);
     }
 }

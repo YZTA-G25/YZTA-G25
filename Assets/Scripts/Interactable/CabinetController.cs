@@ -1,41 +1,58 @@
-// CabinetController.cs
+// CabinetController.cs (Çoklu Obje Versiyonu)
+using System.Collections.Generic;
 using UnityEngine;
 
-// Bu script artýk Interactable deðil. Sadece bir yönetici.
 public class CabinetController : MonoBehaviour
 {
     [Header("Cabinet Settings")]
-    [Tooltip("Bu dolabýn içinde görünecek olan malzeme.")]
-    [SerializeField] private Ingredient ingredientToShow;
+    [Tooltip("Bu dolabýn içinde görünecek malzemelerin listesi.")]
+    [SerializeField] private List<Ingredient> displayIngredients;
 
-    [Tooltip("Malzemenin duracaðý yer.")]
-    [SerializeField] private Transform itemDisplayPoint;
+    [Tooltip("Her malzemenin duracaðý yerlerin listesi. Sayýsý malzeme listesiyle ayný olmalý.")]
+    [SerializeField] private List<Transform> itemDisplayPoints;
 
     private void Start()
     {
-        SpawnDisplayItem();
-        Debug.Log(gameObject.name + " içine görsel obje spawn etti ve GrabbableCloner script'ini ekledi.");
-
-
+        // Oyun baþladýðýnda, dolabýn içine tüm "görsel" malzemeleri spawn et.
+        CreateDisplayItems();
     }
 
-    private void SpawnDisplayItem()
+    private void CreateDisplayItems()
     {
-        if (ingredientToShow == null || ingredientToShow.prefab == null || itemDisplayPoint == null)
+        // Malzeme sayýsý ile spawn noktasý sayýsý eþleþmiyorsa hata ver.
+        if (displayIngredients.Count != itemDisplayPoints.Count)
         {
-            Debug.LogError("Cabinet display item için atamalar eksik!");
+            Debug.LogError(gameObject.name + " dolabýnda malzeme sayýsý ile spawn noktasý sayýsý uyuþmuyor!");
             return;
         }
 
-        // Görsel objeyi oluþtur.
-        GameObject displayItem = Instantiate(ingredientToShow.prefab, itemDisplayPoint.position, itemDisplayPoint.rotation);
+        for (int i = 0; i < displayIngredients.Count; i++)
+        {
+            Ingredient ingredient = displayIngredients[i];
+            Transform spawnPoint = itemDisplayPoints[i];
 
-        // Onu dolabýn bir parçasý yap (parent'ý yap).
-        displayItem.transform.SetParent(itemDisplayPoint);
+            GameObject displayItem = Instantiate(ingredient.prefab, spawnPoint.position, spawnPoint.rotation);
+            displayItem.transform.SetParent(spawnPoint);
 
-        // Bu objenin, kendisinin bir "kopyala ve al" objesi olduðunu bilmesi lazým.
-        // Bunun için yeni bir script ekleyeceðiz.
-        var cloner = displayItem.AddComponent<GrabbableCloner>();
-        cloner.Setup(ingredientToShow); // Hangi malzemeyi klonlayacaðýný ona söylüyoruz.
+            // Bu objeye, etkileþime girildiðinde kendisinin bir kopyasýný istemesini söyleyen bir script ekle.
+            var itemButton = displayItem.AddComponent<DisplayItemButton>();
+            // Bu "düðme", hangi malzemeyi ve hangi dolabý temsil ettiðini bilmeli.
+            itemButton.Setup(ingredient, this);
+        }
+    }
+
+    // Bu metot, içindeki bir görsel objeye týklandýðýnda çaðrýlacak.
+    public void RequestItemClone(Ingredient ingredient, HandInteractor interactor)
+    {
+        Debug.Log($"{ingredient.ingredientName} için klonlama talebi alýndý.");
+
+        // Malzemenin prefab'ýndan YENÝ BÝR KOPYA (klon) oluþtur.
+        GameObject clone = Instantiate(ingredient.prefab);
+
+        // Bu yeni kopyaya, yere býrakýldýðýnda tekrar alýnabilmesi için GrabbableItem ekle.
+        clone.AddComponent<GrabbableItem>();
+
+        // Yeni kopyayý (klonu) oyuncunun eline ver.
+        interactor.HoldItem(clone);
     }
 }

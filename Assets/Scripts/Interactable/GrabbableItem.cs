@@ -1,13 +1,12 @@
-// Scripts/Interaction/GrabbableItem.cs
+// GrabbableItem.cs
 using UnityEngine;
 
-// Bu da Interactable sýnýfýndan miras alýyor.
 public class GrabbableItem : Interactable
 {
-    public override void Interact(PlayerInteractor interactor)
+    // Parametreyi PlayerInteractor'dan HandInteractor'a çeviriyoruz.
+    public override void Interact(HandInteractor interactor)
     {
         Debug.Log($"Yerden alýndý: {gameObject.name}");
-        // Bu objenin kendisini oyuncunun eline tutmasý için yolla.
         interactor.HoldItem(this.gameObject);
     }
 }

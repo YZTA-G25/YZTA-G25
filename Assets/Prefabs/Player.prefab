@@ -144,8 +144,7 @@ MonoBehaviour:
   interactionDistance: 3
   interactionLayer:
     serializedVersion: 2
-    m_Bits: 16384
-  handHoldPoint: {fileID: 3655521842484358603}
+    m_Bits: 0
 --- !u!1 &6041850321651202394
 GameObject:
   m_ObjectHideFlags: 0
@@ -406,9 +405,9 @@ MonoBehaviour:
     m_ActionName: 'Player/AlternateMode[/Mouse/rightButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1827325193291175322}
-        m_TargetAssemblyTypeName: PlayerInteractor, Assembly-CSharp
-        m_MethodName: OnInteract
+      - m_Target: {fileID: 962916625694295683}
+        m_TargetAssemblyTypeName: HandInteractor, Assembly-CSharp
+        m_MethodName: OnGrab
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -442,6 +441,7 @@ GameObject:
   - component: {fileID: 8653105382495744739}
   - component: {fileID: 1124374180893771628}
   - component: {fileID: 2288492360802838139}
+  - component: {fileID: 962916625694295683}
   m_Layer: 0
   m_Name: Hand
   m_TagString: Untagged
@@ -568,3 +568,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &962916625694295683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087050555096370552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdfa1b454b3730c4fa42ca8eecd42940, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handHoldPoint: {fileID: 3655521842484358603}
