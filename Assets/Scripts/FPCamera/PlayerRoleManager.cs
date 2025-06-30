@@ -39,8 +39,8 @@ public class PlayerRoleManager : NetworkBehaviour
             cameraSystemObject.SetActive(true);
             fpController.enabled = true; // Deðiþiklik: FPController'ý aktive et
 
-            handController.enabled = true;
-            handInteractor.enabled = true;
+            handController.enabled = false;
+            handInteractor.enabled = false;
         }
         else // El Oyuncusu ise...
         {
