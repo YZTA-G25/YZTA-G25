@@ -1,4 +1,3 @@
-// PlayerRoleManager.cs (NÝHAÝ VE TAM HALÝ)
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,19 +6,20 @@ public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
     [SerializeField] private HandController handController;
-    [SerializeField] private FPController fpController; // Deðiþiklik: Artýk FPController kullanýyoruz
     [SerializeField] private PlayerInputHandler playerInputHandler;
     [SerializeField] private PlayerInput playerInput;
     [SerializeField] private HandInteractor handInteractor;
 
     [Header("Camera System")]
-    [SerializeField] private GameObject cameraSystemObject;
+    [SerializeField] private GameObject handPlayerCameraObject;
+    [SerializeField] private GameObject eyePlayerVCamObject;
 
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
         {
-            if (cameraSystemObject != null) cameraSystemObject.SetActive(false);
+            if (handPlayerCameraObject != null) handPlayerCameraObject.SetActive(false);
+            if (eyePlayerVCamObject != null) eyePlayerVCamObject.SetActive(false);
             this.enabled = false;
             return;
         }
@@ -33,23 +33,19 @@ public class PlayerRoleManager : NetworkBehaviour
 
     private void AssignRole()
     {
-        if (IsHost) // Göz Oyuncusu ise...
+        if (IsHost) // GÃ¶z Oyuncusu
         {
-            Debug.Log("Rol Atandý: GÖZ OYUNCUSU (Host)");
-            cameraSystemObject.SetActive(true);
-            fpController.enabled = true; // Deðiþiklik: FPController'ý aktive et
-
             handController.enabled = false;
             handInteractor.enabled = false;
+            handPlayerCameraObject.SetActive(false);
+            eyePlayerVCamObject.SetActive(true);
         }
-        else // El Oyuncusu ise...
+        else // El Oyuncusu
         {
-            Debug.Log("Rol Atandý: EL OYUNCUSU (Client)");
-            cameraSystemObject.SetActive(false);
-            fpController.enabled = false; // Deðiþiklik: FPController'ý devre dýþý býrak
-
             handController.enabled = true;
             handInteractor.enabled = true;
+            handPlayerCameraObject.SetActive(true);
+            eyePlayerVCamObject.SetActive(false);
         }
     }
 

@@ -136,7 +136,6 @@ public class HandController : NetworkBehaviour
     private void OnMoveInput(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-
     }
 
     private void OnHandMoveInput(InputAction.CallbackContext context)
