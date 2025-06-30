@@ -31,7 +31,7 @@ public class HandInteractor : MonoBehaviour
     }
 
     // Her frame'de çalýþýr
-    private void Update()
+    private void LateUpdate()
     {
         // Elimizde bir obje varsa, onun pozisyonunu her frame'de
         // bizim tutma noktamýzýn pozisyonuna eþitle.
