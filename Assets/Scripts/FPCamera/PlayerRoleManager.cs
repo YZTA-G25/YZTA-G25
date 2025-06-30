@@ -7,10 +7,10 @@ public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
     [SerializeField] private HandController handController;
-    [SerializeField] private CameraController cameraController;
+    [SerializeField] private FPController fpController; // Deðiþiklik: Artýk FPController kullanýyoruz
     [SerializeField] private PlayerInputHandler playerInputHandler;
     [SerializeField] private PlayerInput playerInput;
-    [SerializeField] private HandInteractor handInteractor; // YENÝ: HandInteractor referansý eklendi.
+    [SerializeField] private HandInteractor handInteractor;
 
     [Header("Camera System")]
     [SerializeField] private GameObject cameraSystemObject;
@@ -37,21 +37,19 @@ public class PlayerRoleManager : NetworkBehaviour
         {
             Debug.Log("Rol Atandý: GÖZ OYUNCUSU (Host)");
             cameraSystemObject.SetActive(true);
-            cameraController.enabled = true;
+            fpController.enabled = true; // Deðiþiklik: FPController'ý aktive et
 
-            // El Oyuncusu'nun kontrolcülerini KAPAT.
             handController.enabled = false;
-            handInteractor.enabled = false; // YENÝ: HandInteractor'ý Göz Oyuncusu için kapatýyoruz.
+            handInteractor.enabled = false;
         }
         else // El Oyuncusu ise...
         {
             Debug.Log("Rol Atandý: EL OYUNCUSU (Client)");
             cameraSystemObject.SetActive(false);
-            cameraController.enabled = false;
+            fpController.enabled = false; // Deðiþiklik: FPController'ý devre dýþý býrak
 
-            // El Oyuncusu'nun kontrolcülerini AÇ.
             handController.enabled = true;
-            handInteractor.enabled = true; // YENÝ: HandInteractor'ý El Oyuncusu için açýyoruz.
+            handInteractor.enabled = true;
         }
     }
 

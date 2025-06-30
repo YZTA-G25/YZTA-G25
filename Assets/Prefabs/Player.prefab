@@ -61,8 +61,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1984287903496656245}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalRotation: {x: -0.008778044, y: 0.9880009, z: -0.141493, w: -0.06129431}
+  m_LocalPosition: {x: 0.84230846, y: 1.6799998, z: -0.8849062}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -325,9 +325,9 @@ GameObject:
   - component: {fileID: -6114401909998107212}
   - component: {fileID: 7544691108855062268}
   - component: {fileID: 7138004682473484260}
-  - component: {fileID: 883190236045238259}
-  - component: {fileID: 5084673831362003416}
   - component: {fileID: 3750504803801157783}
+  - component: {fileID: 4612251914474452224}
+  - component: {fileID: 7019422922509167503}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -525,7 +525,7 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 883190236045238259}
+      - m_Target: {fileID: 7019422922509167503}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: OnMove
         m_Mode: 0
@@ -553,7 +553,7 @@ MonoBehaviour:
     m_ActionName: 'Player/AlternateMode[/Mouse/rightButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 883190236045238259}
+      - m_Target: {fileID: 7019422922509167503}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: OnGrab
         m_Mode: 0
@@ -565,23 +565,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: HandInteractor, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
     m_ActionId: 9f660d2a-74a1-4db8-9edc-4cf8ecb365fc
     m_ActionName: 'Player/Grab[/Mouse/leftButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 883190236045238259}
+      - m_Target: {fileID: 7019422922509167503}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: OnLook
         m_Mode: 0
@@ -600,34 +588,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &883190236045238259
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f3e2b5bf3d1cec418d989049969e7e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5084673831362003416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6054bd76f92c1cc40893e5d471689b96, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraPitchController: {fileID: 4116651615368844063}
-  moveSpeed: 5
-  lookSensitivity: 5
-  pitchLimit: 45
 --- !u!114 &3750504803801157783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,11 +602,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   handController: {fileID: 7544691108855062268}
-  cameraController: {fileID: 5084673831362003416}
-  playerInputHandler: {fileID: 883190236045238259}
+  fpController: {fileID: 4612251914474452224}
+  playerInputHandler: {fileID: 7019422922509167503}
   playerInput: {fileID: 7138004682473484260}
   handInteractor: {fileID: 962916625694295683}
   cameraSystemObject: {fileID: 1984287903496656245}
+--- !u!114 &4612251914474452224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6818570024144399171}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f6efca5538b7b94f9ccedb7d1531c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxSpeed: 5
+  Acceleration: 5
+  LookSensitivity: {x: 0.1, y: 0.1}
+  PitchLimit: 45
+  currentPitch: 0
+  MoveInput: {x: 0, y: 0}
+  LookInput: {x: 0, y: 0}
+  fpCamera: {fileID: 8537530501996063146}
+  characterController: {fileID: -6114401909998107212}
+--- !u!114 &7019422922509167503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6818570024144399171}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3e2b5bf3d1cec418d989049969e7e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9087050555096370552
 GameObject:
   m_ObjectHideFlags: 0
