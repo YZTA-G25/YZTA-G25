@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f92444872950794ba91e58667c0dd8c, type: 3}
   m_Name: NewRecipe 2
   m_EditorClassIdentifier: 
-  recipeName: 
-  requiredIngredients: []
+  recipeName: MeyveTabak
+  requiredIngredients:
+  - {fileID: 11400000, guid: 02894cbfbcf873d4894d59c9d328e428, type: 2}
+  - {fileID: 11400000, guid: 8d10f242f3c7ff54cb214f19c91b44b5, type: 2}
+  recipeImage: {fileID: 0}
   cookingInstructions: 
