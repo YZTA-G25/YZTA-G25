@@ -10,7 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c397604919ae9f04da855abac5cce434, type: 3}
-  m_Name: NewIngredient 4
+  m_Name: Apple
   m_EditorClassIdentifier: 
-  ingredientName: 
-  isSafe: 0
+  ingredientName: Apple
+  icon: {fileID: 0}
+  prefab: {fileID: 388876489497171537, guid: d0ddd93953187fd4195f9cea4a7b8a56, type: 3}
+  isSafe: 1
+  cookTime: 0

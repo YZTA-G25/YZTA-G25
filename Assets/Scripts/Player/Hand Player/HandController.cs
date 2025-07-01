@@ -94,9 +94,11 @@ public class HandController : NetworkBehaviour
     }
 
     // El kontrol mantuğı
+    // HandController.cs içindeki HandleHandControl metodu
+
     private void HandleHandControl()
     {
-        // Eğer ell objesi atanmamışsa hata vermemesi için
+        // Eğer el objesi atanmamışsa hata vermemesi için
         if (handTransform == null)
         {
             Debug.LogError("handTransform is NULL in HandController");
@@ -106,31 +108,41 @@ public class HandController : NetworkBehaviour
         // Sağ tuşa basılı tutuluyorsa (Alternate Mode)
         if (alternateModeActive)
         {
-            // Elin Z ekseninde dönmesini sağla
+            // Elin Z ekseninde dönmesini sağla (Bu kısım doğru, kendi ekseninde döner)
             float _rotationAmount = handVerticalInput * handRotationSpeed * Time.deltaTime;
             handTransform.Rotate(0, 0, _rotationAmount, Space.Self);
 
-            // Elin X ve Z ekseninde mouse ile hareket etmesi
-            Vector3 _handMovement = new Vector3(handMoveInput.x, 0, handMoveInput.y) * handSensitivity * Time.deltaTime;
-            handTransform.Translate(_handMovement, Space.World);
+            // --- DEĞİŞİKLİK BURADA ---
+            // Mouse hareketinden yerel bir yön vektörü oluştur
+            Vector3 _localHandMovement = new Vector3(handMoveInput.x, 0, handMoveInput.y);
+
+            // Bu yerel yönü, oyuncunun mevcut dönüşüne göre dünya yönüne çevir
+            Vector3 _worldSpaceMovement = transform.TransformDirection(_localHandMovement);
+
+            // Elin pozisyonunu bu yeni, doğru yönde güncelle
+            handTransform.position += _worldSpaceMovement * handSensitivity * Time.deltaTime;
+            // --- DEĞİŞİKLİK BİTTİ ---
         }
         else // Normal Mode
         {
-            // Elin Y ekseninde hareketini sağla
+            // Elin Y ekseninde hareketi (Yukarı/Aşağı) genellikle dünya koordinatında kalabilir, bu doğrudur.
             float _verticalMovement = handVerticalInput * handVerticalSpeed * Time.deltaTime;
             handTransform.Translate(0, _verticalMovement, 0, Space.World);
         }
-
-
     }
-#endregion
+    #endregion
 
     #region Input Events
     private void OnMoveInput(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-
     }
+
+    public void SetMoveInput(Vector2 input)
+    {
+        moveInput = input;
+    }
+
 
     private void OnHandMoveInput(InputAction.CallbackContext context)
     {
@@ -155,5 +167,6 @@ public class HandController : NetworkBehaviour
             Debug.Log("Grab Pressed!");
         }
     }
+
     #endregion
 }
