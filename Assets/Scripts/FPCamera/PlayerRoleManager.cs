@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel.Design;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,48 +7,57 @@ using UnityEngine.InputSystem;
 public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
-    [SerializeField] private HandController handController;
-    [SerializeField] private PlayerInputHandler playerInputHandler;
+    [Tooltip("Bu PF'daki ana kontrolcü script'i (EyePlayerController OR HandController).")]
+    [SerializeField] private MonoBehaviour mainController;
+
+    [Tooltip("Bu PF'daki input'u alan bileşin.")]
     [SerializeField] private PlayerInput playerInput;
+
+    [Tooltip("Bu PF'da el etkileşimi varsa (HandInteractor).")]
     [SerializeField] private HandInteractor handInteractor;
 
-    [Header("Camera System")]
-    [SerializeField] private GameObject handPlayerCameraObject;
-    [SerializeField] private GameObject eyePlayerVCamObject;
+    [Header("Camera To Disable For Others")]
+    [Tooltip("Diğer oyuncuların görmemesi gereken kamera.")]
+    [SerializeField] private GameObject ownedCamera;
 
     public override void OnNetworkSpawn()
     {
+        // Eğer obje bizim değilse (başka bir oyuncunun kopyası ise)
         if (!IsOwner)
         {
-            if (handPlayerCameraObject != null) handPlayerCameraObject.SetActive(false);
-            if (eyePlayerVCamObject != null) eyePlayerVCamObject.SetActive(false);
+            // onu disable et
+            if (ownedCamera != null)
+            {
+                ownedCamera.SetActive(false);
+            }
             this.enabled = false;
             return;
         }
 
-        playerInput.enabled = true;
-        playerInputHandler.enabled = true;
-
-        AssignRole();
+        // Eğer bu obje bizimse aktive et
+        ActivateMyControls();
         LockCursor();
     }
 
-    private void AssignRole()
+    private void ActivateMyControls()
     {
-        if (IsHost) // Göz Oyuncusu
+        // Inspector ile atadığımız tüm bileşenleri aktive et
+        if (mainController != null)
         {
-            handController.enabled = false;
-            handInteractor.enabled = false;
-            handPlayerCameraObject.SetActive(false);
-            eyePlayerVCamObject.SetActive(true);
+            mainController.enabled = true;
         }
-        else // El Oyuncusu
+
+        if (playerInput != null)
         {
-            handController.enabled = true;
+            playerInput.enabled = true;
+        }
+
+        if (handInteractor != null)
+        {
             handInteractor.enabled = true;
-            handPlayerCameraObject.SetActive(true);
-            eyePlayerVCamObject.SetActive(false);
         }
+        
+        Debug.Log(gameObject.name + " için kontroller aktive edildi");
     }
 
     private void LockCursor()

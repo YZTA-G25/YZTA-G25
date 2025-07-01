@@ -138,6 +138,12 @@ public class HandController : NetworkBehaviour
         moveInput = context.ReadValue<Vector2>();
     }
 
+    public void SetMoveInput(Vector2 input)
+    {
+        moveInput = input;
+    }
+
+
     private void OnHandMoveInput(InputAction.CallbackContext context)
     {
         handMoveInput = context.ReadValue<Vector2>();
@@ -161,5 +167,6 @@ public class HandController : NetworkBehaviour
             Debug.Log("Grab Pressed!");
         }
     }
+
     #endregion
 }
