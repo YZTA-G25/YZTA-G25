@@ -9,4 +9,6 @@ public class Ingredient : ScriptableObject
     public bool isSafe;
     public float cookTime;
 
+
+    public GameObject displayPrefab;
 }

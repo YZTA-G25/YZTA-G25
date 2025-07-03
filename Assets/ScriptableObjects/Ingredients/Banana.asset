@@ -15,5 +15,6 @@ MonoBehaviour:
   ingredientName: Banana
   icon: {fileID: 0}
   prefab: {fileID: 2230530226155236490, guid: 869b55c0dc2962d41a835b0eeb3c4b36, type: 3}
-  isSafe: 0
+  isSafe: 1
   cookTime: 0
+  displayPrefab: {fileID: 2230530226155236490, guid: e31815fb0bd39ca4eb814c93d525f03d, type: 3}

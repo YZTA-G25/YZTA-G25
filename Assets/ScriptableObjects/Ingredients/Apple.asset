@@ -17,3 +17,4 @@ MonoBehaviour:
   prefab: {fileID: 388876489497171537, guid: d0ddd93953187fd4195f9cea4a7b8a56, type: 3}
   isSafe: 1
   cookTime: 0
+  displayPrefab: {fileID: 388876489497171537, guid: 3486a1ef054dabc41993eea142b435f7, type: 3}
