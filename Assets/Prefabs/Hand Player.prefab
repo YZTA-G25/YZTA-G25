@@ -408,7 +408,6 @@ GameObject:
   - component: {fileID: 7138004682473484260}
   - component: {fileID: 7544691108855062268}
   - component: {fileID: 3750504803801157783}
-  - component: {fileID: 1934680607428901653}
   - component: {fileID: 8663528261625618603}
   - component: {fileID: -8057179575930272126}
   m_Layer: 0
@@ -664,7 +663,7 @@ MonoBehaviour:
     m_ActionName: 'Player/AlternateMode[/Mouse/rightButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 8663528261625618603}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: OnGrab
         m_Mode: 0
@@ -734,21 +733,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   mainController: {fileID: 7544691108855062268}
   playerInput: {fileID: 7138004682473484260}
-  handInteractor: {fileID: 1934680607428901653}
+  handInteractor: {fileID: 4263420066765931113}
   ownedCamera: {fileID: 2457679642709567492}
---- !u!114 &1934680607428901653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdfa1b454b3730c4fa42ca8eecd42940, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handHoldPoint: {fileID: 3655521842484358603}
 --- !u!114 &8663528261625618603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -788,6 +774,7 @@ GameObject:
   - component: {fileID: 8653105382495744739}
   - component: {fileID: 1124374180893771628}
   - component: {fileID: 598656007246612551}
+  - component: {fileID: 4263420066765931113}
   m_Layer: 15
   m_Name: Hand
   m_TagString: Untagged
@@ -914,6 +901,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4263420066765931113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087050555096370552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdfa1b454b3730c4fa42ca8eecd42940, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handHoldPoint: {fileID: 3655521842484358603}
 --- !u!1 &9094500311816154533
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,7 +942,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9094500311816154533}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.053712748, y: 0, z: 0, w: 0.99855644}
+  m_LocalRotation: {x: 0.053712748, y: -0, z: -0, w: 0.99855644}
   m_LocalPosition: {x: 0, y: 0, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

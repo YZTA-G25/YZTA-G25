@@ -8,6 +8,7 @@ public class HandInteractor : MonoBehaviour
     [SerializeField] private Transform handHoldPoint;
 
     // Elin etkileþim alanýndaki objeleri tutar
+    private CookingStation _stationInRange;
     private CabinetController _cabinetInRange;
     private GrabbableItem _grabbableInRange;
 
@@ -30,6 +31,22 @@ public class HandInteractor : MonoBehaviour
             _grabbableInRange = item;
             Debug.Log("Yerden alýnabilir obje algýlandý: " + item.gameObject.name);
         }
+        else if (other.TryGetComponent(out CookingStation station))
+        {
+            // VE O ANDA ELÝMÝZ DOLU MU?
+            if (_heldItem != null)
+            {
+                // O ZAMAN HÝÇ BEKLEMEDEN OTOMATÝK ETKÝLEÞÝME GÝR!
+                Debug.Log("Ýstasyonla otomatik etkileþim tetiklendi.");
+                station.Interact(this); // CookingStation'a görevi devret
+            }
+            else
+            {
+                // Elimiz boþsa, gelecekteki etkileþimler için sadece menzilde olduðunu kaydet
+                _stationInRange = station;
+                Debug.Log("Piþirme istasyonu alanýna girildi (el boþ).");
+            }
+        }
     }
 
     // El etkileþim alanýndan çýktýðýnda...
@@ -44,6 +61,11 @@ public class HandInteractor : MonoBehaviour
         {
             _grabbableInRange = null;
             Debug.Log("Yerden alýnabilir obje menzilden çýktý.");
+        }
+        else if (other.TryGetComponent(out CookingStation station) && _stationInRange == station)
+        {
+            _stationInRange = null;
+            Debug.Log("Piþirme istasyonu alanýndan çýkýldý.");
         }
     }
 
@@ -60,27 +82,43 @@ public class HandInteractor : MonoBehaviour
     // Input'tan gelen "Grab" eylemi bu metodu çaðýrýr.
     public void OnGrab(InputAction.CallbackContext context)
     {
-        if (context.performed) // Tuþa ilk basýldýðýnda
+        // Sadece tuþa tam basýldýðý aný ('Performed' durumunu) dinle.
+        // Tuþun býrakýldýðý ('Canceled') veya yeni basýldýðý ('Started') anlarý görmezden gel.
+        if (!context.performed)
         {
-            if (_heldItem == null) // Eðer elimiz boþsa
+            return;
+        }
+
+        // --- Durum 1: El Boþsa ---
+        // Elimiz boþken tuþa basýldýysa, bir þey ALMAYI deniyoruz.
+        if (_heldItem == null)
+        {
+            // Öncelik sýrasýna göre kontrol et:
+            // Öncelik 1: Yerde alýnabilir bir obje var mý?
+            if (_grabbableInRange != null)
             {
-                // Öncelik: Yerdeki bir objeyi al
-                if (_grabbableInRange != null)
-                {
-                    _grabbableInRange.Interact(this);
-                }
-                // Eðer yerde bir þey yoksa ama dolap alanýndaysak, dolaptan iste
-                else if (_cabinetInRange != null)
-                {
-                    _cabinetInRange.RequestItem(this);
-                }
+                _grabbableInRange.Interact(this);
+            }
+            // Öncelik 2: Dolap menzilinde miyiz?
+            else if (_cabinetInRange != null)
+            {
+                _cabinetInRange.RequestItem(this);
             }
         }
-        else if (context.canceled) // Tuþ býrakýldýðýnda
+        // --- Durum 2: El Doluysa ---
+        // Elimiz doluyken tuþa basýldýysa, elimizdekini bir yere BIRAKMAYI/KOYMAYI deniyoruz.
+        else
         {
-            if (_heldItem != null) // Eðer elimiz doluysa
+            // Öncelik sýrasýna göre kontrol et:
+            // Öncelik 1: Piþirme istasyonunun menzilinde miyiz?
+            if (_stationInRange != null)
             {
-                ReleaseItem();
+                _stationInRange.Interact(this); // Ýstasyonla etkileþime gir (objeyi slota koy)
+            }
+            // Öncelik 2: Hiçbir etkileþim alanýnda deðilsek, objeyi normal bir þekilde yere býrak
+            else
+            {
+                ReleaseItem(); // Objeyi yere düþür
             }
         }
     }
@@ -118,5 +156,17 @@ public class HandInteractor : MonoBehaviour
         // Referanslarý temizle
         _heldItem = null;
         _heldItemRb = null;
+    }
+
+    public GameObject GetHeldItem()
+    {
+        return _heldItem;
+    }
+
+    public void ClearHeldItem()
+    {
+        _heldItem = null;
+        _heldItemRb = null;
+        Debug.Log("El referanslarý temizlendi.");
     }
 }

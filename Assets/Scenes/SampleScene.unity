@@ -512,37 +512,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 600868068}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &206091783
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 206091784}
-  m_Layer: 0
-  m_Name: Banana (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &206091784
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206091783}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.077, y: 3.33, z: -0.107}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 600868068}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -977,11 +946,9 @@ MonoBehaviour:
   availableIngredients:
   - {fileID: 11400000, guid: 02894cbfbcf873d4894d59c9d328e428, type: 2}
   - {fileID: 11400000, guid: 8d10f242f3c7ff54cb214f19c91b44b5, type: 2}
-  - {fileID: 11400000, guid: 8d10f242f3c7ff54cb214f19c91b44b5, type: 2}
   itemDisplayPoints:
   - {fileID: 137793860}
   - {fileID: 1203436427}
-  - {fileID: 206091784}
 --- !u!65 &600868065
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1001,8 +968,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.95265347, y: 3.8761826, z: 1.090268}
-  m_Center: {x: -0.04844838, y: 1.4380878, z: -0.045134924}
+  m_Size: {x: 1.3168179, y: 3.8761826, z: 1.090268}
+  m_Center: {x: 0.13363487, y: 1.4380878, z: -0.045134924}
 --- !u!33 &600868067
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1026,7 +993,6 @@ Transform:
   m_Children:
   - {fileID: 137793860}
   - {fileID: 1203436427}
-  - {fileID: 206091784}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &643038180
@@ -1688,7 +1654,7 @@ Transform:
   m_GameObject: {fileID: 1203436426}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.438, y: 3.33, z: -0.107}
+  m_LocalPosition: {x: -0.316, y: 3.33, z: -0.128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
