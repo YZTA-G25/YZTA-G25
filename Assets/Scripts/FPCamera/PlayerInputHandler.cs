@@ -1,51 +1,32 @@
-// PlayerInputHandler.cs (Güncellenmiþ Hali)
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
-    // Artýk CameraController'a deðil, FPController'a referans tutuyoruz.
-    private FPController _fpController;
-    private HandInteractor _handInteractor;
+    private HandController handController;
+    private HandInteractor handInteractor;
 
     private void Awake()
     {
-        // Referanslarý alýyoruz.
-        _fpController = GetComponent<FPController>();
-        _handInteractor = GetComponentInChildren<HandInteractor>();
-    }
-
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        // Eðer FPController aktifse, Look verisini ona yolla.
-        if (_fpController != null && _fpController.enabled)
-        {
-            _fpController.SetLookInput(context.ReadValue<Vector2>());
-        }
+        handController = GetComponent<HandController>();
+        handInteractor = GetComponentInChildren<HandInteractor>(); // El bir child object
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        Vector2 input = context.ReadValue<Vector2>();
-
-        // Eðer FPController aktifse, Move verisini ona yolla.
-        if (_fpController != null && _fpController.enabled)
+        // HandController aktifse hareket verisi yolla
+        if (handController != null && handController.enabled)
         {
-            _fpController.SetMoveInput(input);
+            Vector2 input = context.ReadValue<Vector2>();
+            handController.SetMoveInput(input);
         }
-
-        // El oyuncusu aktifse hareketi ona yolla (Bu kýsým HandController'da düzenlenmeli)
-        // if (_handController != null && _handController.enabled)
-        // {
-        //     _handController.SetMoveInput(input);
-        // }
     }
 
     public void OnGrab(InputAction.CallbackContext context)
     {
-        if (_handInteractor != null && _handInteractor.enabled)
+        if (handInteractor != null && handInteractor.enabled)
         {
-            _handInteractor.OnGrab(context);
+            handInteractor.OnGrab(context);
         }
     }
 }

@@ -1,4 +1,5 @@
-// PlayerRoleManager.cs (NÝHAÝ VE TAM HALÝ)
+using System;
+using System.ComponentModel.Design;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,51 +7,57 @@ using UnityEngine.InputSystem;
 public class PlayerRoleManager : NetworkBehaviour
 {
     [Header("Role Components")]
-    [SerializeField] private HandController handController;
-    [SerializeField] private FPController fpController; // Deðiþiklik: Artýk FPController kullanýyoruz
-    [SerializeField] private PlayerInputHandler playerInputHandler;
+    [Tooltip("Bu PF'daki ana kontrolcÃ¼ script'i (EyePlayerController OR HandController).")]
+    [SerializeField] private MonoBehaviour mainController;
+
+    [Tooltip("Bu PF'daki input'u alan bileÅŸin.")]
     [SerializeField] private PlayerInput playerInput;
+
+    [Tooltip("Bu PF'da el etkileÅŸimi varsa (HandInteractor).")]
     [SerializeField] private HandInteractor handInteractor;
 
-    [Header("Camera System")]
-    [SerializeField] private GameObject cameraSystemObject;
+    [Header("Camera To Disable For Others")]
+    [Tooltip("DiÄŸer oyuncularÄ±n gÃ¶rmemesi gereken kamera.")]
+    [SerializeField] private GameObject ownedCamera;
 
     public override void OnNetworkSpawn()
     {
+        // EÄŸer obje bizim deÄŸilse (baÅŸka bir oyuncunun kopyasÄ± ise)
         if (!IsOwner)
         {
-            if (cameraSystemObject != null) cameraSystemObject.SetActive(false);
+            // onu disable et
+            if (ownedCamera != null)
+            {
+                ownedCamera.SetActive(false);
+            }
             this.enabled = false;
             return;
         }
 
-        playerInput.enabled = true;
-        playerInputHandler.enabled = true;
-
-        AssignRole();
+        // EÄŸer bu obje bizimse aktive et
+        ActivateMyControls();
         LockCursor();
     }
 
-    private void AssignRole()
+    private void ActivateMyControls()
     {
-        if (IsHost) // Göz Oyuncusu ise...
+        // Inspector ile atadÄ±ÄŸÄ±mÄ±z tÃ¼m bileÅŸenleri aktive et
+        if (mainController != null)
         {
-            Debug.Log("Rol Atandý: GÖZ OYUNCUSU (Host)");
-            cameraSystemObject.SetActive(true);
-            fpController.enabled = true; // Deðiþiklik: FPController'ý aktive et
-
-            handController.enabled = false;
-            handInteractor.enabled = false;
+            mainController.enabled = true;
         }
-        else // El Oyuncusu ise...
-        {
-            Debug.Log("Rol Atandý: EL OYUNCUSU (Client)");
-            cameraSystemObject.SetActive(false);
-            fpController.enabled = false; // Deðiþiklik: FPController'ý devre dýþý býrak
 
-            handController.enabled = true;
+        if (playerInput != null)
+        {
+            playerInput.enabled = true;
+        }
+
+        if (handInteractor != null)
+        {
             handInteractor.enabled = true;
         }
+        
+        Debug.Log(gameObject.name + " iÃ§in kontroller aktive edildi");
     }
 
     private void LockCursor()
