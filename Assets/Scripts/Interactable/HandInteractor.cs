@@ -80,45 +80,39 @@ public class HandInteractor : MonoBehaviour
     }
 
     // Input'tan gelen "Grab" eylemi bu metodu çaðýrýr.
+    // HandInteractor.cs içindeki OnGrab metodunu bu kodla tamamen deðiþtirin
+
     public void OnGrab(InputAction.CallbackContext context)
     {
-        // Sadece tuþa tam basýldýðý aný ('Performed' durumunu) dinle.
-        // Tuþun býrakýldýðý ('Canceled') veya yeni basýldýðý ('Started') anlarý görmezden gel.
-        if (!context.performed)
+        // --- EYLEM 1: TUÞA BASILDIÐINDA (El Boþken) ---
+        // Tuþa basýldýðýnda ve elimiz boþsa, bir þey almayý deneriz.
+        if (context.performed && _heldItem == null)
         {
-            return;
-        }
-
-        // --- Durum 1: El Boþsa ---
-        // Elimiz boþken tuþa basýldýysa, bir þey ALMAYI deniyoruz.
-        if (_heldItem == null)
-        {
-            // Öncelik sýrasýna göre kontrol et:
-            // Öncelik 1: Yerde alýnabilir bir obje var mý?
+            // Öncelik 1: Yerde alýnabilir bir obje varsa onu al.
             if (_grabbableInRange != null)
             {
                 _grabbableInRange.Interact(this);
             }
-            // Öncelik 2: Dolap menzilinde miyiz?
+            // Öncelik 2: Yerde bir þey yoksa ve dolap menzilindeysek, dolaptan malzeme iste.
             else if (_cabinetInRange != null)
             {
                 _cabinetInRange.RequestItem(this);
             }
         }
-        // --- Durum 2: El Doluysa ---
-        // Elimiz doluyken tuþa basýldýysa, elimizdekini bir yere BIRAKMAYI/KOYMAYI deniyoruz.
-        else
+        // --- EYLEM 2: TUÞ BIRAKILDIÐINDA (El Doluyken) ---
+        // Tuþ býrakýldýðýnda ve elimiz doluysa, elimizdekini bir yere býrakmayý/koymayý deneriz.
+        else if (context.canceled && _heldItem != null)
         {
-            // Öncelik sýrasýna göre kontrol et:
-            // Öncelik 1: Piþirme istasyonunun menzilinde miyiz?
+            // Öncelik 1: Býrakma anýnda bir piþirme istasyonunun menzilinde miyiz?
             if (_stationInRange != null)
             {
-                _stationInRange.Interact(this); // Ýstasyonla etkileþime gir (objeyi slota koy)
+                // Evet, o zaman istasyonla etkileþime gir (malzemeyi istasyona koy).
+                _stationInRange.Interact(this);
             }
-            // Öncelik 2: Hiçbir etkileþim alanýnda deðilsek, objeyi normal bir þekilde yere býrak
+            // Öncelik 2: Bir istasyon menzilinde deðilsek, objeyi normal bir þekilde yere býrak.
             else
             {
-                ReleaseItem(); // Objeyi yere düþür
+                ReleaseItem();
             }
         }
     }
