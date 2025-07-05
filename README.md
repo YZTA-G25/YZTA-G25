@@ -189,6 +189,10 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 ![Screenshot 3](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Mechanics.mp4)
 -GamePlay Video
 
+### Jira Ekran Görüntüleri
+![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Jira%201.png)
+![Screenshot 2](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Jira%202.png)
+
 **Sprint Review**:
 - Network multiplayer foundation başarıyla kuruldu ✔️
 - Basic Audio Manager kuruldu ✔️
