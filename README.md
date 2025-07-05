@@ -183,8 +183,11 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 ### Ürün Durumu: Ekran Görüntüleri
 ![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20DEsign.mp4)
+-Level Design Gösterimi Video
 ![Screenshot 2](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20Design.png)
+-Level içerisinden bir fotoğraf
 ![Screenshot 3](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Mechanics.mp4)
+-GamePlay Video
 
 **Sprint Review**:
 - Network multiplayer foundation başarıyla kuruldu ✔️
