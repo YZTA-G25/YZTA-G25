@@ -199,6 +199,9 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 - Cooking Station kuruldu ✔️
 - İlk seviye tasarımı tamamlandı (iterasyonlarla daha rafine hale getirilecek) ✔️
 
+
+**Sprint Retrospective**:
+
 **Yapılan Doğrular**:
 - Herkes görevlerini benimsediği için kimse birbirinin yükünü almak zorunda kalmadı
 - Toplantı saatlerine uyuldu, toplantılar kısa ve öz yapıldı
@@ -210,7 +213,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 - Özellikle AI araçlarının kullanımında karışıklığın devam etmemesi amacı ile çeşitli kurallara karar verildi
 - Kontrol edilemeyen yoğunluk nedeni ile (seyahat, kişisel problemler, sınavlar, YKS vb.) görevler için ön görülen süreler uzayabildi. Olası engel değerlendirilmesi daha kuvvetli yapılmalı.
 
-**Sprint Retrospective**:
+**Planlar**:
 - Network sync optimization'a odaklanılacak ❗
 - UI design için araştırmalar önceliklendirildi ❗
 - Audio Design için araştırmalar yapılacak ❗
