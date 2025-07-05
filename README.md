@@ -182,9 +182,9 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 **Sprint board update**: ![Sprint Board](assets/sprint1-board.png)
 
 ### Ürün Durumu: Ekran Görüntüleri
-![Screenshot 1](assets/sprint1-ss1.png)
-![Screenshot 2](assets/sprint1-ss2.png)
-![Screenshot 3](assets/sprint1-ss3.png)
+![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20DEsign.mp4)
+![Screenshot 2](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20Design.png)
+![Screenshot 3](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Mechanics.mp4)
 
 **Sprint Review**:
 - Network multiplayer foundation başarıyla kuruldu ✔️
