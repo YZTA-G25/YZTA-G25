@@ -155,7 +155,8 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 ## Product Backlog
 
-[Jira Backlog Board](https://yzta-g25.atlassian.net/jira/core/projects/GBG/board?groupBy=status)
+[GDD and Technical Documentation](https://docs.google.com/document/d/1ZmhoZyXFm3eA4U6i_Zuzi-xYOyjhhTCf5N6YDwXcX9U/edit?usp=sharing)
+[Jira Board](https://yzta-g25.atlassian.net/jira/core/projects/GBG/timeline?rangeMode=weeks)
 
 ---
 
@@ -166,11 +167,17 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 **Sprint Notları**: Temel network altyapısı ve player kontrol sistemlerinin implementasyonu neredeyse tamamlandı.
 
-**Sprint içinde tamamlanması tahmin edilen puan**: 85 Puan
+**Sprint içinde tamamlanması tahmin edilen puan**: 60 Puan -> Sprint içinde atadığımız görevlerin puanlarının üstüne bir miktar çıkarak bir deneme hedefi olarak seçtik. Bu sayede bundan sonraki sprintlerde yoğunluğumuza göre hesaplama yapabilir ve daha gerçekçi hedefler koyabiliriz.
 
-**Puan tamamlama mantığı**: 6 haftalık development cycle'ı göz önünde bulundurularak, ilk sprint'te temel foundation sistemlerinin kurulması hedeflendi.
+**Sprint içerisinde ulaşılan puan**: 40
 
-**Daily Scrum**: Toplantılar Slack üzerinden gerçekleştirildi, gün içerisinde Whatsapp aracılığı ile iletişim kuruldu. [Daily Scrum Chats](link-to-chats)
+**Puan tamamlama mantığı**: 
+-1 Puan: Çok basit, tek adımlık, bilinen bir görev.
+-2 Puan: Birkaç adımı olan, basit ama biraz kurulum gerektiren bir görev.
+-3 Puan: Standart bir geliştirme görevi. Ne yapılacağı net, belirli bir kodlama eforu gerektiriyor.
+-5 Puan: Birden fazla parçayı etkileyen veya yeni bir mimari düşünmeyi gerektiren, daha karmaşık bir görev.
+
+**Daily Scrum**: Toplantılar Slack üzerinden gerçekleştirildi, gün içerisinde Whatsapp aracılığı ile iletişim kuruldu. [Daily Scrum Chats](https://imgur.com/a/WUMZggb)
 
 **Sprint board update**: ![Sprint Board](assets/sprint1-board.png)
 
@@ -188,6 +195,17 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 - Recipe System temeli kuruldu ✔️
 - Cooking Station kuruldu ✔️
 - İlk seviye tasarımı tamamlandı (iterasyonlarla daha rafine hale getirilecek) ✔️
+
+**Yapılan Doğrular**:
+- Herkes görevlerini benimsediği için kimse birbirinin yükünü almak zorunda kalmadı
+- Toplantı saatlerine uyuldu, toplantılar kısa ve öz yapıldı
+- Tanışma toplantısı sonrası oyun mekanikleri ile ilgili kritik kararlar geç kalınmadan verildi
+- GDD oluşturuldu mekanikler ve oyun detayları detaylı bir şekilde dokümantasyona eklendi 
+
+**Hatalar**:
+- Görev dağılımında daha efektif iletişim yapılmalı, bir developer'ın görevleri karıştırması nedeni ile ortaya çıkan karışıklık 10 puan değerinde iki görevin uzamasına ve bu sprinte puan olarak girilememesine sebep oldu
+- Özellikle AI araçlarının kullanımında karışıklığın devam etmemesi amacı ile çeşitli kurallara karar verildi
+- Kontrol edilemeyen yoğunluk nedeni ile (seyahat, kişisel problemler, sınavlar, YKS vb.) görevler için ön görülen süreler uzayabildi. Olası engel değerlendirilmesi daha kuvvetli yapılmalı.
 
 **Sprint Retrospective**:
 - Network sync optimization'a odaklanılacak ❗
