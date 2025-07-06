@@ -11,6 +11,9 @@ public class HandInteractor : MonoBehaviour
     private CabinetController _cabinetInRange;
     private GrabbableItem _grabbableInRange;
 
+    //Tarif defteri butonu için
+    private PageTurnButton _buttonInRange;
+
     // Elin þu anda tuttuðu obje
     private GameObject _heldItem;
     private Rigidbody _heldItemRb;
@@ -30,6 +33,12 @@ public class HandInteractor : MonoBehaviour
             _grabbableInRange = item;
             Debug.Log("Yerden alýnabilir obje algýlandý: " + item.gameObject.name);
         }
+        //Defterin butonu algýlandý mý?
+        else if (other.TryGetComponent(out PageTurnButton button))
+        {
+            _buttonInRange = button;
+            Debug.Log("Defter butonu algýlandý: " + button.gameObject.name);
+        }
     }
 
     // El etkileþim alanýndan çýktýðýnda...
@@ -44,6 +53,11 @@ public class HandInteractor : MonoBehaviour
         {
             _grabbableInRange = null;
             Debug.Log("Yerden alýnabilir obje menzilden çýktý.");
+        }
+        else if (other.TryGetComponent(out PageTurnButton button) && _buttonInRange == button)
+        {
+            _buttonInRange = null;
+            Debug.Log("Defter butonu menzilden çýktý.");
         }
     }
 
@@ -64,8 +78,16 @@ public class HandInteractor : MonoBehaviour
         {
             if (_heldItem == null) // Eðer elimiz boþsa
             {
+                // Elimiz bir defter butonunun menzilinde mi?
+                if (_buttonInRange != null)
+                {
+                    // Evet, o zaman butonla etkileþime gir (sayfayý çevir).
+                    _buttonInRange.Interact(this);
+                }
+                // Eðer buton menzilinde deðilsek, diðer kontrollere geç.
+
                 // Öncelik: Yerdeki bir objeyi al
-                if (_grabbableInRange != null)
+                else if (_grabbableInRange != null)
                 {
                     _grabbableInRange.Interact(this);
                 }
