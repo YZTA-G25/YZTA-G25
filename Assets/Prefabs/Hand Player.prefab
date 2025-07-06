@@ -407,7 +407,6 @@ GameObject:
   - component: {fileID: -6114401909998107212}
   - component: {fileID: 7138004682473484260}
   - component: {fileID: 7544691108855062268}
-  - component: {fileID: 3750504803801157783}
   - component: {fileID: 1934680607428901653}
   - component: {fileID: 8663528261625618603}
   - component: {fileID: -8057179575930272126}
@@ -719,23 +718,6 @@ MonoBehaviour:
   handRotationSpeed: 45
   handTransform: {fileID: 2578983085602209902}
   characterController: {fileID: -6114401909998107212}
---- !u!114 &3750504803801157783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45d71691a401d3345bed7dce8875cfc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  mainController: {fileID: 7544691108855062268}
-  playerInput: {fileID: 7138004682473484260}
-  handInteractor: {fileID: 1934680607428901653}
-  ownedCamera: {fileID: 2457679642709567492}
 --- !u!114 &1934680607428901653
 MonoBehaviour:
   m_ObjectHideFlags: 0
