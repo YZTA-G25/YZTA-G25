@@ -2,64 +2,90 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 
+#if UNITY_EDITOR
+using UnityEditor.EditorTools;
+#endif
+
 public class EyeInteractor : MonoBehaviour
 {
+    [Header("Interaction Settings")]
     [SerializeField] private float interactionDistance = 5f;
-    [SerializeField] private float leverSensitivity = 2f; // Kol Hassasiyeti
-    private Camera camera;
+    [Tooltip("Kolun hassasiyeti - Yatay fare hareketi ile kontrol edilir")]
+    [SerializeField] private float leverSensitivity = 2f;
+
+    [Header("Component References")]
+    [Tooltip("Etkileşim ışınının başlayacağı nokta. Genellikle PF'in kamera objesi")]
+    [SerializeField] private Transform raycastOrigin;
+
     private LeverController leverInRange;
-    private LeverController controlledLever; // Kontrol edilen kol
-    private void Start()
-    {
-        camera = GetComponent<Camera>();
-    }
+    private LeverController controlledLever;
 
     private void Update()
     {
-        // Eğer bir kol kontrol etmiyorsak, kontrol edecek kol ara
+        // Safety check for input system
+        if (Mouse.current == null) return;
+
         if (controlledLever == null)
         {
             FindLever();
         }
-        else // Eğer kontrol ediyorsak
+        else
         {
-            // Mouse'un Y eksenindeki hareketini al ve kola gönder
-            float mouseYInput = Mouse.current.delta.y.ReadValue();
-            controlledLever.UpdateRotation(mouseYInput * leverSensitivity * Time.deltaTime);
+            float mouseXInput = Mouse.current.delta.x.ReadValue();
+            controlledLever.UpdateRotation(mouseXInput * leverSensitivity * Time.deltaTime);
         }
     }
 
     private void FindLever()
     {
-        Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f));
+        if (raycastOrigin == null) return;
+
+        Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
+
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
         {
-            hit.collider.TryGetComponent(out leverInRange);
+            leverInRange = hit.collider.GetComponent<LeverController>();
+            
+            if (leverInRange != null)
+            {
+                CrosshairUI.Instance.SetCrosshairState(CrosshairUI.CrosshairState.Interactable);
+            }
+            else
+            {
+                CrosshairUI.Instance.SetCrosshairState(CrosshairUI.CrosshairState.Normal);
+            }
         }
         else
         {
             leverInRange = null;
+            CrosshairUI.Instance.SetCrosshairState(CrosshairUI.CrosshairState.Normal);
         }
     }
 
-    // Input Actions'dan "Interact" veya "Grab" eylemi geldiğinde çalışır
     public void OnInteract(InputAction.CallbackContext context)
     {
-        // Sadece tuşa basıldığında çalıştır
         if (!context.performed) return;
 
-        // Eğer bir kolu zaten kontrol ediyorsak, bırak
-        if (controlledLever != null)
+        try
         {
-            controlledLever.Release();
-            controlledLever = null;
-            Debug.Log("Kol Bırakıldı.");
+            if (controlledLever != null)
+            {
+                controlledLever.Release();
+                controlledLever = null;
+                Debug.Log("Lever released.");
+                CrosshairUI.Instance.SetCrosshairState(CrosshairUI.CrosshairState.Interactable);
+            }
+            else if (leverInRange != null)
+            {
+                controlledLever = leverInRange;
+                controlledLever.Grab();
+                Debug.Log($"{controlledLever.GetControlDescription()} lever grabbed: {controlledLever.name}");
+                CrosshairUI.Instance.SetCrosshairState(CrosshairUI.CrosshairState.Grabbed);
+            }
         }
-        else if (leverInRange != null) // Eğer bir kol menzilindeysek ve bir şey kontrol etmiyorsak onu tut
+        catch (System.Exception e)
         {
-            controlledLever = leverInRange;
-            controlledLever.Grab();
-            Debug.Log("Kol tutuldu", controlledLever);
+            Debug.LogError("Error in OnInteract: " + e.Message);
         }
     }
 }

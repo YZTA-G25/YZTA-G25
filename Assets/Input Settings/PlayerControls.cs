@@ -24,7 +24,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     ""name"": ""PlayerControls"",
     ""maps"": [
         {
-            ""name"": ""Player"",
+            ""name"": ""HandPlayer"",
             ""id"": ""c1ac7689-e09a-4ff1-a8df-226bbf43d7c6"",
             ""actions"": [
                 {
@@ -80,6 +80,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""1131edf5-0ba1-41e3-90d9-9ccbd45324b5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -214,25 +223,176 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""08b9aa58-31b2-4942-bad4-2051c8a2c0c1"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""EyePlayer"",
+            ""id"": ""8288287b-700d-4269-aac5-4b9c1df02a6b"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""4fc78d7d-4ab2-4558-b4b0-0deddae55c5a"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""e89d63b4-7d08-4b7b-9ad5-ab366fb60452"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""924666a8-448a-4248-963b-67c9fa32f84b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""e58d910b-5f16-4059-b21d-704df8be7f4c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""b948ae68-08ed-43af-b582-6740e0e425fb"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""487c7215-75c1-4056-91ed-3078367ecc48"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""b7c9d9e4-d686-4c09-9777-9cf61655651a"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""96d58f80-ab0e-4cc8-89b1-5a5e9f753f03"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""67f06c87-a71c-4b16-8119-b1ba837a7d2e"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""49554d94-6e3b-4726-8290-2228ea6df196"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""de85c922-563d-4323-b246-06d7a8db18ab"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4910c52f-046c-4919-b832-a058f3f614ec"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
     ],
     ""controlSchemes"": []
 }");
-        // Player
-        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-        m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
-        m_Player_HandMove = m_Player.FindAction("HandMove", throwIfNotFound: true);
-        m_Player_HandVertical = m_Player.FindAction("HandVertical", throwIfNotFound: true);
-        m_Player_AlternateMode = m_Player.FindAction("AlternateMode", throwIfNotFound: true);
-        m_Player_Grab = m_Player.FindAction("Grab", throwIfNotFound: true);
-        m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        // HandPlayer
+        m_HandPlayer = asset.FindActionMap("HandPlayer", throwIfNotFound: true);
+        m_HandPlayer_Move = m_HandPlayer.FindAction("Move", throwIfNotFound: true);
+        m_HandPlayer_HandMove = m_HandPlayer.FindAction("HandMove", throwIfNotFound: true);
+        m_HandPlayer_HandVertical = m_HandPlayer.FindAction("HandVertical", throwIfNotFound: true);
+        m_HandPlayer_AlternateMode = m_HandPlayer.FindAction("AlternateMode", throwIfNotFound: true);
+        m_HandPlayer_Grab = m_HandPlayer.FindAction("Grab", throwIfNotFound: true);
+        m_HandPlayer_Look = m_HandPlayer.FindAction("Look", throwIfNotFound: true);
+        m_HandPlayer_Jump = m_HandPlayer.FindAction("Jump", throwIfNotFound: true);
+        // EyePlayer
+        m_EyePlayer = asset.FindActionMap("EyePlayer", throwIfNotFound: true);
+        m_EyePlayer_Move = m_EyePlayer.FindAction("Move", throwIfNotFound: true);
+        m_EyePlayer_Look = m_EyePlayer.FindAction("Look", throwIfNotFound: true);
+        m_EyePlayer_Interact = m_EyePlayer.FindAction("Interact", throwIfNotFound: true);
+        m_EyePlayer_Jump = m_EyePlayer.FindAction("Jump", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
     {
-        UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, PlayerControls.Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_HandPlayer.enabled, "This will cause a leak and performance issues, PlayerControls.HandPlayer.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_EyePlayer.enabled, "This will cause a leak and performance issues, PlayerControls.EyePlayer.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -291,34 +451,36 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // Player
-    private readonly InputActionMap m_Player;
-    private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
-    private readonly InputAction m_Player_Move;
-    private readonly InputAction m_Player_HandMove;
-    private readonly InputAction m_Player_HandVertical;
-    private readonly InputAction m_Player_AlternateMode;
-    private readonly InputAction m_Player_Grab;
-    private readonly InputAction m_Player_Look;
-    public struct PlayerActions
+    // HandPlayer
+    private readonly InputActionMap m_HandPlayer;
+    private List<IHandPlayerActions> m_HandPlayerActionsCallbackInterfaces = new List<IHandPlayerActions>();
+    private readonly InputAction m_HandPlayer_Move;
+    private readonly InputAction m_HandPlayer_HandMove;
+    private readonly InputAction m_HandPlayer_HandVertical;
+    private readonly InputAction m_HandPlayer_AlternateMode;
+    private readonly InputAction m_HandPlayer_Grab;
+    private readonly InputAction m_HandPlayer_Look;
+    private readonly InputAction m_HandPlayer_Jump;
+    public struct HandPlayerActions
     {
         private @PlayerControls m_Wrapper;
-        public PlayerActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_Player_Move;
-        public InputAction @HandMove => m_Wrapper.m_Player_HandMove;
-        public InputAction @HandVertical => m_Wrapper.m_Player_HandVertical;
-        public InputAction @AlternateMode => m_Wrapper.m_Player_AlternateMode;
-        public InputAction @Grab => m_Wrapper.m_Player_Grab;
-        public InputAction @Look => m_Wrapper.m_Player_Look;
-        public InputActionMap Get() { return m_Wrapper.m_Player; }
+        public HandPlayerActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_HandPlayer_Move;
+        public InputAction @HandMove => m_Wrapper.m_HandPlayer_HandMove;
+        public InputAction @HandVertical => m_Wrapper.m_HandPlayer_HandVertical;
+        public InputAction @AlternateMode => m_Wrapper.m_HandPlayer_AlternateMode;
+        public InputAction @Grab => m_Wrapper.m_HandPlayer_Grab;
+        public InputAction @Look => m_Wrapper.m_HandPlayer_Look;
+        public InputAction @Jump => m_Wrapper.m_HandPlayer_Jump;
+        public InputActionMap Get() { return m_Wrapper.m_HandPlayer; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerActions instance)
+        public static implicit operator InputActionMap(HandPlayerActions set) { return set.Get(); }
+        public void AddCallbacks(IHandPlayerActions instance)
         {
-            if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_HandPlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_HandPlayerActionsCallbackInterfaces.Add(instance);
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
@@ -337,9 +499,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
         }
 
-        private void UnregisterCallbacks(IPlayerActions instance)
+        private void UnregisterCallbacks(IHandPlayerActions instance)
         {
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
@@ -359,24 +524,97 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
         }
 
-        public void RemoveCallbacks(IPlayerActions instance)
+        public void RemoveCallbacks(IHandPlayerActions instance)
         {
-            if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_HandPlayerActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IPlayerActions instance)
+        public void SetCallbacks(IHandPlayerActions instance)
         {
-            foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_HandPlayerActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_HandPlayerActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public PlayerActions @Player => new PlayerActions(this);
-    public interface IPlayerActions
+    public HandPlayerActions @HandPlayer => new HandPlayerActions(this);
+
+    // EyePlayer
+    private readonly InputActionMap m_EyePlayer;
+    private List<IEyePlayerActions> m_EyePlayerActionsCallbackInterfaces = new List<IEyePlayerActions>();
+    private readonly InputAction m_EyePlayer_Move;
+    private readonly InputAction m_EyePlayer_Look;
+    private readonly InputAction m_EyePlayer_Interact;
+    private readonly InputAction m_EyePlayer_Jump;
+    public struct EyePlayerActions
+    {
+        private @PlayerControls m_Wrapper;
+        public EyePlayerActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_EyePlayer_Move;
+        public InputAction @Look => m_Wrapper.m_EyePlayer_Look;
+        public InputAction @Interact => m_Wrapper.m_EyePlayer_Interact;
+        public InputAction @Jump => m_Wrapper.m_EyePlayer_Jump;
+        public InputActionMap Get() { return m_Wrapper.m_EyePlayer; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(EyePlayerActions set) { return set.Get(); }
+        public void AddCallbacks(IEyePlayerActions instance)
+        {
+            if (instance == null || m_Wrapper.m_EyePlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_EyePlayerActionsCallbackInterfaces.Add(instance);
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+        }
+
+        private void UnregisterCallbacks(IEyePlayerActions instance)
+        {
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+        }
+
+        public void RemoveCallbacks(IEyePlayerActions instance)
+        {
+            if (m_Wrapper.m_EyePlayerActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IEyePlayerActions instance)
+        {
+            foreach (var item in m_Wrapper.m_EyePlayerActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_EyePlayerActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public EyePlayerActions @EyePlayer => new EyePlayerActions(this);
+    public interface IHandPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnHandMove(InputAction.CallbackContext context);
@@ -384,5 +622,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnAlternateMode(InputAction.CallbackContext context);
         void OnGrab(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+    }
+    public interface IEyePlayerActions
+    {
+        void OnMove(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

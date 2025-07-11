@@ -1,4 +1,6 @@
+using Unity.Cinemachine;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : NetworkBehaviour
@@ -10,20 +12,63 @@ public class GameManager : NetworkBehaviour
     [Header("Spawn Points")]
     [SerializeField] private Transform handPlayerSpawnPoint;
     [SerializeField] private Transform eyePlayerSpawnPoint;
+
+    void Start()
+    {
+        Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
+    }
+
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) return; //Bu kod sadece host için çalışır
+        if (!IsServer) return; // Only server handles spawning
 
-        // 1. Ana karakter bedenini oluştur
-        // Bu objenin sahibi sunucudur ve tüm client'lar tarafından görülür.
-        GameObject handPlayerInstance = Instantiate(handPlayerPF, handPlayerSpawnPoint);
-        handPlayerInstance.GetComponent<NetworkObject>().Spawn();
+        // Handle player spawning based on client connection
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
-        // 2. Göz Oyuncusu'nun bedenini oluştur
-        // Bu obje sadece Host için oluşturulur ve sahibi de odur.
-        // Diğer Client'ların bunu görmesine gerek yok, bu yüzden Spawn(true) yerine
-        // sadece Host'a özel spawn ediyoruz.
-        GameObject eyePlayerInstance = Instantiate(eyePlayerPF, eyePlayerSpawnPoint);
-        eyePlayerInstance.GetComponent<NetworkObject>().SpawnWithOwnership(NetworkManager.Singleton.LocalClientId);
+        // Spawn host player immediately as Eye Player
+        SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId, true);
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId) return; // Skip host
+
+        // First client becomes Hand Player
+        SpawnPlayerForClient(clientId, false);
+    }
+
+    private void SpawnPlayerForClient(ulong clientId, bool isHost)
+    {
+        GameObject playerPrefab;
+        Transform spawnPoint;
+
+        if (isHost)
+        {
+            // Host = Eye Player
+            playerPrefab = eyePlayerPF;
+            spawnPoint = eyePlayerSpawnPoint;
+            Debug.Log($"[GameManager] Spawning Eye Player for Host (Client {clientId})");
+        }
+        else
+        {
+            // Client = Hand Player
+            playerPrefab = handPlayerPF;
+            spawnPoint = handPlayerSpawnPoint;
+            Debug.Log($"[GameManager] Spawning Hand Player for Client {clientId}");
+        }
+
+        GameObject playerInstance = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
+        
+        // Spawn with proper ownership
+        networkObject.SpawnAsPlayerObject(clientId);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
     }
 }
