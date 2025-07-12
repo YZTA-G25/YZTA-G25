@@ -22,6 +22,7 @@ public class HandController : NetworkBehaviour
     [Header("References")]
     [SerializeField] private Transform handTransform; // El pozisyonunu kontrol edeceğimiz obje
     [SerializeField] private CharacterController characterController; // Karakterin bedeni için
+    [SerializeField] private HandInteractor handInteractor; // El etkileşim sistemi
 
     private PlayerControls playerControls;
     private Vector2 moveInput;
@@ -48,6 +49,16 @@ public class HandController : NetworkBehaviour
         }
 
         // Sahibi olan client için yapılacak başlangıç ayarları
+
+        // Auto-detect HandInteractor if not assigned
+        if (handInteractor == null)
+        {
+            handInteractor = GetComponent<HandInteractor>();
+            if (handInteractor == null)
+            {
+                handInteractor = GetComponentInChildren<HandInteractor>();
+            }
+        }
 
         // Input'ları burada aktive et
         playerControls = new PlayerControls();
@@ -194,6 +205,12 @@ public class HandController : NetworkBehaviour
         if (grabActive)
         {
             Debug.Log("Grab Pressed!");
+        }
+        
+        // Forward grab input to HandInteractor
+        if (handInteractor != null)
+        {
+            handInteractor.OnGrab(context);
         }
     }
 

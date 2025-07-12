@@ -4,64 +4,64 @@ using UnityEngine.InputSystem;
 public class HandInteractor : MonoBehaviour
 {
     [Header("Holding Settings")]
-    [Tooltip("Elin objeyi tutacaðý nokta.")]
+    [Tooltip("Elin objeyi tutacaÄŸÄ± nokta.")]
     [SerializeField] private Transform handHoldPoint;
 
-    // Elin etkileþim alanýndaki objeleri tutar
+    // Elin etkileÅŸim alanÄ±ndaki objeleri tutar
     private CabinetController _cabinetInRange;
     private GrabbableItem _grabbableInRange;
 
-    //Tarif defteri butonu için
+    //Tarif defteri butonu iÃ§in
     private PageTurnButton _buttonInRange;
 
-    // Elin þu anda tuttuðu obje
+    // Elin ÅŸu anda tuttuÄŸu obje
     private GameObject _heldItem;
     private Rigidbody _heldItemRb;
 
-    // El bir objenin etkileþim alanýna girdiðinde...
+    // El bir objenin etkileÅŸim alanÄ±na girdiÄŸinde...
     private void OnTriggerEnter(Collider other)
     {
-        // Girdiði obje bir dolap mý?
+        // GirdiÄŸi obje bir dolap mÄ±?
         if (other.TryGetComponent(out CabinetController cabinet))
         {
             _cabinetInRange = cabinet;
-            Debug.Log("Dolap alanýna girildi: " + cabinet.gameObject.name);
+            Debug.Log("Dolap alanÄ±na girildi: " + cabinet.gameObject.name);
         }
-        // Girdiði obje yerden alýnabilir bir malzeme mi?
+        // GirdiÄŸi obje yerden alÄ±nabilir bir malzeme mi?
         else if (other.TryGetComponent(out GrabbableItem item))
         {
             _grabbableInRange = item;
-            Debug.Log("Yerden alýnabilir obje algýlandý: " + item.gameObject.name);
+            Debug.Log("Yerden alÄ±nabilir obje algÄ±landÄ±: " + item.gameObject.name);
         }
-        //Defterin butonu algýlandý mý?
+        //Defterin butonu algÄ±landÄ± mÄ±?
         else if (other.TryGetComponent(out PageTurnButton button))
         {
             _buttonInRange = button;
-            Debug.Log("Defter butonu algýlandý: " + button.gameObject.name);
+            Debug.Log("Defter butonu algÄ±landÄ±: " + button.gameObject.name);
         }
     }
 
-    // El etkileþim alanýndan çýktýðýnda...
+    // El etkileÅŸim alanÄ±ndan Ã§Ä±ktÄ±ÄŸÄ±nda...
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent(out CabinetController cabinet) && _cabinetInRange == cabinet)
         {
             _cabinetInRange = null;
-            Debug.Log("Dolap alanýndan çýkýldý.");
+            Debug.Log("Dolap alanÄ±ndan Ã§Ä±kÄ±ldÄ±.");
         }
         else if (other.TryGetComponent(out GrabbableItem item) && _grabbableInRange == item)
         {
             _grabbableInRange = null;
-            Debug.Log("Yerden alýnabilir obje menzilden çýktý.");
+            Debug.Log("Yerden alÄ±nabilir obje menzilden Ã§Ä±ktÄ±.");
         }
         else if (other.TryGetComponent(out PageTurnButton button) && _buttonInRange == button)
         {
             _buttonInRange = null;
-            Debug.Log("Defter butonu menzilden çýktý.");
+            Debug.Log("Defter butonu menzilden Ã§Ä±ktÄ±.");
         }
     }
 
-    // Elimizdeki objenin pozisyonunu her frame sonunda güncelleyerek takýlmayý önler.
+    // Elimizdeki objenin pozisyonunu her frame sonunda gÃ¼ncelleyerek takÄ±lmayÄ± Ã¶nler.
     private void LateUpdate()
     {
         if (_heldItem != null && handHoldPoint != null)
@@ -71,53 +71,53 @@ public class HandInteractor : MonoBehaviour
         }
     }
 
-    // Input'tan gelen "Grab" eylemi bu metodu çaðýrýr.
+    // Input'tan gelen "Grab" eylemi bu metodu Ã§aÄŸÄ±rÄ±r.
     public void OnGrab(InputAction.CallbackContext context)
     {
-        if (context.performed) // Tuþa ilk basýldýðýnda
+        if (context.performed) // TuÅŸa ilk basÄ±ldÄ±ÄŸÄ±nda
         {
-            if (_heldItem == null) // Eðer elimiz boþsa
+            if (_heldItem == null) // EÄŸer elimiz boÅŸsa
             {
                 // Elimiz bir defter butonunun menzilinde mi?
                 if (_buttonInRange != null)
                 {
-                    // Evet, o zaman butonla etkileþime gir (sayfayý çevir).
+                    // Evet, o zaman butonla etkileÅŸime gir (sayfayÄ± Ã§evir).
                     _buttonInRange.Interact(this);
                 }
-                // Eðer buton menzilinde deðilsek, diðer kontrollere geç.
+                // EÄŸer buton menzilinde deÄŸilsek, diÄŸer kontrollere geÃ§.
 
-                // Öncelik: Yerdeki bir objeyi al
+                // Ã–ncelik: Yerdeki bir objeyi al
                 else if (_grabbableInRange != null)
                 {
                     _grabbableInRange.Interact(this);
                 }
-                // Eðer yerde bir þey yoksa ama dolap alanýndaysak, dolaptan iste
+                // EÄŸer yerde bir ÅŸey yoksa ama dolap alanÄ±ndaysak, dolaptan iste
                 else if (_cabinetInRange != null)
                 {
                     _cabinetInRange.RequestItem(this);
                 }
             }
         }
-        else if (context.canceled) // Tuþ býrakýldýðýnda
+        else if (context.canceled) // TuÅŸ bÄ±rakÄ±ldÄ±ÄŸÄ±nda
         {
-            if (_heldItem != null) // Eðer elimiz doluysa
+            if (_heldItem != null) // EÄŸer elimiz doluysa
             {
                 ReleaseItem();
             }
         }
     }
 
-    // Diðer script'lerin (Cabinet, GrabbableItem) eline obje vermesi için kullandýðý metot
+    // DiÄŸer script'lerin (Cabinet, GrabbableItem) eline obje vermesi iÃ§in kullandÄ±ÄŸÄ± metot
     public void HoldItem(GameObject item)
     {
         _heldItem = item;
         _heldItemRb = _heldItem.GetComponent<Rigidbody>();
 
-        // Fiziðini kapat
+        // FiziÄŸini kapat
         if (_heldItemRb != null) _heldItemRb.isKinematic = true;
         if (_heldItem.TryGetComponent(out Collider col)) col.enabled = false;
 
-        // Anýnda elin pozisyonuna ýþýnla
+        // AnÄ±nda elin pozisyonuna Ä±ÅŸÄ±nla
         if (handHoldPoint != null)
         {
             _heldItem.transform.position = handHoldPoint.position;
@@ -127,17 +127,17 @@ public class HandInteractor : MonoBehaviour
         Debug.Log(_heldItem.name + " tutuluyor.");
     }
 
-    // Elimizdeki objeyi býrakma metodu
+    // Elimizdeki objeyi bÄ±rakma metodu
     private void ReleaseItem()
     {
         if (_heldItem == null) return;
-        Debug.Log(_heldItem.name + " býrakýldý.");
+        Debug.Log(_heldItem.name + " bÄ±rakÄ±ldÄ±.");
 
-        // Fiziðini tekrar aç
+        // FiziÄŸini tekrar aÃ§
         if (_heldItemRb != null) _heldItemRb.isKinematic = false;
         if (_heldItem.TryGetComponent(out Collider col)) col.enabled = true;
 
-        // Referanslarý temizle
+        // ReferanslarÄ± temizle
         _heldItem = null;
         _heldItemRb = null;
     }

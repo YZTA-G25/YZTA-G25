@@ -521,6 +521,7 @@ MonoBehaviour:
   jumpHeight: 2
   handTransform: {fileID: 2578983085602209902}
   characterController: {fileID: -6114401909998107212}
+  handInteractor: {fileID: 1934680607428901653}
 --- !u!114 &1934680607428901653
 MonoBehaviour:
   m_ObjectHideFlags: 0

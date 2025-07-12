@@ -856,7 +856,7 @@ GameObject:
   - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Hand Player Camera
-  m_TagString: MainCamera
+  m_TagString: Hand Player Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2576,7 +2576,7 @@ GameObject:
   - component: {fileID: 1156597406}
   m_Layer: 0
   m_Name: Eye Player Camera
-  m_TagString: Untagged
+  m_TagString: Eye Player Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

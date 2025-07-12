@@ -8,6 +8,8 @@ TagManager:
   - FxTemporaire
   - Eye Player
   - Hand Player
+  - Eye Player Camera
+  - Hand Player Camera
   layers:
   - Default
   - TransparentFX

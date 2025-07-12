@@ -96,7 +96,7 @@ public class EyePlayerController : NetworkBehaviour
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y); 
         
         // Apply horizontal movement
-        Vector3 horizontalMovement = transform.TransformDirection(moveDirection) * moveSpeed * Time.deltaTime;
+        Vector3 horizontalMovement = transform.TransformDirection(moveDirection) * moveSpeed;
         
         // Update grounded state
         isGrounded = characterController.isGrounded;
@@ -119,10 +119,10 @@ public class EyePlayerController : NetworkBehaviour
         }
         
         // Combine horizontal movement with vertical velocity
-        Vector3 finalMovement = horizontalMovement + new Vector3(0, velocity.y * Time.deltaTime, 0);
+        Vector3 finalMovement = horizontalMovement + new Vector3(0, velocity.y, 0);
         
         // Move the character
-        characterController.Move(finalMovement);
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
     private void HandleLook()
