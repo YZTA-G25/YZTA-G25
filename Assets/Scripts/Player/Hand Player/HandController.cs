@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 
 // HandController, bir NetworkBehaviour'dur. Bu, onun
 // ağ üzerinde bir kimliğe sahip olmasını sağlar.
@@ -12,10 +14,15 @@ public class HandController : NetworkBehaviour
     [SerializeField] private float handSensitivity = 0.1f;
     [SerializeField] private float handVerticalSpeed = 2f;
     [SerializeField] private float handRotationSpeed = 45f;
+    
+    [Header("Gravity & Jumping")]
+    [SerializeField] private float gravity = -9.81f;
+    [SerializeField] private float jumpHeight = 2f;
 
     [Header("References")]
     [SerializeField] private Transform handTransform; // El pozisyonunu kontrol edeceğimiz obje
     [SerializeField] private CharacterController characterController; // Karakterin bedeni için
+    [SerializeField] private HandInteractor handInteractor; // El etkileşim sistemi
 
     private PlayerControls playerControls;
     private Vector2 moveInput;
@@ -23,6 +30,11 @@ public class HandController : NetworkBehaviour
     private float handVerticalInput;
     private bool alternateModeActive;
     private bool grabActive;
+    
+    // Gravity and jumping variables
+    private Vector3 velocity;
+
+    private CinemachineCamera eyePlayerFeedCm;
 
     // Bu fonksiyon, obje ağ üzerinde spawn olduğunda Netcode tarafından çağrılır.
     // Bir objenin ağ üzerindeki yaşam döngüsünün başlangıcıdır.
@@ -38,25 +50,43 @@ public class HandController : NetworkBehaviour
 
         // Sahibi olan client için yapılacak başlangıç ayarları
 
+        // Auto-detect HandInteractor if not assigned
+        if (handInteractor == null)
+        {
+            handInteractor = GetComponent<HandInteractor>();
+            if (handInteractor == null)
+            {
+                handInteractor = GetComponentInChildren<HandInteractor>();
+            }
+        }
+
         // Input'ları burada aktive et
         playerControls = new PlayerControls();
-        playerControls.Player.Enable();
+        // PlayerInputManager.instance.JoinPlayer(); // REMOVED - This was causing NullReference
+        playerControls.HandPlayer.Enable();
+        playerControls.EyePlayer.Disable();
 
         // Her bir action için event'ler tanımlıyoruz
-        playerControls.Player.Move.performed += OnMoveInput;
-        playerControls.Player.Move.canceled += OnMoveInput;
+        playerControls.HandPlayer.Move.performed += OnMoveInput;
+        playerControls.HandPlayer.Move.canceled += OnMoveInput;
 
-        playerControls.Player.HandMove.performed += OnHandMoveInput;
-        playerControls.Player.HandMove.canceled += OnHandMoveInput;
+        playerControls.HandPlayer.HandMove.performed += OnHandMoveInput;
+        playerControls.HandPlayer.HandMove.canceled += OnHandMoveInput;
 
-        playerControls.Player.HandVertical.performed += OnHandVerticalInput;
-        playerControls.Player.HandVertical.canceled += OnHandVerticalInput;
+        playerControls.HandPlayer.HandVertical.performed += OnHandVerticalInput;
+        playerControls.HandPlayer.HandVertical.canceled += OnHandVerticalInput;
 
-        playerControls.Player.AlternateMode.performed += OnAlternateModeInput;
-        playerControls.Player.AlternateMode.canceled += OnAlternateModeInput;
+        playerControls.HandPlayer.AlternateMode.performed += OnAlternateModeInput;
+        playerControls.HandPlayer.AlternateMode.canceled += OnAlternateModeInput;
 
-        playerControls.Player.Grab.performed += OnGrabInput;
-        playerControls.Player.Grab.canceled += OnGrabInput;
+        playerControls.HandPlayer.Grab.performed += OnGrabInput;
+        playerControls.HandPlayer.Grab.canceled += OnGrabInput;
+        
+        // Add jump input if you have a jump action in your input actions
+        playerControls.HandPlayer.Jump.performed += OnJumpInput;
+
+        eyePlayerFeedCm = GameObject.FindGameObjectWithTag("EyePlayer Feed CM").GetComponent<CinemachineCamera>();
+        eyePlayerFeedCm.Follow = this.gameObject.transform;
     }
 
     // OnNetworkDespawn, obje ağdan kaldırıldığında çalışır.
@@ -65,13 +95,14 @@ public class HandController : NetworkBehaviour
         if (!IsOwner) return;
 
         // Input'ları devre dışı bırakarak hafıza sızıntısını önlüyoruz
-        playerControls.Player.Disable();
+        playerControls.HandPlayer.Disable();
     }
 
     // Her frame'de çalışacak olan ana güncelleme fonksiyonu
     private void Update()
     {
         if (!IsOwner) return;
+        if (!Application.isFocused) return;
 
         HandleMovement();
         HandleHandControl();
@@ -83,7 +114,25 @@ public class HandController : NetworkBehaviour
     private void HandleMovement()
     {
         Vector3 _moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        characterController.Move(transform.TransformDirection(_moveDirection) * moveSpeed * Time.deltaTime);
+        
+        // Apply horizontal movement
+        Vector3 horizontalMovement = transform.TransformDirection(_moveDirection) * moveSpeed * Time.deltaTime;
+        
+        // Apply gravity
+        if (!characterController.isGrounded)
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
+        else
+        {
+            velocity.y = -0.1f; // Small downward force to stay grounded
+        }
+        
+        // Combine horizontal movement with vertical velocity
+        Vector3 finalMovement = horizontalMovement + new Vector3(0, velocity.y * Time.deltaTime, 0);
+        
+        // Move the character
+        characterController.Move(finalMovement);
 
         // Normal mode'da karakterin dönmesi
         if (!alternateModeActive)
@@ -94,8 +143,6 @@ public class HandController : NetworkBehaviour
     }
 
     // El kontrol mantuğı
-    // HandController.cs içindeki HandleHandControl metodu
-
     private void HandleHandControl()
     {
         // Eğer el objesi atanmamışsa hata vermemesi için
@@ -121,7 +168,6 @@ public class HandController : NetworkBehaviour
 
             // Elin pozisyonunu bu yeni, doğru yönde güncelle
             handTransform.position += _worldSpaceMovement * handSensitivity * Time.deltaTime;
-            // --- DEĞİŞİKLİK BİTTİ ---
         }
         else // Normal Mode
         {
@@ -137,12 +183,6 @@ public class HandController : NetworkBehaviour
     {
         moveInput = context.ReadValue<Vector2>();
     }
-
-    public void SetMoveInput(Vector2 input)
-    {
-        moveInput = input;
-    }
-
 
     private void OnHandMoveInput(InputAction.CallbackContext context)
     {
@@ -165,6 +205,21 @@ public class HandController : NetworkBehaviour
         if (grabActive)
         {
             Debug.Log("Grab Pressed!");
+        }
+        
+        // Forward grab input to HandInteractor
+        if (handInteractor != null)
+        {
+            handInteractor.OnGrab(context);
+        }
+    }
+
+    private void OnJumpInput(InputAction.CallbackContext context)
+    {
+        if (context.performed && characterController.isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            Debug.Log("Jump performed!");
         }
     }
 

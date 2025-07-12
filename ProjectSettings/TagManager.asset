@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - EyePlayer Feed CM
+  - FxTemporaire
+  - Eye Player
+  - Hand Player
+  - Eye Player Camera
+  - Hand Player Camera
   layers:
   - Default
   - TransparentFX
@@ -11,7 +17,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Don't See Layer
   - 
   - 
   - 
