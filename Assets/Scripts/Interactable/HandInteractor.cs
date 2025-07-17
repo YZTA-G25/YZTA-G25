@@ -8,9 +8,11 @@ public class HandInteractor : MonoBehaviour
     [SerializeField] private Transform handHoldPoint;
 
     // Elin etkileþim alanýndaki objeleri tutar
-    private CookingStation _stationInRange;
     private CabinetController _cabinetInRange;
     private GrabbableItem _grabbableInRange;
+
+    //Tarif defteri butonu için
+    private PageTurnButton _buttonInRange;
 
     // Elin þu anda tuttuðu obje
     private GameObject _heldItem;
@@ -31,21 +33,11 @@ public class HandInteractor : MonoBehaviour
             _grabbableInRange = item;
             Debug.Log("Yerden alýnabilir obje algýlandý: " + item.gameObject.name);
         }
-        else if (other.TryGetComponent(out CookingStation station))
+        //Defterin butonu algýlandý mý?
+        else if (other.TryGetComponent(out PageTurnButton button))
         {
-            // VE O ANDA ELÝMÝZ DOLU MU?
-            if (_heldItem != null)
-            {
-                // O ZAMAN HÝÇ BEKLEMEDEN OTOMATÝK ETKÝLEÞÝME GÝR!
-                Debug.Log("Ýstasyonla otomatik etkileþim tetiklendi.");
-                station.Interact(this); // CookingStation'a görevi devret
-            }
-            else
-            {
-                // Elimiz boþsa, gelecekteki etkileþimler için sadece menzilde olduðunu kaydet
-                _stationInRange = station;
-                Debug.Log("Piþirme istasyonu alanýna girildi (el boþ).");
-            }
+            _buttonInRange = button;
+            Debug.Log("Defter butonu algýlandý: " + button.gameObject.name);
         }
     }
 
@@ -62,10 +54,10 @@ public class HandInteractor : MonoBehaviour
             _grabbableInRange = null;
             Debug.Log("Yerden alýnabilir obje menzilden çýktý.");
         }
-        else if (other.TryGetComponent(out CookingStation station) && _stationInRange == station)
+        else if (other.TryGetComponent(out PageTurnButton button) && _buttonInRange == button)
         {
-            _stationInRange = null;
-            Debug.Log("Piþirme istasyonu alanýndan çýkýldý.");
+            _buttonInRange = null;
+            Debug.Log("Defter butonu menzilden çýktý.");
         }
     }
 
@@ -80,37 +72,35 @@ public class HandInteractor : MonoBehaviour
     }
 
     // Input'tan gelen "Grab" eylemi bu metodu çaðýrýr.
-    // HandInteractor.cs içindeki OnGrab metodunu bu kodla tamamen deðiþtirin
-
     public void OnGrab(InputAction.CallbackContext context)
     {
-        // --- EYLEM 1: TUÞA BASILDIÐINDA (El Boþken) ---
-        // Tuþa basýldýðýnda ve elimiz boþsa, bir þey almayý deneriz.
-        if (context.performed && _heldItem == null)
+        if (context.performed) // Tuþa ilk basýldýðýnda
         {
-            // Öncelik 1: Yerde alýnabilir bir obje varsa onu al.
-            if (_grabbableInRange != null)
+            if (_heldItem == null) // Eðer elimiz boþsa
             {
-                _grabbableInRange.Interact(this);
-            }
-            // Öncelik 2: Yerde bir þey yoksa ve dolap menzilindeysek, dolaptan malzeme iste.
-            else if (_cabinetInRange != null)
-            {
-                _cabinetInRange.RequestItem(this);
+                // Elimiz bir defter butonunun menzilinde mi?
+                if (_buttonInRange != null)
+                {
+                    // Evet, o zaman butonla etkileþime gir (sayfayý çevir).
+                    _buttonInRange.Interact(this);
+                }
+                // Eðer buton menzilinde deðilsek, diðer kontrollere geç.
+
+                // Öncelik: Yerdeki bir objeyi al
+                else if (_grabbableInRange != null)
+                {
+                    _grabbableInRange.Interact(this);
+                }
+                // Eðer yerde bir þey yoksa ama dolap alanýndaysak, dolaptan iste
+                else if (_cabinetInRange != null)
+                {
+                    _cabinetInRange.RequestItem(this);
+                }
             }
         }
-        // --- EYLEM 2: TUÞ BIRAKILDIÐINDA (El Doluyken) ---
-        // Tuþ býrakýldýðýnda ve elimiz doluysa, elimizdekini bir yere býrakmayý/koymayý deneriz.
-        else if (context.canceled && _heldItem != null)
+        else if (context.canceled) // Tuþ býrakýldýðýnda
         {
-            // Öncelik 1: Býrakma anýnda bir piþirme istasyonunun menzilinde miyiz?
-            if (_stationInRange != null)
-            {
-                // Evet, o zaman istasyonla etkileþime gir (malzemeyi istasyona koy).
-                _stationInRange.Interact(this);
-            }
-            // Öncelik 2: Bir istasyon menzilinde deðilsek, objeyi normal bir þekilde yere býrak.
-            else
+            if (_heldItem != null) // Eðer elimiz doluysa
             {
                 ReleaseItem();
             }
@@ -150,17 +140,5 @@ public class HandInteractor : MonoBehaviour
         // Referanslarý temizle
         _heldItem = null;
         _heldItemRb = null;
-    }
-
-    public GameObject GetHeldItem()
-    {
-        return _heldItem;
-    }
-
-    public void ClearHeldItem()
-    {
-        _heldItem = null;
-        _heldItemRb = null;
-        Debug.Log("El referanslarý temizlendi.");
     }
 }
