@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c397604919ae9f04da855abac5cce434, type: 3}
-  m_Name: Steak
+  m_Name: Garlic
   m_EditorClassIdentifier: 
-  ingredientName: Steak
+  ingredientName: Garlic
   icon: {fileID: 0}
-  prefab: {fileID: 8202614754564459210, guid: 10ab30527b9bc8a4995e798ac0706a37, type: 3}
+  prefab: {fileID: 5987858285101769375, guid: b701910af56d089428c372aa6ba53383, type: 3}
   isSafe: 1
   cookTime: 0
   displayPrefab: {fileID: 6182167302060043991, guid: 7712c81f76537734fb0524b122f01886, type: 3}
