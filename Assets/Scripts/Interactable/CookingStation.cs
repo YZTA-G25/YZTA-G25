@@ -44,8 +44,13 @@ public class CookingStation : Interactable
                 if (visualClone.TryGetComponent<Collider>(out Collider col)) { col.enabled = false; }
 
                 // Görev 7c (devamý): Orijinal objeyi oyuncunun elinden yok et ve elini boþalt
-                Destroy(heldItem);
+                //...
+                // Yok etme görevini HandInteractor'a devrediyoruz
+                interactor.DestroyHeldItemOnNetwork();
+
+                // Elimizi yerel olarak temizliyoruz
                 interactor.ClearHeldItem();
+                //...
             }
         }
     }

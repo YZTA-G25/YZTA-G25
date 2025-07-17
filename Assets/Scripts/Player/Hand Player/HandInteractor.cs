@@ -1,4 +1,5 @@
-using System.Diagnostics;
+//using System.Diagnostics;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,7 @@ public class HandInteractor : MonoBehaviour
     // Elin etkileşim alanındaki objeleri tutar
     private CabinetController _cabinetInRange;
     private GrabbableItem _grabbableInRange;
+    private CookingStation _stationInRange;
 
     //Tarif defteri butonu için
     private PageTurnButton _buttonInRange;
@@ -40,6 +42,11 @@ public class HandInteractor : MonoBehaviour
             _buttonInRange = button;
             Debug.Log("Defter butonu algılandı: " + button.gameObject.name);
         }
+        else if (other.TryGetComponent(out CookingStation station))
+        {
+            _stationInRange = station;
+            Debug.Log("Pişirme istasyonu alanına girildi.");
+        }
     }
 
     // El etkileşim alanından çıktığında...
@@ -59,6 +66,11 @@ public class HandInteractor : MonoBehaviour
         {
             _buttonInRange = null;
             Debug.Log("Defter butonu menzilden çıktı.");
+        }
+        else if (other.TryGetComponent(out CookingStation station) && _stationInRange == station)
+        {
+            _stationInRange = null;
+            Debug.Log("Pişirme istasyonu alanından çıkıldı.");
         }
     }
 
@@ -97,13 +109,24 @@ public class HandInteractor : MonoBehaviour
                 {
                     _cabinetInRange.RequestItem(this);
                 }
+               
             }
         }
-        else if (context.canceled) // Tuş bırakıldığında
+        else if (context.canceled)
         {
-            if (_heldItem != null) // Eğer elimiz doluysa
+            if (_heldItem != null)
             {
-                ReleaseItem();
+                // Bırakma anında bir istasyonun menzilinde miyiz?
+                if (_stationInRange != null)
+                {
+                    // Evet, o zaman objeyi istasyona koy (etkileşime gir).
+                    _stationInRange.Interact(this);
+                }
+                // Değilsek, objeyi normal bir şekilde yere bırak.
+                else
+                {
+                    ReleaseItem();
+                }
             }
         }
     }
@@ -142,4 +165,42 @@ public class HandInteractor : MonoBehaviour
         _heldItem = null;
         _heldItemRb = null;
     }
+
+    public GameObject GetHeldItem()
+    {
+        return _heldItem;
+    }
+
+    public void ClearHeldItem()
+    {
+        _heldItem = null;
+        _heldItemRb = null;
+    }
+
+
+    // HandInteractor.cs
+
+    // --- YENİ EKLENEN METOTLAR ---
+
+    // CookingStation gibi dış script'ler bu metodu çağıracak.
+    public void DestroyHeldItemOnNetwork()
+    {
+        // Eğer elimizde bir obje yoksa, bir şey yapma.
+        if (_heldItem == null) return;
+
+        // Bu isteği sunucuya iletmesi için ServerRpc'yi çağır.
+        DestroyHeldItemServerRpc(_heldItem.GetComponent<NetworkObject>());
+    }
+
+    [ServerRpc]
+    private void DestroyHeldItemServerRpc(NetworkObjectReference itemToDestroyRef)
+    {
+        // Bu kod sunucuda çalışır.
+        if (itemToDestroyRef.TryGet(out NetworkObject networkObject))
+        {
+            // Objeyi ağ üzerinden herkes için yok et.
+            networkObject.Despawn(true);
+        }
+    }
+    // --- YENİ METOTLAR BİTTİ ---
 }
