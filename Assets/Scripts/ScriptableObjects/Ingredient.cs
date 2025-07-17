@@ -8,5 +8,5 @@ public class Ingredient : ScriptableObject
     public GameObject prefab;
     public bool isSafe;
     public float cookTime;
-
+    public LayerMask layerMask;
 }

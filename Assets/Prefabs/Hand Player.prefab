@@ -165,7 +165,7 @@ Transform:
   m_GameObject: {fileID: 6041850321651202394}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.21636245, y: -0.29370373, z: 0.40499997}
+  m_LocalPosition: {x: -0.21636245, y: -0.29370373, z: 0.174}
   m_LocalScale: {x: 3.3806627, y: 6.118828, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -188,7 +188,6 @@ GameObject:
   - component: {fileID: -6114401909998107212}
   - component: {fileID: 7138004682473484260}
   - component: {fileID: 7544691108855062268}
-  - component: {fileID: 1934680607428901653}
   - component: {fileID: 8986550731188141467}
   - component: {fileID: 989099499298201783}
   m_Layer: 6
@@ -514,27 +513,16 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
   mouseSensitivity: 1
-  handSensitivity: 0.1
+  pitchLimit: 85
+  lookAtTarget: {fileID: 5982292853994554255}
+  handSensitivity: 5
   handVerticalSpeed: 2
   handRotationSpeed: 45
   gravity: -9.81
   jumpHeight: 2
   handTransform: {fileID: 2578983085602209902}
   characterController: {fileID: -6114401909998107212}
-  handInteractor: {fileID: 1934680607428901653}
---- !u!114 &1934680607428901653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdfa1b454b3730c4fa42ca8eecd42940, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handHoldPoint: {fileID: 3655521842484358603}
+  handInteractor: {fileID: 0}
 --- !u!114 &8986550731188141467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -690,6 +678,7 @@ GameObject:
   - component: {fileID: 8653105382495744739}
   - component: {fileID: 1124374180893771628}
   - component: {fileID: 598656007246612551}
+  - component: {fileID: 1998558582772689149}
   m_Layer: 15
   m_Name: Hand
   m_TagString: Untagged
@@ -811,11 +800,31 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1998558582772689149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087050555096370552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdfa1b454b3730c4fa42ca8eecd42940, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handHoldPoint: {fileID: 3655521842484358603}
+  grabRange: 1.28
+  grabbedDrag: 10
+  grabbedAngularDrag: 10
+  jointBreakForce: 1000
+  grabbableLayer:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!1 &9102668685668980142
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,144 +1,354 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class HandInteractor : MonoBehaviour
 {
-    [Header("Holding Settings")]
+    [Header("Kinematic Grabbing Settings")]
     [Tooltip("Elin objeyi tutacağı nokta.")]
     [SerializeField] private Transform handHoldPoint;
+    
+    [Tooltip("Ne kadar uzağa erişebiliriz")]
+    [SerializeField] private float grabRange = 1.5f;
+    
+    [Tooltip("Hangi layer'daki objeler tutulabilir")]
+    [SerializeField] private LayerMask grabbableLayer = -1;
+    
+    [Tooltip("Fırlatma kuvveti çarpanı")]
+    [SerializeField] private float throwForceMultiplier = 5f;
+    
+    [Tooltip("Bırakma/fırlatma hassasiyeti")]
+    [SerializeField] private float velocityThreshold = 2f;
+    
+    [Tooltip("Hız takip örnek sayısı")]
+    [SerializeField] private int velocitySamples = 5;
 
-    // Elin etkileşim alanındaki objeleri tutar
-    private CabinetController _cabinetInRange;
-    private GrabbableItem _grabbableInRange;
+    // Current grabbed object
+    private GameObject grabbedObject;
+    private Rigidbody grabbedRigidbody;
+    private Vector3 grabPointOffset;
+    
+    // Original object properties
+    private bool originalKinematic;
+    private bool originalGravity;
+    private Transform originalParent;
+    
+    // Hand velocity tracking for throwing
+    private List<Vector3> handPositions = new List<Vector3>();
+    private List<float> handTimes = new List<float>();
+    
+    // Legacy interaction variables
+    private GrabbableItem grabbableInRange;
+    private PageTurnButton buttonInRange;
+    private CabinetController cabinetInRange;
 
-    //Tarif defteri butonu için
-    private PageTurnButton _buttonInRange;
+    private void Update()
+    {
+        // Track hand position for velocity calculation
+        TrackHandVelocity();
+    }
 
-    // Elin şu anda tuttuğu obje
-    private GameObject _heldItem;
-    private Rigidbody _heldItemRb;
+    public void OnGrab(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (grabbedObject == null)
+            {
+                // Try new grabbing system first
+                TryGrabObject();
+                
+                // Fallback to legacy interactions
+                if (grabbedObject == null)
+                {
+                    HandleLegacyInteractions();
+                }
+            }
+        }
+        else if (context.canceled)
+        {
+            if (grabbedObject != null)
+            {
+                ReleaseObject();
+            }
+        }
+    }
 
-    // El bir objenin etkileşim alanına girdiğinde...
+    #region New Kinematic Grabbing System
+
+    private void TryGrabObject()
+    {
+        // Find closest grabbable object
+        GameObject targetObject = FindClosestGrabbableObject();
+        
+        if (targetObject != null)
+        {
+            // Get exact contact point via raycast
+            Vector3 contactPoint = GetContactPoint(targetObject);
+            
+            if (contactPoint != Vector3.zero)
+            {
+                GrabObjectAtPoint(targetObject, contactPoint);
+            }
+        }
+    }
+
+    private GameObject FindClosestGrabbableObject()
+    {
+        Collider[] nearbyObjects = Physics.OverlapSphere(handHoldPoint.position, grabRange, grabbableLayer);
+        
+        GameObject closest = null;
+        float closestDistance = float.MaxValue;
+        
+        foreach (Collider col in nearbyObjects)
+        {
+            // Must have rigidbody to be grabbable
+            if (col.GetComponent<Rigidbody>() == null) continue;
+            
+            float distance = Vector3.Distance(handHoldPoint.position, col.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = col.gameObject;
+            }
+        }
+        
+        Debug.Log(closest != null ? $"Found closest object: {closest.name} at distance {closestDistance}" 
+                                  : "No grabbable objects found in range");
+        
+        return closest;
+    }
+
+    private Vector3 GetContactPoint(GameObject targetObject)
+    {
+        // Raycast from hand to object for exact contact point
+        Vector3 direction = (targetObject.transform.position - handHoldPoint.position).normalized;
+        
+        if (Physics.Raycast(handHoldPoint.position, direction, out RaycastHit hit, grabRange, grabbableLayer))
+        {
+            if (hit.collider.gameObject == targetObject)
+            {
+                Debug.Log($"Contact point found at: {hit.point}");
+                
+                // Draw debug visualization
+                Debug.DrawRay(handHoldPoint.position, direction * hit.distance, Color.green, 1f);
+                
+                return hit.point;
+            }
+        }
+        
+        Debug.Log("No valid contact point found");
+        return Vector3.zero;
+    }
+
+    private void GrabObjectAtPoint(GameObject targetObject, Vector3 contactPoint)
+    {
+        grabbedObject = targetObject;
+        grabbedRigidbody = targetObject.GetComponent<Rigidbody>();
+        
+        // Store original properties
+        originalKinematic = grabbedRigidbody.isKinematic;
+        originalGravity = grabbedRigidbody.useGravity;
+        originalParent = grabbedObject.transform.parent;
+        
+        // Calculate grab point offset in hand's local space
+        grabPointOffset = handHoldPoint.InverseTransformPoint(contactPoint);
+        
+        // Make object kinematic and parent it to hand
+        grabbedRigidbody.isKinematic = true;
+        grabbedRigidbody.useGravity = false;
+        grabbedObject.transform.SetParent(handHoldPoint);
+        
+        // Position object so contact point aligns with hand
+        Vector3 desiredObjectPosition = handHoldPoint.position - (contactPoint - grabbedObject.transform.position);
+        grabbedObject.transform.position = desiredObjectPosition;
+        
+        Debug.Log($"Grabbed {targetObject.name} at contact point {contactPoint}");
+    }
+
+    private void ReleaseObject()
+    {
+        if (grabbedObject == null) return;
+        
+        // Calculate release velocity
+        Vector3 releaseVelocity = CalculateHandVelocity();
+        bool shouldThrow = releaseVelocity.magnitude > velocityThreshold;
+        
+        // Restore original properties
+        grabbedRigidbody.isKinematic = originalKinematic;
+        grabbedRigidbody.useGravity = originalGravity;
+        grabbedObject.transform.SetParent(originalParent);
+        
+        // Apply momentum if throwing
+        if (shouldThrow && !originalKinematic)
+        {
+            grabbedRigidbody.linearVelocity = releaseVelocity * throwForceMultiplier;
+            Debug.Log($"Threw {grabbedObject.name} with velocity: {releaseVelocity * throwForceMultiplier}");
+        }
+        else
+        {
+            // Just drop
+            if (!originalKinematic)
+            {
+                grabbedRigidbody.linearVelocity = Vector3.zero;
+                grabbedRigidbody.angularVelocity = Vector3.zero;
+            }
+            Debug.Log($"Dropped {grabbedObject.name}");
+        }
+        
+        // Clear references
+        grabbedObject = null;
+        grabbedRigidbody = null;
+    }
+
+    #endregion
+
+    #region Hand Velocity Tracking
+
+    private void TrackHandVelocity()
+    {
+        // Add current position and time
+        handPositions.Add(handHoldPoint.position);
+        handTimes.Add(Time.time);
+        
+        // Remove old samples
+        while (handPositions.Count > velocitySamples)
+        {
+            handPositions.RemoveAt(0);
+            handTimes.RemoveAt(0);
+        }
+    }
+
+    private Vector3 CalculateHandVelocity()
+    {
+        if (handPositions.Count < 2) return Vector3.zero;
+        
+        // Calculate average velocity over recent samples
+        Vector3 totalVelocity = Vector3.zero;
+        int velocityCount = 0;
+        
+        for (int i = 1; i < handPositions.Count; i++)
+        {
+            float deltaTime = handTimes[i] - handTimes[i - 1];
+            if (deltaTime > 0)
+            {
+                Vector3 velocity = (handPositions[i] - handPositions[i - 1]) / deltaTime;
+                totalVelocity += velocity;
+                velocityCount++;
+            }
+        }
+        
+        return velocityCount > 0 ? totalVelocity / velocityCount : Vector3.zero;
+    }
+
+    #endregion
+
+    #region Legacy Interaction System
+
     private void OnTriggerEnter(Collider other)
     {
-        // Girdiği obje bir dolap mı?
         if (other.TryGetComponent(out CabinetController cabinet))
         {
-            _cabinetInRange = cabinet;
+            cabinetInRange = cabinet;
             Debug.Log("Dolap alanına girildi: " + cabinet.gameObject.name);
         }
-        // Girdiği obje yerden alınabilir bir malzeme mi?
         else if (other.TryGetComponent(out GrabbableItem item))
         {
-            _grabbableInRange = item;
+            grabbableInRange = item;
             Debug.Log("Yerden alınabilir obje algılandı: " + item.gameObject.name);
         }
-        //Defterin butonu algılandı mı?
         else if (other.TryGetComponent(out PageTurnButton button))
         {
-            _buttonInRange = button;
+            buttonInRange = button;
             Debug.Log("Defter butonu algılandı: " + button.gameObject.name);
         }
     }
 
-    // El etkileşim alanından çıktığında...
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out CabinetController cabinet) && _cabinetInRange == cabinet)
+        if (other.TryGetComponent(out CabinetController cabinet) && cabinetInRange == cabinet)
         {
-            _cabinetInRange = null;
+            cabinetInRange = null;
             Debug.Log("Dolap alanından çıkıldı.");
         }
-        else if (other.TryGetComponent(out GrabbableItem item) && _grabbableInRange == item)
+        else if (other.TryGetComponent(out GrabbableItem item) && grabbableInRange == item)
         {
-            _grabbableInRange = null;
+            grabbableInRange = null;
             Debug.Log("Yerden alınabilir obje menzilden çıktı.");
         }
-        else if (other.TryGetComponent(out PageTurnButton button) && _buttonInRange == button)
+        else if (other.TryGetComponent(out PageTurnButton button) && buttonInRange == button)
         {
-            _buttonInRange = null;
+            buttonInRange = null;
             Debug.Log("Defter butonu menzilden çıktı.");
         }
     }
 
-    // Elimizdeki objenin pozisyonunu her frame sonunda güncelleyerek takılmayı önler.
-    private void LateUpdate()
+    private void HandleLegacyInteractions()
     {
-        if (_heldItem != null && handHoldPoint != null)
+        if (buttonInRange != null)
         {
-            _heldItem.transform.position = handHoldPoint.position;
-            _heldItem.transform.rotation = handHoldPoint.rotation;
+            buttonInRange.Interact(this);
+        }
+        else if (grabbableInRange != null)
+        {
+            grabbableInRange.Interact(this);
         }
     }
 
-    // Input'tan gelen "Grab" eylemi bu metodu çağırır.
-    public void OnGrab(InputAction.CallbackContext context)
-    {
-        if (context.performed) // Tuşa ilk basıldığında
-        {
-            if (_heldItem == null) // Eğer elimiz boşsa
-            {
-                // Elimiz bir defter butonunun menzilinde mi?
-                if (_buttonInRange != null)
-                {
-                    // Evet, o zaman butonla etkileşime gir (sayfayı çevir).
-                    _buttonInRange.Interact(this);
-                }
-                // Eğer buton menzilinde değilsek, diğer kontrollere geç.
-
-                // Öncelik: Yerdeki bir objeyi al
-                else if (_grabbableInRange != null)
-                {
-                    _grabbableInRange.Interact(this);
-                }
-                // Eğer yerde bir şey yoksa ama dolap alanındaysak, dolaptan iste
-                else if (_cabinetInRange != null)
-                {
-                    _cabinetInRange.RequestItem(this);
-                }
-            }
-        }
-        else if (context.canceled) // Tuş bırakıldığında
-        {
-            if (_heldItem != null) // Eğer elimiz doluysa
-            {
-                ReleaseItem();
-            }
-        }
-    }
-
-    // Diğer script'lerin (Cabinet, GrabbableItem) eline obje vermesi için kullandığı metot
+    // Legacy method for other scripts
     public void HoldItem(GameObject item)
     {
-        _heldItem = item;
-        _heldItemRb = _heldItem.GetComponent<Rigidbody>();
-
-        // Fiziğini kapat
-        if (_heldItemRb != null) _heldItemRb.isKinematic = true;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = false;
-
-        // Anında elin pozisyonuna ışınla
-        if (handHoldPoint != null)
+        if (grabbedObject != null) return;
+        
+        grabbedObject = item;
+        grabbedRigidbody = item.GetComponent<Rigidbody>();
+        
+        if (grabbedRigidbody != null)
         {
-            _heldItem.transform.position = handHoldPoint.position;
-            _heldItem.transform.rotation = handHoldPoint.rotation;
+            originalKinematic = grabbedRigidbody.isKinematic;
+            originalGravity = grabbedRigidbody.useGravity;
+            grabbedRigidbody.isKinematic = true;
+            grabbedRigidbody.useGravity = false;
         }
-
-        Debug.Log(_heldItem.name + " tutuluyor.");
+        
+        originalParent = item.transform.parent;
+        item.transform.SetParent(handHoldPoint);
+        item.transform.localPosition = Vector3.zero;
+        item.transform.localRotation = Quaternion.identity;
+        
+        Debug.Log($"Holding {item.name} (legacy mode)");
     }
 
-    // Elimizdeki objeyi bırakma metodu
-    private void ReleaseItem()
+    #endregion
+
+    #region Utility Methods
+
+    public bool IsHoldingSomething()
     {
-        if (_heldItem == null) return;
-        Debug.Log(_heldItem.name + " bırakıldı.");
+        return grabbedObject != null;
+    }
 
-        // Fiziğini tekrar aç
-        if (_heldItemRb != null) _heldItemRb.isKinematic = false;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = true;
+    public GameObject GetHeldObject()
+    {
+        return grabbedObject;
+    }
 
-        // Referansları temizle
-        _heldItem = null;
-        _heldItemRb = null;
+    public void ForceRelease()
+    {
+        if (grabbedObject != null)
+        {
+            ReleaseObject();
+        }
+    }
+
+    #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        // Draw grab range
+        if (handHoldPoint != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(handHoldPoint.position, grabRange);
+        }
     }
 }

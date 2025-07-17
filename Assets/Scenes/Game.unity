@@ -819,7 +819,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 206091784}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Banana (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2807,7 +2807,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1203436427}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Banana
   m_TagString: Untagged
   m_Icon: {fileID: 0}

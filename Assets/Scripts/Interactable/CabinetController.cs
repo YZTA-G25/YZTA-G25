@@ -1,22 +1,22 @@
-// CabinetController.cs (SAÐLAM VE NÝHAÝ VERSÝYON)
+// CabinetController.cs (SAï¿½LAM VE Nï¿½HAï¿½ VERSï¿½YON)
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CabinetController : MonoBehaviour
 {
     [Header("Cabinet Contents")]
-    [Tooltip("Bu dolabýn içinde görünecek malzemelerin listesi.")]
+    [Tooltip("Bu dolabï¿½n iï¿½inde gï¿½rï¿½necek malzemelerin listesi.")]
     [SerializeField] private List<Ingredient> availableIngredients;
 
-    [Tooltip("Her malzemenin duracaðý yerlerin listesi. Sayýsý malzeme listesiyle ayný olmalý.")]
+    [Tooltip("Her malzemenin duracaï¿½ï¿½ yerlerin listesi. Sayï¿½sï¿½ malzeme listesiyle aynï¿½ olmalï¿½.")]
     [SerializeField] private List<Transform> itemDisplayPoints;
 
-    // Bu dolabýn ana etkileþim alaný
+    // Bu dolabï¿½n ana etkileï¿½im alanï¿½
     private Collider interactionTrigger;
 
     private void Awake()
     {
-        // Dolabýn üzerindeki ana Collider'ý al ve Trigger moduna ayarla
+        // Dolabï¿½n ï¿½zerindeki ana Collider'ï¿½ al ve Trigger moduna ayarla
         interactionTrigger = GetComponent<Collider>();
         if (interactionTrigger != null)
         {
@@ -29,12 +29,12 @@ public class CabinetController : MonoBehaviour
         CreateDisplayItems();
     }
 
-    // Vitrin malzemelerini oluþturan metot
+    // Vitrin malzemelerini oluï¿½turan metot
     private void CreateDisplayItems()
     {
         if (availableIngredients.Count != itemDisplayPoints.Count)
         {
-            Debug.LogError(gameObject.name + " dolabýnda malzeme sayýsý ile spawn noktasý sayýsý uyuþmuyor!");
+            Debug.LogError(gameObject.name + " dolabï¿½nda malzeme sayï¿½sï¿½ ile spawn noktasï¿½ sayï¿½sï¿½ uyuï¿½muyor!");
             return;
         }
 
@@ -45,49 +45,104 @@ public class CabinetController : MonoBehaviour
 
             GameObject displayItem = Instantiate(ingredient.prefab, spawnPoint.position, spawnPoint.rotation);
             displayItem.transform.SetParent(spawnPoint);
+            
+            // Convert LayerMask to layer index (get the first set bit)
+            int layerIndex = 0;
+            int layerMaskValue = ingredient.layerMask.value;
+            while (layerMaskValue > 1)
+            {
+                layerMaskValue >>= 1;
+                layerIndex++;
+            }
+            displayItem.gameObject.layer = layerIndex;
+            
+            // --- UPDATED PHYSICS SETUP FOR GRABBING ---
 
-            // --- YENÝ EKLENEN VE SORUNU ÇÖZEN KISIM ---
-
-            // 1. Görsel objenin Rigidbody'sini bul.
+            // 1. Setup Rigidbody for physics-based grabbing
             Rigidbody itemRb = displayItem.GetComponent<Rigidbody>();
             if (itemRb != null)
             {
-                // 2. Onu Kinematik yap ve yerçekimini kapat.
-                // Bu, onun bir heykel gibi sabit kalmasýný ve aþaðý düþmemesini saðlar.
+                // Make it kinematic and disable gravity so it stays in place as display
                 itemRb.isKinematic = true;
                 itemRb.useGravity = false;
             }
 
-            // 3. Collider'ýný kapat.
-            // Bu, elin yanlýþlýkla bu görsel objeyi algýlamasýný engeller.
-            // El, sadece dolabýn ana trigger'ýný algýlamalý.
+            // 2. Keep collider enabled but make it a trigger for display items
+            // This allows raycast detection while preventing physics interference
             Collider itemCollider = displayItem.GetComponent<Collider>();
             if (itemCollider != null)
             {
-                itemCollider.enabled = false;
+                itemCollider.enabled = true;  // Keep enabled for raycast detection
+                itemCollider.isTrigger = false;  // Not trigger so raycast can hit it
             }
-            // --- YENÝ KISIM BÝTTÝ ---
+            
+            // 3. Add a tag to identify this as a display item (optional)
+            displayItem.tag = "Interactable";
+            // --- UPDATED SECTION END ---
         }
     }
 
-    // HandInteractor bu metodu çaðýrarak bir item talep edecek
+    // HandInteractor bu metodu cagirarak bir item talep edecek
     public void RequestItem(HandInteractor interactor)
     {
         if (availableIngredients.Count == 0) return;
 
-        // Elin pozisyonuna en yakýn olan malzemeyi bul
+        // Elin pozisyonuna en yakin olan malzemeyi bul
         Ingredient closestIngredient = GetClosestIngredientTo(interactor.transform.position);
 
         if (closestIngredient != null)
         {
-            Debug.Log($"{closestIngredient.ingredientName} için klonlama talebi alýndý.");
+            Debug.Log($"{closestIngredient.ingredientName} icin klonlama talebi alindi.");
             GameObject clone = Instantiate(closestIngredient.prefab);
-            clone.AddComponent<GrabbableItem>();
+            
+            // Set up the clone for physics-based grabbing
+            SetupGrabbableClone(clone, closestIngredient);
+            
             interactor.HoldItem(clone);
         }
     }
+    
+    // Set up cloned objects for proper physics-based grabbing
+    private void SetupGrabbableClone(GameObject clone, Ingredient ingredient)
+    {
+        // Convert LayerMask to layer index for the grabbable clone
+        int layerIndex = 0;
+        int layerMaskValue = ingredient.layerMask.value;
+        while (layerMaskValue > 1)
+        {
+            layerMaskValue >>= 1;
+            layerIndex++;
+        }
+        clone.gameObject.layer = layerIndex;
+        
+        // Ensure the clone has proper physics setup
+        Rigidbody cloneRb = clone.GetComponent<Rigidbody>();
+        if (cloneRb == null)
+        {
+            cloneRb = clone.AddComponent<Rigidbody>();
+        }
+        
+        // Make it dynamic (not kinematic) so it can be grabbed
+        cloneRb.isKinematic = false;
+        cloneRb.useGravity = true;
+        cloneRb.mass = 1f; // Set reasonable mass
+        
+        // Ensure collider is enabled and not a trigger
+        Collider cloneCollider = clone.GetComponent<Collider>();
+        if (cloneCollider != null)
+        {
+            cloneCollider.enabled = true;
+            cloneCollider.isTrigger = false;
+        }
+        
+        // Add GrabbableItem component for legacy compatibility
+        if (clone.GetComponent<GrabbableItem>() == null)
+        {
+            clone.AddComponent<GrabbableItem>();
+        }
+    }
 
-    // Elin pozisyonuna en yakýn spawn noktasýný ve dolayýsýyla malzemeyi bulan metot
+    // Elin pozisyonuna en yakï¿½n spawn noktasï¿½nï¿½ ve dolayï¿½sï¿½yla malzemeyi bulan metot
     private Ingredient GetClosestIngredientTo(Vector3 handPosition)
     {
         float closestDistance = float.MaxValue;

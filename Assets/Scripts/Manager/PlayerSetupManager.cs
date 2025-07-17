@@ -1,8 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Cinemachine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class PlayerSetupManager : NetworkBehaviour
 {
@@ -11,10 +9,16 @@ public class PlayerSetupManager : NetworkBehaviour
 
     [Header("Camera Configuration")]
     [SerializeField] private Unity.Cinemachine.OutputChannels cameraOutputChannel;
+    private GameObject eyePlayerCamera;
     
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = true;
 
+
+    public void Start()
+    {
+        // Camera setup moved to OnNetworkSpawn for proper network ownership handling
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -25,6 +29,9 @@ public class PlayerSetupManager : NetworkBehaviour
             return;
         }
 
+        // Handle specific camera setup for local player only
+        HandleLocalCameraSetup();
+        
         SetupCameras();
         // Remove input setup - controllers handle their own input
         SetupNetworkOwnership();
@@ -32,6 +39,25 @@ public class PlayerSetupManager : NetworkBehaviour
         if (enableDebugLogs)
         {
             Debug.Log($"[PlayerSetup] {(isEyePlayer ? "Eye" : "Hand")} Player setup complete for Client {OwnerClientId}");
+        }
+    }
+
+    private void HandleLocalCameraSetup()
+    {
+        // Only affect cameras when this is a HandPlayer owner
+        if (!isEyePlayer)
+        {
+            // Find Eye Player Camera only if this is the HandPlayer
+            eyePlayerCamera = GameObject.FindGameObjectWithTag("Eye Player Camera");
+            
+            if (eyePlayerCamera != null) 
+            {
+                eyePlayerCamera.SetActive(false);
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerSetup] Local HandPlayer (Client {OwnerClientId}) disabled Eye Player Camera");
+                }
+            }
         }
     }
     
