@@ -14,6 +14,10 @@ public class HandInteractor : MonoBehaviour
     private GrabbableItem _grabbableInRange;
     private CookingStation _stationInRange;
 
+    //Network işlemleri için
+    private PlayerNetworkBridge _networkBridge; // Yeni referans
+
+
     //Tarif defteri butonu için
     private PageTurnButton _buttonInRange;
 
@@ -22,6 +26,12 @@ public class HandInteractor : MonoBehaviour
     private Rigidbody _heldItemRb;
 
     // El bir objenin etkileşim alanına girdiğinde...
+
+    private void Awake()
+    {
+        // Parent objelerdeki HandController'ı bul ve hafızaya al.
+        _networkBridge = GetComponentInParent<PlayerNetworkBridge>();
+    }
     private void OnTriggerEnter(Collider other)
     {
         // Girdiği obje bir dolap mı?
@@ -178,29 +188,14 @@ public class HandInteractor : MonoBehaviour
     }
 
 
-    // HandInteractor.cs
-
-    // --- YENİ EKLENEN METOTLAR ---
-
-    // CookingStation gibi dış script'ler bu metodu çağıracak.
     public void DestroyHeldItemOnNetwork()
     {
-        // Eğer elimizde bir obje yoksa, bir şey yapma.
-        if (_heldItem == null) return;
+        if (_heldItem == null || _networkBridge == null) return;
 
-        // Bu isteği sunucuya iletmesi için ServerRpc'yi çağır.
-        DestroyHeldItemServerRpc(_heldItem.GetComponent<NetworkObject>());
-    }
-
-    [ServerRpc]
-    private void DestroyHeldItemServerRpc(NetworkObjectReference itemToDestroyRef)
-    {
-        // Bu kod sunucuda çalışır.
-        if (itemToDestroyRef.TryGet(out NetworkObject networkObject))
+        // Görevi artık HandController'a değil, doğrudan Ağ Köprüsü'ne devrediyoruz.
+        if (_heldItem.TryGetComponent<NetworkObject>(out var networkObject))
         {
-            // Objeyi ağ üzerinden herkes için yok et.
-            networkObject.Despawn(true);
+            _networkBridge.RequestDestroyObjectServerRpc(networkObject);
         }
     }
-    // --- YENİ METOTLAR BİTTİ ---
 }
