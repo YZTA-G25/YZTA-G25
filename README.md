@@ -1,4 +1,4 @@
-<img width="824" height="603" alt="image" src="https://github.com/user-attachments/assets/baab12cc-ed1c-48e4-8e51-0fc3136d6701" /># YZTA - G25
+# YZTA - G25
 
 ## 📚 İçindekiler
 
