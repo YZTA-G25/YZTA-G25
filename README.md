@@ -1,4 +1,4 @@
-**YZTA - G25**
+<img width="824" height="603" alt="image" src="https://github.com/user-attachments/assets/baab12cc-ed1c-48e4-8e51-0fc3136d6701" /># YZTA - G25
 
 ## 📚 İçindekiler
 
@@ -30,6 +30,7 @@
 - [Development Roadmap](#development-roadmap)
 - [Product Backlog](#product-backlog)
 - [Sprint 1](#sprint-1)
+- [Sprint 2](#sprint-2)
 
 </details>
 
@@ -51,14 +52,14 @@
 | Photo | Name | Title |
 |-------|------|-------|
 | ![Dev1](assets/dev1-photo.jpg) | Erkut Kılınç | Scrum Manager | 
-| ![Dev2](assets/dev2-photo.jpg) | Zeynep Salman | Project Owner | 
-| ![Dev3](assets/dev3-photo.jpg) | Yiğit Aydın | Developer | 
-| ![Designer](assets/designer-photo.jpg) | Ecem Kayra Cesur | Developer |
+| ![Designer](assets/dev2-photo.jpg) | Zeynep Salman | Project Owner | 
+| ![Dev2](assets/dev3-photo.jpg) | Yiğit Aydın | Developer | 
+| ![Dev3](assets/designer-photo.jpg) | Ecem Kayra Cesur | Developer |
 
 ---
 
 # Oyun İsmi
-## **[Place Holder]**
+## **Friendslop**
 
 ## Oyun Logosu
 ![Oyun Logo](assets/game-logo.png)
@@ -66,20 +67,20 @@
 
 ## Oyun Açıklaması
 
-**[Place Holder]**, kooperatif oynanış mekanikleriyle öne çıkan, heyecan verici ve komik bir **Arcade Party Game**'dir. İki oyuncu tamamen farklı roller üstlenerek birlikte yemek tarifleri hazırlar: bir oyuncu elleri kontrol ederek malzemeleri toplar ve yemekleri hazırlarken, diğer oyuncu gözleri kontrol ederek çevreyi gözlemler ve partnerine rehberlik eder. Oyuncular, sürekli değişen kaotik olaylarla mücadele ederken, işbirliği ve iletişim becerilerini test eden benzersiz bir deneyim yaşarlar.
+**Friendslop**, kooperatif oynanış mekanikleriyle öne çıkan, heyecan verici ve komik bir **Arcade Party Game**'dir. İki oyuncu tamamen farklı roller üstlenerek birlikte yemek tarifleri hazırlar: bir oyuncu elleri kontrol ederek malzemeleri toplar ve yemekleri hazırlarken, diğer oyuncu gözleri kontrol ederek çevreyi gözlemler ve partnerine rehberlik eder. Oyuncular, sürekli değişen kaotik olaylarla mücadele ederken, işbirliği ve iletişim becerilerini test eden benzersiz bir deneyim yaşarlar.
 
 ## Oyun Hikayesi
 
-Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleştiklerinde kendilerini sitenin uyumluluk testi içerisinded bulurlar. Aynı bedeni paylaşan bu çift gerçekten uyumlu olduklarını görmek için etraflarında dönen kaosa rağmen başarılı bir şekilde sınavları geçmeli ve ilikilerini kanıtlamalıdır.
+Büyülü bir partner bulma sitesine üye olan iki kişi birbirleri ile eşleştiklerinde kendilerini sitenin uyumluluk testi içerisinde bulurlar. Aynı bedeni paylaşan bu çift, gerçekten uyumlu olduklarını görmek için etraflarında dönen kaosa rağmen başarılı bir şekilde sınavları geçmeli ve ilişkilerini kanıtlamalıdır.
 
 ## Oyun Özellikleri
 
-- 🎮 **Kooperatif Multiplayer** (Network + Local [Second Priority])
-- 🍳 **Benzersiz Asymmetric Gameplay** (El vs Göz kontrolü)
+- 🎮 **Kooperatif Multiplayer** (Network + Local [İkinci Öncelik])
+- 🍳 **Benzersiz Asimetrik Oynanış** (El vs Göz kontrolü)
 - ⚡ **Dinamik Kaos Sistemi** (Fırtına, Levitasyon, Halüsinasyon vb.)
-- 📖 **Interaktif Tarif Defteri** Mekaniği
+- 📖 **İnteraktif Tarif Defteri** Mekaniği
 - 🎯 **Arkadaşlık Testi** Oynanışı
-- 🎨 **Polished 3D Görsel Tasarım**
+- 🎨 **Cilalanmış 3D Görsel Tasarım**
 - 🎵 **Yoğun Ses Tasarımı ve Müzik**
 
 ## Kontrol Şeması
@@ -89,21 +90,22 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 ### El Oyuncusu (Hand Player) : Klavye Mouse
 - **WASD**: Karakter hareketi
-- **Mouse XZ**: El X/Z ekseni kontrolü  
-- **Q/E**: El yükselt/alçalt
-- **Sağ Tık + Q/E**: Eli Z ekseni üzerinde Solda/Sağa döndür
+- **Mouse XY**: El X/Z ekseni kontrolü  
+- **Sağ Tık + Mouse Y**: El yükselt/alçalt
+- **Sağ Tık + Mouse X**: Eli Z ekseni üzerinde döndür
 - **Sol Tık**: Obje tutma/bırakma
+
 ### El Oyuncusu (Hand Player) : Gamepad
 - **Sol Stick**: Karakter Hareketi
 - **Sağ Stick**: El X/Z ekseni kontrolü
-- **L1(LT)/R1(RT)**: El yükselt/alçalt
-- **L2(LB) + L1/R1**: Eli Z ekseni üzerinde Sola/Sağa döndür
-- **R2(RB)**: Obje tutma/bırakma 
+- **L1/R1 veya LT/RT**: El yükselt/alçalt
+- **L2/R2 veya LB/RB + Sağ Stick**: Eli Z ekseni üzerinde döndür
+- **L2/R2 veya LB/RB**: Obje tutma/bırakma 
 
 ### Göz Oyuncusu (Eye Player)
-- **WASD**: Karakter hareketi
-- **Sol Tık**: Etkileşim
-- **Gamepad**: Sol stick hareket, R2 Etkileşim
+- **Mouse**: Karakter kafasının rotasyonu
+- **Sol Tık**: Etkileşim (Lever vb.)
+- **Gamepad**: Sol stick kafa rotasyonu, Yüz tuşları etkileşim
 
 </details>
 
@@ -113,7 +115,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 <summary>⚡ Chaos Event Systems</summary>
 
 - 🌪️ **Fırtına**: Eşyaları savurur, sığınak açılmalı
-- ✨ **Eşya Levitasyonu**: Malzemeler havaya uçar, büyü durdurulmalı  
+- ✨ **Eşya Levitasyonu**: Malzemeler havaya uçar, büyü durdurulmalı
 - 👁️ **Göz Kamaşması**: Görüş bozulur, gözlük takılmalı
 - ⚖️ **Denge Bozulması**: Karakter sallanır, denge sağlanmalı
 - 🌀 **Halüsinasyon**: Yanıltıcı görüntüler, ilaç alınmalı
@@ -123,8 +125,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 ## Hedef Kitle
 
 - 🎯 **Kooperatif Oyun Severler**
-- 👫 **Arkadaş Grupları ve Çiftler**  
-- 🎮 **Party Game Meraklıları**
+- 👫 **Arkadaş Grupları ve Çiftler** - 🎮 **Party Game Meraklıları**
 - 🧩 **Puzzle ve Koordinasyon Oyunu Severler**
 - 👥 **16+ Yaş Grubu**
 
@@ -172,10 +173,10 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 **Sprint içerisinde ulaşılan puan**: 40
 
 **Puan tamamlama mantığı**: 
--1 Puan: Çok basit, tek adımlık, bilinen bir görev.
--2 Puan: Birkaç adımı olan, basit ama biraz kurulum gerektiren bir görev.
--3 Puan: Standart bir geliştirme görevi. Ne yapılacağı net, belirli bir kodlama eforu gerektiriyor.
--5 Puan: Birden fazla parçayı etkileyen veya yeni bir mimari düşünmeyi gerektiren, daha karmaşık bir görev.
+- 1 Puan: Çok basit, tek adımlık, bilinen bir görev.
+- 2 Puan: Birkaç adımı olan, basit ama biraz kurulum gerektiren bir görev.
+- 3 Puan: Standart bir geliştirme görevi. Ne yapılacağı net, belirli bir kodlama eforu gerektiriyor.
+- 5 Puan: Birden fazla parçayı etkileyen veya yeni bir mimari düşünmeyi gerektiren, daha karmaşık bir görev.
 
 **Daily Scrum**: Toplantılar Slack üzerinden gerçekleştirildi, gün içerisinde Whatsapp aracılığı ile iletişim kuruldu. [Daily Scrum Chats](https://imgur.com/a/WUMZggb)
 
@@ -183,11 +184,11 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 ### Ürün Durumu: Ekran Görüntüleri
 ![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20DEsign.mp4)
--Level Design Gösterimi Video
+- Level Design Gösterimi Video
 ![Screenshot 2](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20Design.png)
--Level içerisinden bir fotoğraf
+- Level içerisinden bir fotoğraf
 ![Screenshot 3](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Mechanics.mp4)
--GamePlay Video
+- GamePlay Video
 
 ### Jira Ekran Görüntüleri
 ![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Jira%201.png)
@@ -225,4 +226,64 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 </details>
 
-**© 2025 [Place Holder] - GameJam 2025 Project**
+---
+
+## Sprint 2
+
+<details>
+<summary>🚀 Sprint 2 - Core Systems</summary>
+
+**Sprint Notları**: İkinci sprint, oyuncu sistemlerini tamamlamaya, temel etkileşim döngüsünü (dolaptan al, tezgaha koy) kurmaya ve Kaos Sistemi'nin temellerini atmaya odaklandı. Göz Oyuncusu için lever tabanlı kafa kontrolü başarıyla implemente edildi.
+
+**Sprint içinde tamamlanması tahmin edilen puan**: 50 Puan
+
+**Sprint içerisinde ulaşılan puan**: 45
+
+**Puan tamamlama mantığı**: 
+- 1 Puan: Çok basit, tek adımlık, bilinen bir görev.
+- 2 Puan: Birkaç adımı olan, basit ama biraz kurulum gerektiren bir görev.
+- 3 Puan: Standart bir geliştirme görevi. Ne yapılacağı net, belirli bir kodlama eforu gerektiriyor.
+- 5 Puan: Birden fazla parçayı etkileyen veya yeni bir mimari düşünmeyi gerektiren, daha karmaşık bir görev.
+
+**Daily Scrum**: Toplantılar Slack üzerinden devam etti. Whatsapp, anlık iletişim için aktif olarak kullanıldı.
+
+**Sprint board update**: ![Sprint 2 Board](https://imgur.com/a/iM02kJz)
+
+### Ürün Durumu: Ekran Görüntüleri
+![Sprint 2 Gameplay Video](https://imgur.com/a/9IWS6AO)
+- *Geliştirilmiş Etkileşim ve Lever Mekanikleri Videosu
+
+### Jira Ekran Görüntüleri
+![Sprint 2 Jira 1](https://imgur.com/a/ymWSuGu)
+- *Sprint 2 Jira Panosu (Sizin tarafınızdan eklenecek)*
+**Sprint Review**:
+- Gelişmiş Oyuncu Kontrolleri (El ve Göz) tamamlandı ✔️
+- Etkileşim Sistemi (Tutma/Bırakma) geliştirildi ve dolap mekaniği eklendi ✔️
+- Göz Oyuncusu'nun Kafa Kontrolü (Lever Sistemi) implemente edildi ✔️
+- Defter (Notebook) çevirme mekaniği eklendi ✔️
+- Temel Kaos Sistemi altyapısı kuruldu (Fırtına olayı üzerinde çalışılıyor) ➖
+- UI elemanları (Crosshair, Butonlar) entegre edildi ✔️
+
+**Sprint Retrospective**:
+
+**Yapılan Doğrular**:
+- Takım içi teknik iletişim güçlendi, özellikle kod birleştirme (merge) ve senkronizasyon konularında daha dikkatli davranıldı. ![Yeni Pull Request Formatımız](https://imgur.com/a/SEUaxYr)
+- İlk sprint'teki hatalardan ders çıkarılarak görev dağılımı daha net yapıldı ve görev takibi Jira üzerinden daha sıkı yürütüldü.
+- Asimetrik oyuncu rollerinin (El vs Göz) oynanışını netleştiren önemli kararlar alındı.
+
+**Hatalar**:
+- Fizik tabanlı network senkronizasyonu (Kaos Olayı - Fırtına) beklenenden daha zorlayıcı oldu ve tam olarak çözülemedi. Bu durum, bazı görevlerin tamamlanamamasına neden oldu.
+- UI elemanlarının entegrasyonu sprint sonuna bırakıldığı için yetişmedi.
+- Ekip üyelerinin toplu olarak şehir dışında olması gereken bir hafta olduğu için bütün amaçlara tam olarak ulaşılamadı. (Özellikle Customer sistemi bitirilmediği ve Pull Requestler tam olarak dahil edilmediği için oyun döngüsü daha gösterilemiyor.)
+- Scrum Master ev taşıdığı için (ben) bu sprint'in yönetimi eksikti.
+
+**Planlar**:
+- Fırtına Kaos Olayı'ndaki senkronizasyon sorununu çözmek **birinci öncelik** ❗
+- UI/UX üzerinde detaylı çalışmalara başlanacak (animasyonlar, geri bildirimler vb.) ❗
+- Müşteriler entegre edilecek son değişiklikler birleştirilecek❗
+- Geçtiğimiz haftanın eksikleri nedeni ile en sert Sprint başlayacak.
+
+</details>
+
+---
+**© 2025 YZTA - G25**
