@@ -180,8 +180,6 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbirleri ile eşleşt
 
 **Daily Scrum**: Toplantılar Slack üzerinden gerçekleştirildi, gün içerisinde Whatsapp aracılığı ile iletişim kuruldu. [Daily Scrum Chats](https://imgur.com/a/WUMZggb)
 
-**Sprint board update**: ![Sprint Board](assets/sprint1-board.png)
-
 ### Ürün Durumu: Ekran Görüntüleri
 ![Screenshot 1](https://github.com/YZTA-G25/YZTA-G25/blob/main/Assets/Github%20Assets/Level%20DEsign.mp4)
 - Level Design Gösterimi Video
