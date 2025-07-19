@@ -235,7 +235,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbirleri ile eşleşt
 
 **Sprint Notları**: İkinci sprint, oyuncu sistemlerini tamamlamaya, temel etkileşim döngüsünü (dolaptan al, tezgaha koy) kurmaya ve Kaos Sistemi'nin temellerini atmaya odaklandı. Göz Oyuncusu için lever tabanlı kafa kontrolü başarıyla implemente edildi.
 
-**Sprint içinde tamamlanması tahmin edilen puan**: 50 Puan
+**Sprint içinde tamamlanması tahmin edilen puan**: 72Puan
 
 **Sprint içerisinde ulaşılan puan**: 45
 
