@@ -9,6 +9,7 @@ public class Storm : ChaosBehaviour
     private Transform stormCenter;
     [SerializeField] private float stormRadius = 20f;
     [SerializeField] private float windForce = 50f;
+    [SerializeField] private float upwardForce = 2f;
 
     private List<Rigidbody> affectedObjects = new List<Rigidbody>();
     public bool isEventActive { get; private set; }
@@ -39,6 +40,7 @@ public class Storm : ChaosBehaviour
         {
             if (rb != null)
             {
+                Vector3 upwardDirection = Vector3.up * upwardForce;
                 //Merkezden objeye doğru olan kuvvet yönü
                 Vector3 radialDirection = (rb.transform.position - stormCenter.position).normalized;
 
@@ -48,7 +50,7 @@ public class Storm : ChaosBehaviour
                 //Merkezkaç kuvveti
                 Vector3 vortexForce = (tangentialDirection - radialDirection * 0.5f).normalized;
 
-                rb.AddForce(vortexForce * windForce, ForceMode.Force);
+                rb.AddForce(vortexForce * windForce + upwardDirection, ForceMode.Force);
             }
         }
     }

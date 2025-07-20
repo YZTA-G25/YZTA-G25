@@ -512,7 +512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
-  mouseSensitivity: 1
+  mouseSensitivity: 0.46
   pitchLimit: 85
   lookAtTarget: {fileID: 5982292853994554255}
   handSensitivity: 5
