@@ -3,10 +3,11 @@ using UnityEngine;
 
 public class GrabbableItem : Interactable
 {
-    // Parametreyi PlayerInteractor'dan HandInteractor'a çeviriyoruz.
+    public bool inFood = false;
+
     public override void Interact(HandInteractor interactor)
     {
-        Debug.Log($"Yerden alýndý: {gameObject.name}");
+        Debug.Log($"Yerden alÄ±ndÄ±: {gameObject.name}");
         interactor.HoldItem(this.gameObject);
     }
 }

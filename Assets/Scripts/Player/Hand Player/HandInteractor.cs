@@ -42,6 +42,13 @@ public class HandInteractor : MonoBehaviour
     private PageTurnButton buttonInRange;
     private CabinetController cabinetInRange;
 
+    private Vector3 originalScale;
+
+    private void Start()
+    {
+        originalScale = transform.localScale;
+    }
+
     private void Update()
     {
         // Track hand position for velocity calculation
@@ -113,7 +120,7 @@ public class HandInteractor : MonoBehaviour
         }
         
         Debug.Log(closest != null ? $"Found closest object: {closest.name} at distance {closestDistance}" 
-                                  : "No grabbable objects found in range");
+                                : "No grabbable objects found in range");
         
         return closest;
     }
@@ -175,13 +182,16 @@ public class HandInteractor : MonoBehaviour
         
         // Restore original properties
         grabbedRigidbody.isKinematic = originalKinematic;
+
+        grabbedObject.transform.localScale = originalScale;
+
         grabbedRigidbody.useGravity = originalGravity;
         grabbedObject.transform.SetParent(originalParent);
         
         // Apply momentum if throwing
         if (shouldThrow && !originalKinematic)
         {
-            grabbedRigidbody.linearVelocity = releaseVelocity * throwForceMultiplier;
+            grabbedRigidbody.linearVelocity = releaseVelocity * throwForceMultiplier * Time.deltaTime;
             Debug.Log($"Threw {grabbedObject.name} with velocity: {releaseVelocity * throwForceMultiplier}");
         }
         else

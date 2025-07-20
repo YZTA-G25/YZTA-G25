@@ -819,12 +819,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handHoldPoint: {fileID: 3655521842484358603}
   grabRange: 1.28
-  grabbedDrag: 10
-  grabbedAngularDrag: 10
-  jointBreakForce: 1000
   grabbableLayer:
     serializedVersion: 2
     m_Bits: 16384
+  throwForceMultiplier: 1
+  velocityThreshold: 2
+  velocitySamples: 5
 --- !u!1 &9102668685668980142
 GameObject:
   m_ObjectHideFlags: 0

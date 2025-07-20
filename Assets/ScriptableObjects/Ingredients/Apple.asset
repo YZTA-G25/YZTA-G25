@@ -19,4 +19,4 @@ MonoBehaviour:
   cookTime: 0
   layerMask:
     serializedVersion: 2
-    m_Bits: 49152
+    m_Bits: 16384
