@@ -1,5 +1,6 @@
 // CabinetController.cs (SAĞLAM VE NİHAİ VERSİYON)
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CabinetController : MonoBehaviour
@@ -40,7 +41,13 @@ public class CabinetController : MonoBehaviour
             Transform spawnPoint = itemDisplayPoints[i];
 
             GameObject displayItem = Instantiate(ingredient.prefab, spawnPoint.position, spawnPoint.rotation);
-            displayItem.transform.SetParent(spawnPoint);
+            var networkObject = displayItem.GetComponent<NetworkObject>();
+            if (Unity.Netcode.NetworkManager.Singleton != null && 
+                (Unity.Netcode.NetworkManager.Singleton.IsServer || Unity.Netcode.NetworkManager.Singleton.IsHost))
+            {
+                networkObject.Spawn(true);
+                networkObject.TrySetParent(spawnPoint);
+            }
             
             // Convert LayerMask to layer index (get the first set bit)
             int layerIndex = 0;

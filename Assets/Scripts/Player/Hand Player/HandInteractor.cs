@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
@@ -163,8 +164,8 @@ public class HandInteractor : MonoBehaviour
         // Make object kinematic and parent it to hand
         grabbedRigidbody.isKinematic = true;
         grabbedRigidbody.useGravity = false;
-        grabbedObject.transform.SetParent(handHoldPoint);
-        
+        grabbedObject.GetComponent<NetworkObject>().TrySetParent(handHoldPoint);
+
         // Position object so contact point aligns with hand
         Vector3 desiredObjectPosition = handHoldPoint.position - (contactPoint - grabbedObject.transform.position);
         grabbedObject.transform.position = desiredObjectPosition;
@@ -186,7 +187,7 @@ public class HandInteractor : MonoBehaviour
         grabbedObject.transform.localScale = originalScale;
 
         grabbedRigidbody.useGravity = originalGravity;
-        grabbedObject.transform.SetParent(originalParent);
+        grabbedObject.GetComponent<NetworkObject>().TrySetParent(originalParent);
         
         // Apply momentum if throwing
         if (shouldThrow && !originalKinematic)
