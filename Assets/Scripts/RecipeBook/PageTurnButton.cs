@@ -18,4 +18,10 @@ public class PageTurnButton : MonoBehaviour, IInteractable
             notebookController.TurnToPreviousPage();
         }
     }
+
+    public void Release()
+    {
+        // PageTurnButton doesn't need any release functionality
+        // This is only for grabbable objects
+    }
 }

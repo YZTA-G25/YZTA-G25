@@ -44,10 +44,14 @@ public class HandController : NetworkBehaviour
     // Bir objenin ağ üzerindeki yaşam döngüsünün başlangıcıdır.
     public override void OnNetworkSpawn()
     {
+        Debug.Log($"HandController OnNetworkSpawn called! IsOwner: {IsOwner}, IsServer: {IsServer}, IsClient: {IsClient}");
+        Debug.Log($"NetworkObjectId: {NetworkObjectId}, IsSpawned: {IsSpawned}");
+        
         // Kodun sadece bu objenin "sahibi" olan client'ta çalışmasını sağlar
         // Böylece bir oyuncu, diğer oyuncunun karakterini kontrol edemez.
         if (!IsOwner)
         {
+            Debug.Log("Not owner, disabling HandController");
             this.enabled = false;
             return;
         }
