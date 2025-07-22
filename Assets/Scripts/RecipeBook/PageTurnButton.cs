@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class PageTurnButton : Interactable
+public class PageTurnButton : MonoBehaviour, IInteractable
 {
     [SerializeField] private NotebookController notebookController;
     [SerializeField] private bool isNextButton;
 
-    public override void Interact(HandInteractor interactor)
+    public void Interact(HandInteractor interactor)
     {
         if (notebookController == null) return;
 
@@ -17,5 +17,11 @@ public class PageTurnButton : Interactable
         {
             notebookController.TurnToPreviousPage();
         }
+    }
+
+    public void Release()
+    {
+        // PageTurnButton doesn't need any release functionality
+        // This is only for grabbable objects
     }
 }

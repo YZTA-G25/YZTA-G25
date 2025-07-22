@@ -149,6 +149,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3655521842484358603}
+  - component: {fileID: 2989313775532371828}
+  - component: {fileID: 8184248757395804555}
   m_Layer: 15
   m_Name: HandHoldPoint
   m_TagString: Untagged
@@ -165,12 +167,83 @@ Transform:
   m_GameObject: {fileID: 6041850321651202394}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.21636245, y: -0.29370373, z: 0.40499997}
+  m_LocalPosition: {x: -0.21636245, y: -0.29370373, z: 0.174}
   m_LocalScale: {x: 3.3806627, y: 6.118828, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2578983085602209902}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2989313775532371828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6041850321651202394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &8184248757395804555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6041850321651202394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &6818570024144399171
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,7 +263,6 @@ GameObject:
   - component: {fileID: 7544691108855062268}
   - component: {fileID: 8986550731188141467}
   - component: {fileID: 989099499298201783}
-  - component: {fileID: 2069074443236838303}
   m_Layer: 6
   m_Name: Hand Player
   m_TagString: Hand Player
@@ -513,8 +585,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
-  mouseSensitivity: 1
-  handSensitivity: 0.1
+  mouseSensitivity: 0.46
+  pitchLimit: 85
+  lookAtTarget: {fileID: 5982292853994554255}
+  handSensitivity: 5
   handVerticalSpeed: 2
   handRotationSpeed: 45
   gravity: -9.81
@@ -555,19 +629,6 @@ MonoBehaviour:
   isEyePlayer: 0
   cameraOutputChannel: 2
   enableDebugLogs: 1
---- !u!114 &2069074443236838303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91b3e43b34bdc864499c7df6593498a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &9006520116669081007
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +751,8 @@ GameObject:
   - component: {fileID: 8653105382495744739}
   - component: {fileID: 1124374180893771628}
   - component: {fileID: 598656007246612551}
-  - component: {fileID: 3615840244424506893}
+  - component: {fileID: 1998558582772689149}
+  - component: {fileID: 5088104509545711964}
   m_Layer: 15
   m_Name: Hand
   m_TagString: Untagged
@@ -812,12 +874,12 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3615840244424506893
+--- !u!114 &1998558582772689149
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -830,6 +892,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handHoldPoint: {fileID: 3655521842484358603}
+  grabRange: 1.28
+  grabbableLayer:
+    serializedVersion: 2
+    m_Bits: 16384
+  throwForceMultiplier: 1
+  velocityThreshold: 2
+  velocitySamples: 5
+--- !u!114 &5088104509545711964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9087050555096370552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &9102668685668980142
 GameObject:
   m_ObjectHideFlags: 0

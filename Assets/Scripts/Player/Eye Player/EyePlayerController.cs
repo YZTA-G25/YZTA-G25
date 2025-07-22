@@ -5,6 +5,8 @@ using Unity.Netcode;
 #if UNITY_EDITOR
 using UnityEditor.EditorTools;
 using Unity.VisualScripting;
+using UnityEngine.Events;
+
 #endif
 
 
@@ -44,6 +46,8 @@ public class EyePlayerController : NetworkBehaviour
 
     private float jumpCooldown = 0.05f;
 
+    public static UnityEvent OnSpawned = new UnityEvent();
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -51,6 +55,11 @@ public class EyePlayerController : NetworkBehaviour
         // İmleci Kitle
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         UnityEngine.Cursor.visible = false;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        OnSpawned.Invoke();
     }
 
     public void Start()
