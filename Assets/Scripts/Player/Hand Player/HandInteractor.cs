@@ -81,6 +81,7 @@ public class HandInteractor : MonoBehaviour
                 // Elimiz bir defter butonunun menzilinde mi?
                 if (_buttonInRange != null)
                 {
+                    Debug.Log("Grab tuşuna basıldı ve buton menzilde! Interact metodu çağrılıyor...");
                     // Evet, o zaman butonla etkileşime gir (sayfayı çevir).
                     _buttonInRange.Interact(this);
                 }
