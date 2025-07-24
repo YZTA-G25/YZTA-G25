@@ -169,7 +169,6 @@ GameObject:
   - component: {fileID: -3952270589571999894}
   - component: {fileID: 8327702528252651419}
   - component: {fileID: 1329783114491598974}
-  - component: {fileID: 5850262673143225445}
   m_Layer: 6
   m_Name: Eye Player
   m_TagString: Eye Player
@@ -558,19 +557,6 @@ MonoBehaviour:
   isEyePlayer: 1
   cameraOutputChannel: 4
   enableDebugLogs: 1
---- !u!114 &5850262673143225445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6818570024144399171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41f9a6f9dac30fe409094b8c2682ca82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &7062586062123699546
 GameObject:
   m_ObjectHideFlags: 0

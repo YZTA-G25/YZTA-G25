@@ -55,6 +55,10 @@ public class HandController : NetworkBehaviour
             this.enabled = false;
             return;
         }
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused += HandleGamePaused;
+        }
 
         // Sahibi olan client için yapılacak başlangıç ayarları
 
@@ -106,6 +110,10 @@ public class HandController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused -= HandleGamePaused;
+        }
         // Input'ları devre dışı bırakarak hafıza sızıntısını önlüyoruz
         playerControls.HandPlayer.Disable();
     }
@@ -269,5 +277,9 @@ public class HandController : NetworkBehaviour
     #endregion
 
 
-    
+    private void HandleGamePaused(bool isPaused)
+    {
+        // isPaused true ise bu script'i devre dışı bırak, değilse etkinleştir.
+        this.enabled = !isPaused;
+    }
 }

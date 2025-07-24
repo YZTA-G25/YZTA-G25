@@ -1,10 +1,12 @@
-using UnityEngine;
-using UnityEngine.UI;
-using Unity.Netcode;
-using UnityEngine.SceneManagement;
-using TMPro;
-using UnityEngine.Audio;
 using System;
+using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
+using UnityEditor.Rendering;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InGameUIManager : MonoBehaviour
 {
@@ -22,6 +24,11 @@ public class InGameUIManager : MonoBehaviour
     [Header("Settings UI")]
     [SerializeField] private Slider volumeSlider;
     [SerializeField] private AudioMixer mainMixer;
+    [SerializeField] private TMP_Dropdown qualityDropdown;
+    [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Toggle fullscreenToggle;
+
+    private List<Resolution> resolutions;
 
     [Header("Disconnect UI")]
     [SerializeField] private TextMeshProUGUI countdownText;
@@ -68,11 +75,41 @@ public class InGameUIManager : MonoBehaviour
         float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
         volumeSlider.value = savedVolume;
         SetVolume(savedVolume);
+
+        qualityDropdown.ClearOptions();
+        qualityDropdown.AddOptions(new List<string>(QualitySettings.names));
+        qualityDropdown.value = QualitySettings.GetQualityLevel();
+        qualityDropdown.RefreshShownValue();
+        qualityDropdown.onValueChanged.AddListener(SetQuality);
+
+        fullscreenToggle.isOn = Screen.fullScreen;
+        fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+
+        // --- Çözünürlük Ayarlarý Baþlangýcý ---
+        resolutions = new List<Resolution>(Screen.resolutions);
+        resolutionDropdown.ClearOptions();
+        List<string> options = new List<string>();
+        int currentResolutionIndex = 0;
+        for (int i = 0; i < resolutions.Count; i++)
+        {
+            string option = resolutions[i].width + " x " + resolutions[i].height;
+            options.Add(option);
+
+            if (resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
+            {
+                currentResolutionIndex = i;
+            }
+        }
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = currentResolutionIndex;
+        resolutionDropdown.RefreshShownValue();
+        resolutionDropdown.onValueChanged.AddListener(SetResolution);
     }
 
     private void Update()
     {
-        // ESC tuþuna basýldýðýnda duraklatma menüsünü aç/kapat
+        
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePauseMenu();
@@ -145,5 +182,21 @@ public class InGameUIManager : MonoBehaviour
         // Ýsteðe baðlý: Geri sayým metnini burada güncelleyebilirsiniz.
         if (countdownText != null)
             countdownText.text = $"Diðer oyuncunun baðlantýsý koptu. Ana menüye dönmek için bekleniyor: {duration}";
+    }
+
+    public void SetQuality(int qualityIndex)
+    {
+        QualitySettings.SetQualityLevel(qualityIndex);
+    }
+
+    public void SetFullscreen(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
+    }
+
+    public void SetResolution(int resolutionIndex)
+    {
+        Resolution resolution = resolutions[resolutionIndex];
+        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
 }

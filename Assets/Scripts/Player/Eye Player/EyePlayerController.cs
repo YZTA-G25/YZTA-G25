@@ -60,8 +60,21 @@ public class EyePlayerController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         OnSpawned.Invoke();
-    }
 
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused += HandleGamePaused;
+        }
+    }
+    public override void OnNetworkDespawn()
+    {
+        // ... mevcut OnNetworkDespawn kodlarınızın sonuna ekleyin ...
+
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused -= HandleGamePaused;
+        }
+    }
     public void Start()
     {
         // Only initialize input for the owner
@@ -209,5 +222,11 @@ public class EyePlayerController : NetworkBehaviour
         }
         
         base.OnDestroy();
+    }
+
+    private void HandleGamePaused(bool isPaused)
+    {
+        // isPaused true ise bu script'i devre dışı bırak, değilse etkinleştir.
+        this.enabled = !isPaused;
     }
 }

@@ -1,8 +1,11 @@
-using UnityEngine;
-using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
-using UnityEngine.SceneManagement;
+using UnityEditor.Rendering;
+using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuUIManager : MonoBehaviour
 {
@@ -20,6 +23,15 @@ public class MainMenuUIManager : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioMixer mainMixer;
     [SerializeField] private Slider volumeSlider;
+
+
+    [Header("Settings UI")] // Mevcut baþlýðýn altýna veya yeni bir baþlýða
+    [SerializeField] private TMP_Dropdown qualityDropdown;
+    [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Toggle fullscreenToggle;
+
+    // Çözünürlükleri saklamak için bir liste
+    private List<Resolution> resolutions;
 
     private void Awake()
     {
@@ -61,6 +73,36 @@ public class MainMenuUIManager : MonoBehaviour
         float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
         volumeSlider.value = savedVolume;
         SetVolume(savedVolume);
+
+        qualityDropdown.ClearOptions();
+        qualityDropdown.AddOptions(new List<string>(QualitySettings.names));
+        qualityDropdown.value = QualitySettings.GetQualityLevel();
+        qualityDropdown.RefreshShownValue();
+        qualityDropdown.onValueChanged.AddListener(SetQuality);
+
+        fullscreenToggle.isOn = Screen.fullScreen;
+        fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+
+        // --- Çözünürlük Ayarlarý Baþlangýcý ---
+        resolutions = new List<Resolution>(Screen.resolutions);
+        resolutionDropdown.ClearOptions();
+        List<string> options = new List<string>();
+        int currentResolutionIndex = 0;
+        for (int i = 0; i < resolutions.Count; i++)
+        {
+            string option = resolutions[i].width + " x " + resolutions[i].height;
+            options.Add(option);
+
+            if (resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
+            {
+                currentResolutionIndex = i;
+            }
+        }
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = currentResolutionIndex;
+        resolutionDropdown.RefreshShownValue();
+        resolutionDropdown.onValueChanged.AddListener(SetResolution);
     }
 
     private void OnSettingsClicked()
@@ -108,6 +150,20 @@ public class MainMenuUIManager : MonoBehaviour
 #endif
     }
 
+    public void SetQuality(int qualityIndex)
+    {
+        QualitySettings.SetQualityLevel(qualityIndex);
+    }
 
+    public void SetFullscreen(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
+    }
+
+    public void SetResolution(int resolutionIndex)
+    {
+        Resolution resolution = resolutions[resolutionIndex];
+        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+    }
 
 }
