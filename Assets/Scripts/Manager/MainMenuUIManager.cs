@@ -211,7 +211,7 @@ public class MainMenuUIManager : MonoBehaviour
         {
             if (sliderSoundTimer <= 0f)
             {
-                SoundManager.PlaySound(SoundType.SLIDER_TICK);
+                SoundManager.PlaySound(SoundType.SLIDER_TICK, 0.1f);
                 sliderSoundTimer = sliderSoundInterval;
             }
         }

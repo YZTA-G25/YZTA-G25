@@ -47,6 +47,12 @@ public class InGameUIManager : MonoBehaviour
 
     private void Start()
     {
+
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayMusic(MusicTrack.GameScene);
+        }
+
         // Butonlara týklandýðýnda ne olacaðýný belirle
         // Her týklamada ÖNCE sesi çal, SONRA ilgili fonksiyonu çalýþtýr.
 
@@ -170,6 +176,10 @@ public class InGameUIManager : MonoBehaviour
 
     private void OnMainMenuClicked()
     {
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.PlayMusic(MusicTrack.MainMenu);
+        }
         // Að oturumunu güvenli bir þekilde kapat
         NetworkManager.Singleton.Shutdown();
 
@@ -236,7 +246,23 @@ public class InGameUIManager : MonoBehaviour
 
     public void SetMusicVolume(float volume)
     {
-        mainMixer.SetFloat("MusicVolume", Mathf.Log10(volume) * 20);
+        // Ses çalma mantýðý
+        if (isSettingsInitialized)
+        {
+            if (sliderSoundTimer <= 0f)
+            {
+                SoundManager.PlaySound(SoundType.SLIDER_TICK, 0.1f);
+                sliderSoundTimer = sliderSoundInterval;
+            }
+        }
+
+        // Sýfýr deðeri için matematiksel düzeltme
+        float dbVolume = (volume <= 0.0001f) ? -80f : Mathf.Log10(volume) * 20;
+
+        // Mixer'a doðru parametre adýyla doðru deðeri gönderme
+        mainMixer.SetFloat("MusicVolume", dbVolume);
+
+        // Ayarý kaydetme
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 

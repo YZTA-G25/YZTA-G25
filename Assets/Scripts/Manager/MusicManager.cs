@@ -1,5 +1,13 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement; // Sahne yönetimi için eklendi
+
+// Hangi müziðin çalýnacaðýný belirtmek için bir enum
+public enum MusicTrack
+{
+    MainMenu,
+    GameScene
+}
 
 [RequireComponent(typeof(AudioSource))]
 public class MusicManager : MonoBehaviour
@@ -8,7 +16,8 @@ public class MusicManager : MonoBehaviour
     private AudioSource audioSource;
 
     [Header("Settings")]
-    [SerializeField] private AudioClip backgroundMusic;
+    [SerializeField] private AudioClip mainMenuMusic; // Menü müziði için
+    [SerializeField] private AudioClip gameSceneMusic; // Oyun sahnesi müziði için
     [SerializeField] private AudioMixer mainMixer;
 
     private void Awake()
@@ -21,15 +30,34 @@ public class MusicManager : MonoBehaviour
 
     private void Start()
     {
-        if (mainMixer == null)
-        {
-            Debug.LogError("MusicManager'da 'Main Mixer' atanmamýþ! Lütfen Inspector'dan atayýn.");
-            return;
-        }
-        // Mixer'daki grubun adýný "MusicVolume" olarak düzelttik.
+        // AudioSource'un çýkýþýný "MusicVolume" grubuna ata
         audioSource.outputAudioMixerGroup = mainMixer.FindMatchingGroups("MusicVolume")[0];
-        audioSource.clip = backgroundMusic;
         audioSource.loop = true;
-        audioSource.Play();
+
+        // Oyun ilk açýldýðýnda menü müziðini çal
+        PlayMusic(MusicTrack.MainMenu);
+    }
+
+    // Dýþarýdan çaðrýlarak müziði deðiþtirecek olan metot
+    public void PlayMusic(MusicTrack track)
+    {
+        AudioClip clipToPlay = null;
+
+        switch (track)
+        {
+            case MusicTrack.MainMenu:
+                clipToPlay = mainMenuMusic;
+                break;
+            case MusicTrack.GameScene:
+                clipToPlay = gameSceneMusic;
+                break;
+        }
+
+        // Eðer çalýnan müzik zaten istenen müzikse, tekrar baþlatma
+        if (clipToPlay != null && audioSource.clip != clipToPlay)
+        {
+            audioSource.clip = clipToPlay;
+            audioSource.Play();
+        }
     }
 }
