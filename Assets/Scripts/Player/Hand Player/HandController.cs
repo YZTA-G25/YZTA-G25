@@ -8,6 +8,10 @@ using Unity.VisualScripting;
 // ağ üzerinde bir kimliğe sahip olmasını sağlar.
 public class HandController : NetworkBehaviour
 {
+    [Header("Footstep Settings")]
+    [SerializeField] private float footstepInterval = 0.5f; // Adım sesleri arasındaki saniye
+    private float footstepTimer = 0f;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float mouseSensitivity = 1f;
@@ -154,6 +158,21 @@ public class HandController : NetworkBehaviour
         
         // Move the character
         characterController.Move(finalMovement);
+
+        footstepTimer -= Time.deltaTime;
+
+        // Yatay hareketin büyüklüğünü hesapla (y eksenini yok sayarak)
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+
+        // Eğer oyuncu yerde, yatay olarak hareket ediyor ve zamanlayıcı sıfırlandıysa...
+        if (characterController.isGrounded && horizontalVelocity.magnitude > 0.1f && footstepTimer <= 0f)
+        {
+            // ...ayak sesini çal.
+            SoundManager.PlaySound(SoundType.FOOTSTEP);
+
+            // ...ve zamanlayıcıyı yeniden başlat.
+            footstepTimer = footstepInterval;
+        }
     }
 
     // Karakterin bakış/dönüş mantığı (Similar to EyePlayerController)

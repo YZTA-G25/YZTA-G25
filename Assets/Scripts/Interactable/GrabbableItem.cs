@@ -35,7 +35,9 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
         if (interactor.IsHoldingSomething()) return; // Hand is full
 
         Debug.Log($"Grabbing: {gameObject.name}");
-        
+
+        SoundManager.PlaySound(SoundType.OBJECT_GRAB);
+
         currentInteractor = interactor;
         
         // Store original properties for restoration

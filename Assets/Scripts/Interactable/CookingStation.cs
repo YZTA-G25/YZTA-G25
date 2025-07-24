@@ -187,6 +187,9 @@ public class CookingStation : NetworkBehaviour, IInteractable
             // 3. Tarif DOÐRUYSA: Puan ekle!
             Debug.Log($"Tarif doðru! {currentTargetRecipe.scoreValue} puan ekleniyor.");
             ScoringManager.Instance.AddScoreServerRpc(currentTargetRecipe.scoreValue);
+
+            SoundManager.PlaySound(SoundType.RECIPE_COMPLETE);
+
         }
         else
         {

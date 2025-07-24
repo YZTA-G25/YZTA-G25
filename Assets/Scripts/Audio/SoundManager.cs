@@ -5,7 +5,12 @@ public enum SoundType
 {
     KNIFE,
     FOOTSTEP,
-    MENU_CLICK
+    MENU_CLICK,
+    MENU_HOVER,
+    SLIDER_TICK,
+    MENU_PAUSE,
+    OBJECT_GRAB,
+    RECIPE_COMPLETE
 }
 
 [RequireComponent(typeof(AudioSource)), ExecuteInEditMode]

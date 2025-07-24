@@ -21,6 +21,11 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField] private Button backButton; // Settings panelindeki geri butonu
     [SerializeField] private Button mainMenuButton;
 
+    [Header("Audio")]
+    [SerializeField] private float sliderSoundInterval = 0.1f; // Sesler arasý minimum saniye
+    [SerializeField] private Slider musicVolumeSlider;
+    private float sliderSoundTimer = 0f;
+
     [Header("Settings UI")]
     [SerializeField] private Slider volumeSlider;
     [SerializeField] private AudioMixer mainMixer;
@@ -29,6 +34,7 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField] private Toggle fullscreenToggle;
 
     private List<Resolution> resolutions;
+    private bool isSettingsInitialized = false;
 
     [Header("Disconnect UI")]
     [SerializeField] private TextMeshProUGUI countdownText;
@@ -37,29 +43,37 @@ public class InGameUIManager : MonoBehaviour
 
     // Oyuncu kontrolünü durdurmak için kullanýlacak static event
     public static event Action<bool> OnGamePaused;
+    
 
     private void Start()
     {
         // Butonlara týklandýðýnda ne olacaðýný belirle
         // Her týklamada ÖNCE sesi çal, SONRA ilgili fonksiyonu çalýþtýr.
 
+        musicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
+
+        // Kayýtlý müzik sesini yükle
+        float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+        musicVolumeSlider.value = savedMusicVolume;
+        SetMusicVolume(savedMusicVolume);
+
         resumeButton.onClick.AddListener(() => {
-            SoundManager.PlaySound(SoundType.MENU_CLICK);
+            
             ResumeGame();
         });
 
         mainMenuButton.onClick.AddListener(() => {
-            SoundManager.PlaySound(SoundType.MENU_CLICK);
+            
             OnMainMenuClicked();
         });
 
         settingsButton.onClick.AddListener(() => {
-            SoundManager.PlaySound(SoundType.MENU_CLICK);
+            
             ShowSettingsPanel();
         });
 
         backButton.onClick.AddListener(() => {
-            SoundManager.PlaySound(SoundType.MENU_CLICK);
+            
             HideSettingsPanel();
         });
 
@@ -105,19 +119,29 @@ public class InGameUIManager : MonoBehaviour
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
         resolutionDropdown.onValueChanged.AddListener(SetResolution);
+
+        isSettingsInitialized = true;
     }
 
     private void Update()
     {
+        if (sliderSoundTimer > 0)
+        {
+            sliderSoundTimer -= Time.deltaTime;
+        }
         
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePauseMenu();
         }
+
     }
 
     public void TogglePauseMenu()
     {
+        SoundManager.PlaySound(SoundType.MENU_PAUSE,0.5f);
+
+
         isPaused = !isPaused;
         pausePanel.SetActive(isPaused);
 
@@ -171,8 +195,18 @@ public class InGameUIManager : MonoBehaviour
 
     public void SetVolume(float volume)
     {
+        // Önce zamanlayýcýyý kontrol edip sesi çalýyor
+        if (isSettingsInitialized)
+        {
+            if (sliderSoundTimer <= 0f)
+            {
+                SoundManager.PlaySound(SoundType.SLIDER_TICK, 0.1f);
+                sliderSoundTimer = sliderSoundInterval;
+            }
+        }
+
         float dbVolume = (volume <= 0.0001f) ? -80f : Mathf.Log10(volume) * 20;
-        mainMixer.SetFloat("MasterVolume", dbVolume);
+        mainMixer.SetFloat("SFXVolume", dbVolume);
         PlayerPrefs.SetFloat("MasterVolume", volume);
     }
 
@@ -199,4 +233,12 @@ public class InGameUIManager : MonoBehaviour
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
+
+    public void SetMusicVolume(float volume)
+    {
+        mainMixer.SetFloat("MusicVolume", Mathf.Log10(volume) * 20);
+        PlayerPrefs.SetFloat("MusicVolume", volume);
+    }
+
+
 }

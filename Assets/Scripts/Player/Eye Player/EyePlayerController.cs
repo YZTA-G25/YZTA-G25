@@ -17,6 +17,10 @@ using UnityEditor.Rendering;
 [RequireComponent(typeof(CharacterController))]
 public class EyePlayerController : NetworkBehaviour
 {
+    [Header("Footstep Settings")]
+    [SerializeField] private float footstepInterval = 0.5f; // Adım sesleri arasındaki saniye
+    private float footstepTimer = 0f;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float mouseSensitivity = 0.1f;
@@ -145,6 +149,21 @@ public class EyePlayerController : NetworkBehaviour
         
         // Move the character
         characterController.Move(finalMovement * Time.deltaTime);
+
+        footstepTimer -= Time.deltaTime;
+
+        // Yatay hareketin büyüklüğünü hesapla (y eksenini yok sayarak)
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+
+        // Eğer oyuncu yerde, yatay olarak hareket ediyor ve zamanlayıcı sıfırlandıysa...
+        if (characterController.isGrounded && horizontalVelocity.magnitude > 0.1f && footstepTimer <= 0f)
+        {
+            // ...ayak sesini çal.
+            SoundManager.PlaySound(SoundType.FOOTSTEP);
+
+            // ...ve zamanlayıcıyı yeniden başlat.
+            footstepTimer = footstepInterval;
+        }
     }
 
     private void HandleLook()
