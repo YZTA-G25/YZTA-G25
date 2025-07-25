@@ -180,6 +180,8 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
 
 
         // Set up local grab state
+        SoundManager.PlaySound(SoundType.OBJECT_GRAB);
+
         currentInteractor = interactor;
         SetupGrabbedState();
 

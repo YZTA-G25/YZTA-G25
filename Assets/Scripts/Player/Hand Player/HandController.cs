@@ -8,6 +8,10 @@ using Unity.VisualScripting;
 // ağ üzerinde bir kimliğe sahip olmasını sağlar.
 public class HandController : NetworkBehaviour
 {
+    [Header("Footstep Settings")]
+    [SerializeField] private float footstepInterval = 0.5f; // Adım sesleri arasındaki saniye
+    private float footstepTimer = 0f;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float mouseSensitivity = 1f;
@@ -58,6 +62,10 @@ public class HandController : NetworkBehaviour
             Debug.Log("Not owner, disabling HandController");
             this.enabled = false;
             return;
+        }
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused += HandleGamePaused;
         }
 
         // Sahibi olan client için yapılacak başlangıç ayarları
@@ -111,6 +119,10 @@ public class HandController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused -= HandleGamePaused;
+        }
         // Input'ları devre dışı bırakarak hafıza sızıntısını önlüyoruz
         playerControls.HandPlayer.Disable();
     }
@@ -151,6 +163,21 @@ public class HandController : NetworkBehaviour
         
         // Move the character
         characterController.Move(finalMovement);
+
+        footstepTimer -= Time.deltaTime;
+
+        // Yatay hareketin büyüklüğünü hesapla (y eksenini yok sayarak)
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+
+        // Eğer oyuncu yerde, yatay olarak hareket ediyor ve zamanlayıcı sıfırlandıysa...
+        if (characterController.isGrounded && horizontalVelocity.magnitude > 0.1f && footstepTimer <= 0f)
+        {
+            // ...ayak sesini çal.
+            SoundManager.PlaySound(SoundType.FOOTSTEP);
+
+            // ...ve zamanlayıcıyı yeniden başlat.
+            footstepTimer = footstepInterval;
+        }
     }
 
     // Karakterin bakış/dönüş mantığı (Similar to EyePlayerController)
@@ -288,4 +315,11 @@ public class HandController : NetworkBehaviour
     }
 
     #endregion
+
+
+    private void HandleGamePaused(bool isPaused)
+    {
+        // isPaused true ise bu script'i devre dışı bırak, değilse etkinleştir.
+        this.enabled = !isPaused;
+    }
 }
