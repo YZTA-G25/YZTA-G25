@@ -47,6 +47,10 @@ public class CabinetController : NetworkBehaviour, IInteractable
         }
     }
 
+    public void Grab(HandInteractor interactor)
+    {
+    }
+
     public void Release()
     {
         // Cabinet doesn't need any release functionality

@@ -46,22 +46,48 @@ public class HandInteractor : MonoBehaviour
     }
 
     public void OnGrab(InputAction.CallbackContext context)
-    {
+    {   
         if (context.performed)
         {
-            if (currentInteractable == null)
+            // Check which interaction triggered this
+            if (context.interaction is UnityEngine.InputSystem.Interactions.HoldInteraction)
             {
-                // Find and interact with closest interactable
+                // Hold interaction - start grabbing
+                TryGrabClosest();
+            }
+            else if (context.interaction is UnityEngine.InputSystem.Interactions.TapInteraction)
+            {
+                // Tap interaction - single click
+                TryInteractWithClosest();
+            }
+            else
+            {
+                // Fallback for default interaction
                 TryInteractWithClosest();
             }
         }
         else if (context.canceled)
         {
+            // Release any held object
             if (currentInteractable != null)
             {
-                // Release the current interactable
                 currentInteractable.Release();
             }
+        }
+    }
+
+    private void TryGrabClosest()
+    {
+        // Find closest interactable object
+        IInteractable closestInteractable = FindClosestInteractable();
+        
+        if (closestInteractable != null)
+        {
+            closestInteractable.Grab(this); // Use Grab instead of Interact
+        }
+        else
+        {
+            Debug.Log("No interactable objects found in range");
         }
     }
 

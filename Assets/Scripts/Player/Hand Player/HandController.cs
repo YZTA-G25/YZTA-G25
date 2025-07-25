@@ -25,6 +25,10 @@ public class HandController : NetworkBehaviour
     [SerializeField] private Transform handTransform; // El pozisyonunu kontrol edeceğimiz obje
     [SerializeField] private CharacterController characterController; // Karakterin bedeni için
     [SerializeField] private HandInteractor handInteractor; // El etkileşim sistemi
+    
+    [Header("Hand Constraints")]
+    [Tooltip("Elin karakterden ne kadar uzaklaşabileceği maksimum mesafe")]
+    [SerializeField] private float maxHandDistance = 2f;
 
     private PlayerControls playerControls;
     private Vector2 moveInput;
@@ -91,6 +95,7 @@ public class HandController : NetworkBehaviour
         playerControls.HandPlayer.AlternateMode.performed += OnAlternateModeInput;
         playerControls.HandPlayer.AlternateMode.canceled += OnAlternateModeInput;
 
+        playerControls.HandPlayer.Grab.started += OnGrabInput;
         playerControls.HandPlayer.Grab.performed += OnGrabInput;
         playerControls.HandPlayer.Grab.canceled += OnGrabInput;
         
@@ -212,6 +217,22 @@ public class HandController : NetworkBehaviour
             // Elin Y ekseninde hareketi (Yukarı/Aşağı) genellikle dünya koordinatında kalabilir, bu doğrudur.
             float _verticalMovement = handVerticalInput * handVerticalSpeed * Time.deltaTime;
             handTransform.Translate(0, _verticalMovement, 0, Space.World);
+        }
+
+        // Apply hand distance constraint
+        ApplyHandDistanceConstraint();
+    }
+
+    private void ApplyHandDistanceConstraint()
+    {
+        // Calculate distance from character center to hand
+        float currentDistance = Vector3.Distance(transform.position, handTransform.position);
+        
+        if (currentDistance > maxHandDistance)
+        {
+            // Constrain hand position to max distance
+            Vector3 directionToHand = (handTransform.position - transform.position).normalized;
+            handTransform.position = transform.position + directionToHand * maxHandDistance;
         }
     }
     #endregion

@@ -222,5 +222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 996a0708a16e6a846bf4b2bef732cbc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   inFood: 0
   customGrabOffset: {x: 0, y: 0, z: 0}

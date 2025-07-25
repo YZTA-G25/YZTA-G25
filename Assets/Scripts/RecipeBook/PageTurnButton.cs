@@ -19,6 +19,10 @@ public class PageTurnButton : MonoBehaviour, IInteractable
         }
     }
 
+    public void Grab(HandInteractor interactor)
+    {
+    }
+
     public void Release()
     {
         // PageTurnButton doesn't need any release functionality
