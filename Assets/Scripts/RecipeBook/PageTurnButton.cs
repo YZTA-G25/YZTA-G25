@@ -14,6 +14,7 @@ public class PageTurnButton : Interactable
         {
             notebookController.TurnToNextPage();
         }
+
         else
         {
             notebookController.TurnToPreviousPage();

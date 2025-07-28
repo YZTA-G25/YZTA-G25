@@ -1,6 +1,4 @@
-using Unity.Cinemachine;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : NetworkBehaviour
@@ -13,30 +11,24 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private Transform handPlayerSpawnPoint;
     [SerializeField] private Transform eyePlayerSpawnPoint;
 
-    void Start()
-    {
-        Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
-    }
-
+    // Bu metot, GameManager'ýn bulunduðu "Game" sahnesi yüklendiðinde çalýþýr.
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) return; // Only server handles spawning
-
-        // Handle player spawning based on client connection
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-
-        // Spawn host player immediately as Eye Player
-        SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId, true);
+        // Bu kodun sadece sunucuda (Host'ta) çalýþmasýný saðlarýz. Oyuncularý yaratma görevi Host'a aittir.
+        if (IsServer)
+        {
+            // O an oyuna baðlý olan tüm client'larýn ID'lerini döngüye al
+            foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+            {
+                // Eðer client ID'si Host'un ID'si ile aynýysa, bu oyuncu Host'tur.
+                bool isHost = clientId == NetworkManager.Singleton.LocalClientId;
+                // Her bir client için doðru oyuncu prefab'ýný spawn et
+                SpawnPlayerForClient(clientId, isHost);
+            }
+        }
     }
 
-    private void OnClientConnected(ulong clientId)
-    {
-        if (clientId == NetworkManager.Singleton.LocalClientId) return; // Skip host
-
-        // First client becomes Hand Player
-        SpawnPlayerForClient(clientId, false);
-    }
-
+    // Bu metot, her bir oyuncu için doðru prefab'ý doðru yerde yaratýr.
     private void SpawnPlayerForClient(ulong clientId, bool isHost)
     {
         GameObject playerPrefab;
@@ -44,31 +36,21 @@ public class GameManager : NetworkBehaviour
 
         if (isHost)
         {
-            // Host = Eye Player
+            // Host ise Göz Oyuncusu'nu yarat
             playerPrefab = eyePlayerPF;
             spawnPoint = eyePlayerSpawnPoint;
-            Debug.Log($"[GameManager] Spawning Eye Player for Host (Client {clientId})");
+            Debug.Log($"[GameManager] Göz Oyuncusu, Host (Client {clientId}) için yaratýlýyor.");
         }
         else
         {
-            // Client = Hand Player
+            // Client ise El Oyuncusu'nu yarat
             playerPrefab = handPlayerPF;
             spawnPoint = handPlayerSpawnPoint;
-            Debug.Log($"[GameManager] Spawning Hand Player for Client {clientId}");
+            Debug.Log($"[GameManager] El Oyuncusu, Client {clientId} için yaratýlýyor.");
         }
 
         GameObject playerInstance = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
-        
-        // Spawn with proper ownership
-        networkObject.SpawnAsPlayerObject(clientId);
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        }
+        // Yaratýlan objenin að üzerinde bir kimliði olmasýný saðla ve sahibini ata
+        playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
     }
 }
