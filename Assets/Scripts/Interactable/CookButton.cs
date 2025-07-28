@@ -1,24 +1,29 @@
 using UnityEngine;
 
-// Bu düðme de IInteractable olmalý ki oyuncu etkileþime girebilsin.
+// Bu dÃ¼ÄŸme de IInteractable olmalÄ± ki oyuncu etkileÅŸime girebilsin.
 public class CookButton : MonoBehaviour, IInteractable
 {
-    [Tooltip("Bu düðmenin baðlý olduðu CookingStation.")]
+    [Tooltip("Bu dÃ¼ÄŸmenin baÄŸlÄ± olduÄŸu CookingStation.")]
     [SerializeField] private CookingStation cookingStation;
 
-    // Oyuncu bu düðmeye bastýðýnda...
+    public void Grab(HandInteractor interactor)
+    {
+        Interact(interactor);
+    }
+
+    // Oyuncu bu dÃ¼ÄŸmeye bastÄ±ÄŸÄ±nda...
     public void Interact(HandInteractor interactor)
     {
-        // Eðer cookingStation referansý atanmamýþsa bir þey yapma.
+        // EÄŸer cookingStation referansÄ± atanmamÄ±ÅŸsa bir ÅŸey yapma.
         if (cookingStation == null)
         {
-            Debug.LogError("CookButton'a CookingStation atanmamýþ!");
+            Debug.LogError("CookButton'a CookingStation atanmamÄ±ÅŸ!");
             return;
         }
 
-        // ...CookingStation'daki tarif doðrulama ve piþirme metodunu çaðýr.
+        // ...CookingStation'daki tarif doÄŸrulama ve piÅŸirme metodunu Ã§aÄŸÄ±r.
         cookingStation.ValidateAndCook();
     }
 
-    public void Release() { /* Gerekli Deðil */ }
+    public void Release() { }
 }

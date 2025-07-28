@@ -1,11 +1,12 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewIngredient", menuName = "ScriptableObjects/Ingredient")]
-public class Ingredient : ScriptableObject
+public class Ingredient : ScriptableObject, IScriptableObject
 {
-    [Tooltip("Bu malzemenin að üzerindeki eþsiz kimliði. 0'dan baþlayarak sýralý gidin.")]
-    public ushort ingredientId; // ushort (0-65535) yeterli ve daha az yer kaplar
-    public string ingredientName;
+    [Tooltip("Bu malzemenin aÄŸ Ã¼zerindeki eÅŸsiz kimliÄŸi.")]
+    [SerializeField] private ulong _id;
+    public ulong ID => _id;
+    public string Name => name;
     public Sprite icon;
     public GameObject prefab;
     public bool isSafe;

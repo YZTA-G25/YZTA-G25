@@ -1,37 +1,37 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; // Bu satırı ekleyin
+using System.Linq; // Bu satÄ±rÄ± ekleyin
 
 [CreateAssetMenu(fileName = "IngredientDatabase", menuName = "ScriptableObjects/IngredientDatabase")]
 public class IngredientDatabase : ScriptableObject
 {
-    [Tooltip("Oyundaki tüm Ingredient ScriptableObject'larını buraya sürükleyin.")]
+    [Tooltip("Oyundaki tÃ¼m Ingredient ScriptableObject'larÄ±nÄ± buraya sÃ¼rÃ¼kleyin.")]
     public List<Ingredient> allIngredients;
 
-    // ID'ye göre hızlı arama yapmak için bir sözlük (dictionary)
-    private Dictionary<ushort, Ingredient> ingredientDictionary;
+    // ID'ye gÃ¶re hÄ±zlÄ± arama yapmak iÃ§in bir sÃ¶zlÃ¼k (dictionary)
+    private Dictionary<ulong, Ingredient> ingredientDictionary;
 
-    // ScriptableObject aktif olduğunda çalışır
+    // ScriptableObject aktif olduÄŸunda Ã§alÄ±ÅŸÄ±r
     private void OnEnable()
     {
-        // Sözlüğü oluştur ve doldur
-        ingredientDictionary = new Dictionary<ushort, Ingredient>();
+        // SÃ¶zlÃ¼ÄŸÃ¼ oluÅŸtur ve doldur
+        ingredientDictionary = new Dictionary<ulong, Ingredient>();
         foreach (var ingredient in allIngredients)
         {
-            if (ingredient != null && !ingredientDictionary.ContainsKey(ingredient.ingredientId))
+            if (ingredient != null && !ingredientDictionary.ContainsKey(ingredient.ID))
             {
-                ingredientDictionary.Add(ingredient.ingredientId, ingredient);
+                ingredientDictionary.Add(ingredient.ID, ingredient);
             }
         }
     }
 
-    // Dışarıdan ID ile Ingredient verisini almak için kullanılacak metot
-    public Ingredient GetIngredientById(ushort id)
+    // DÄ±ÅŸarÄ±dan ID ile Ingredient verisini almak iÃ§in kullanÄ±lacak metot
+    public Ingredient GetIngredientById(ulong id)
     {
         if (ingredientDictionary.TryGetValue(id, out Ingredient ingredient))
         {
             return ingredient;
         }
-        return null; // ID bulunamazsa null döner
+        return null; // ID bulunamazsa null dÃ¶ner
     }
 }

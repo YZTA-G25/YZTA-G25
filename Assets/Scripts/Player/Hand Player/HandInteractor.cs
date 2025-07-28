@@ -237,10 +237,12 @@ public class HandInteractor : MonoBehaviour
 
     // Current interactable tracking
     private IInteractable currentInteractable;
+    private GameObject currentInteractableObject;
 
     public void SetCurrentInteractable(IInteractable interactable)
     {
         currentInteractable = interactable;
+        
         if (interactable != null && interactable is GrabbableItem grabbable)
         {
             grabbedObject = grabbable.gameObject;

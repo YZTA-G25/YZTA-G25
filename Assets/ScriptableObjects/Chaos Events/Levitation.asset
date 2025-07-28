@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f504cc5ce2b0d88498acc211a6fc3ec6, type: 3}
   m_Name: Levitation
   m_EditorClassIdentifier: 
+  _id: 1
   eventType: 0
   description: "Malzemeler havalan\u0131r"
   duration: 10

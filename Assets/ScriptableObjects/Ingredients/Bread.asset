@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c397604919ae9f04da855abac5cce434, type: 3}
   m_Name: Bread
   m_EditorClassIdentifier: 
-  ingredientName: Bread
+  _id: 2
   icon: {fileID: 0}
   prefab: {fileID: 839233260410868668, guid: d6846055e97b9ac42a6e11a3ea4f1237, type: 3}
   isSafe: 1
   cookTime: 0
-  displayPrefab: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 16384

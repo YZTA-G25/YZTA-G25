@@ -2,9 +2,13 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class GrabbableItem : NetworkBehaviour, IInteractable
 {
+    [Header("Data")]
+    public Ingredient data;
+
     [Header("Grab Settings")]
     public bool inFood = false;
     [Tooltip("Custom grab point offset for this item")]
@@ -177,8 +181,6 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
         {
             RequestOwnershipServerRpc();
         }
-
-
         // Set up local grab state
         SoundManager.PlaySound(SoundType.OBJECT_GRAB);
 

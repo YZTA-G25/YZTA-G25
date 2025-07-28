@@ -79,7 +79,7 @@ public class CabinetController : NetworkBehaviour, IInteractable
     {
         if (ingredient?.prefab == null) return;
 
-        Debug.Log($"Spawning {ingredient.ingredientName} for player");
+        Debug.Log($"Spawning {ingredient.Name} for player");
 
         // Instantiate the ingredient
         GameObject ingredientInstance = Instantiate(ingredient.prefab);

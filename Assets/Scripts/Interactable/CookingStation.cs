@@ -1,104 +1,150 @@
-// using satýrlarý...
+// using satirlari...
 
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CookingStation : NetworkBehaviour, IInteractable
 {
     [Header("Data")]
-    [Tooltip("Oluþturduðumuz IngredientDatabase asset'ini buraya sürükleyin.")]
-    [SerializeField] private IngredientDatabase ingredientDatabase; // VERÝTABANI REFERANSI
+    [Tooltip("OlusturduÄŸumuz IngredientDatabase asset'ini buraya sÃ¼rÃ¼kleyin.")]
+    [SerializeField] private IngredientDatabase ingredientDatabase; // VERITABANI REFERANSI
 
     [Header("Recipe")]
     [SerializeField] private Recipe currentTargetRecipe;
 
-    [Header("Visuals")]
-    [SerializeField] private Transform[] visualSlots;
+    private NetworkList<ulong> objectsOnStation; // Store NetworkObjectIds instead of ingredient IDs
 
-    private NetworkList<ushort> ingredientsOnStation;
-    private List<GameObject> visualIngredientObjects = new List<GameObject>();
-
-
-    // --- BAÞLANGIÇ METOTLARI ---
-
-    // Bu obje ilk oluþturulduðunda çalýþýr.
     private void Awake()
     {
-        // NetworkList'i burada new() ile oluþturuyoruz.
-        ingredientsOnStation = new NetworkList<ushort>();
+        objectsOnStation = new NetworkList<ulong>();
     }
 
-    // Bu obje að üzerinde spawn olduðunda çalýþýr.
-    public override void OnNetworkSpawn()
+    private void OnTriggerEnter(Collider other)
     {
-        base.OnNetworkSpawn();
-        // Að üzerindeki liste her deðiþtiðinde OnIngredientsChanged metodunu çaðýr.
-        ingredientsOnStation.OnListChanged += OnIngredientsChanged;
-    }
+        // Sadece IInteractable componentine sahip objeler kabul edilir.
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable == null) return;
 
-    // Bu obje aðdan kaldýrýldýðýnda çalýþýr.
-    public override void OnNetworkDespawn()
-    {
-        base.OnNetworkDespawn();
-        // Hafýza sýzýntýsýný önlemek için olay aboneliðini iptal et.
-        ingredientsOnStation.OnListChanged -= OnIngredientsChanged;
-    }
-
-
-    /// <summary>
-    /// Oyuncu bu objeyle etkileþime girdiðinde (client üzerinde) çaðrýlýr.
-    /// Tek görevi, sunucuya bir istek göndermektir.
-    /// </summary>
-    public void Interact(HandInteractor interactor)
-    {
-        // Oyuncunun eli boþsa hiçbir þey yapma.
-        if (!interactor.IsHoldingSomething())
+        if (interactable is GrabbableItem grabbable)
         {
-            Debug.Log("Oyuncunun eli boþ, istasyona bir þey eklenemez.");
-            return;
-        }
+            Debug.Log($"{grabbable.data.Name} malzemesi istasyona girdi.");
 
-        // Elindeki objenin bilgilerini al.
-        GameObject heldObject = interactor.GetHeldObject();
-        IngredientHolder ingredientHolder = heldObject.GetComponent<IngredientHolder>();
-        NetworkObject heldObjectNetworkObject = heldObject.GetComponent<NetworkObject>();
-
-        // Eðer tutulan obje bir malzeme deðilse veya að objesi deðilse iþlem yapma.
-        if (ingredientHolder == null || heldObjectNetworkObject == null)
-        {
-            Debug.LogWarning("Tutulan obje geçerli bir malzeme deðil.");
-            return;
-        }
-
-        Debug.Log($"Oyuncu, {ingredientHolder.ingredientData.ingredientName} malzemesini istasyona eklemek istiyor. Sunucuya istek gönderiliyor...");
-
-        // Sunucudan bu malzemeyi istasyona eklemesini ve elimizdekini yok etmesini isteyelim.
-        AddIngredientServerRpc(ingredientHolder.ingredientData.ingredientId, heldObjectNetworkObject.NetworkObjectId);
-    }
-
-    /// <summary>
-    /// Sadece sunucu üzerinde çalýþan ve malzemeyi istasyonun listesine ekleyen metot.
-    /// </summary>
-    [ServerRpc(RequireOwnership = false)]
-    private void AddIngredientServerRpc(ushort ingredientId, ulong heldObjectNetworkId)
-    {
-        Debug.Log($"Sunucu, {ingredientId} ID'li malzemeyi istasyona ekleme isteði aldý.");
-
-        // 1. Malzeme ID'sini að üzerindeki listeye ekle.
-        //    Bu deðiþiklik otomatik olarak tüm client'lara bildirilecek.
-        ingredientsOnStation.Add(ingredientId);
-
-        // 2. Oyuncunun elindeki orijinal NetworkObject'i bul.
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(heldObjectNetworkId, out NetworkObject objectToDespawn))
-        {
-            // 3. O objeyi aðdan kaldýr ve yok et.
-            objectToDespawn.Despawn(true);
-            Debug.Log($"Sunucu, {heldObjectNetworkId} Network ID'li objeyi baþarýyla yok etti.");
+            // NetworkObject componentini al
+            NetworkObject networkObject = grabbable.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                // Sunucuya malzemeyi listeye ekleme isteÄŸi gÃ¶nder.
+                ulong networkId = networkObject.NetworkObjectId;
+                AddIngredientServerRpc(networkId);
+            }
+            else
+            {
+                Debug.LogError("GrabbableItem'da NetworkObject componenti bulunamadÄ±!");
+            }
         }
         else
         {
-            Debug.LogError($"Sunucu, {heldObjectNetworkId} Network ID'li objeyi bulamadý ve yok edemedi!");
+            Debug.LogError("GÄ°REN GRABBABLE DEÄžÄ°L");
+            throw new System.Exception("Ä°Ã‡Ä°NE GÄ°REN GRABBABLE DEÄžÄ°L. GÄ°REMEMELÄ°YDÄ°.");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Sadece IInteractable componentine sahip objeler kabul edilir.
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable == null) return;
+
+        if (interactable is GrabbableItem grabbable)
+        {
+            Debug.Log($"{grabbable.data.Name} malzemesi istasyondan Ã§Ä±ktÄ±.");
+
+            // NetworkObject componentini al
+            NetworkObject networkObject = grabbable.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                // Sunucuya malzemeyi listeden Ã§Ä±karma isteÄŸi gÃ¶nder.
+                RemoveIngredientServerRpc(networkObject.NetworkObjectId);
+            }
+            else
+            {
+                Debug.LogError("GrabbableItem'da NetworkObject componenti bulunamadÄ±!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Ã‡IKAN GRABBABLE DEÄžÄ°L");
+            throw new System.Exception("Ã‡IKAN GRABBABLE DEÄžÄ°L, GÄ°REMEMELÄ°YDÄ°");
+        }
+    }
+
+    /// <summary>
+    /// Sadece sunucu Ã¼zerinde Ã§alÄ±ÅŸan ve malzemeyi istasyonun listesine ekleyen metot.
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    private void AddIngredientServerRpc(ulong networkObjectId)
+    {
+        // NetworkObject'i NetworkObjectId'den bul
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
+        {
+            GrabbableItem grabbable = networkObject.GetComponent<GrabbableItem>();
+            if (grabbable != null)
+            {
+                Debug.Log($"Sunucu, {grabbable.data.ID} ID'li {grabbable.data.Name} 'i istasyona ekleme isteÄŸi aldÄ±.");
+
+                // NetworkObjectId'yi listeye ekle (ingredient ID'yi deÄŸil)
+                // Bu deÄŸiÅŸiklik otomatik olarak tÃ¼m client'lara bildirilecek.
+                if (!objectsOnStation.Contains(networkObjectId))
+                {
+                    objectsOnStation.Add(networkObjectId);
+                    grabbable.inFood = true;
+                    Debug.Log($"NetworkObjectId {networkObjectId} istasyona eklendi. Toplam obje sayÄ±sÄ±: {objectsOnStation.Count}");
+                }
+            }
+            else
+            {
+                Debug.LogError("NetworkObject'te GrabbableItem componenti bulunamadÄ±!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"NetworkObjectId {networkObjectId} bulunamadÄ±!");
+        }
+    }
+
+    /// <summary>
+    /// Sadece sunucu Ã¼zerinde Ã§alÄ±ÅŸan ve malzemeyi istasyonun listesinden Ã§Ä±karan metot.
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    private void RemoveIngredientServerRpc(ulong networkObjectId)
+    {
+        // NetworkObject'i NetworkObjectId'den bul
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
+        {
+            GrabbableItem grabbable = networkObject.GetComponent<GrabbableItem>();
+            if (grabbable != null)
+            {
+                Debug.Log($"Sunucu, {grabbable.data.ID} ID'li {grabbable.data.Name} 'i istasyondan Ã§Ä±karma isteÄŸi aldÄ±.");
+
+                // NetworkObjectId'yi listeden Ã§Ä±kar
+                if (objectsOnStation.Contains(networkObjectId))
+                {
+                    objectsOnStation.Remove(networkObjectId);
+                    grabbable.inFood = false;
+                    Debug.Log($"NetworkObjectId {networkObjectId} istasyondan Ã§Ä±karÄ±ldÄ±. Kalan obje sayÄ±sÄ±: {objectsOnStation.Count}");
+                }
+            }
+            else
+            {
+                Debug.LogError("NetworkObject'te GrabbableItem componenti bulunamadÄ±!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"NetworkObjectId {networkObjectId} bulunamadÄ±!");
         }
     }
 
@@ -106,86 +152,57 @@ public class CookingStation : NetworkBehaviour, IInteractable
     { 
 
     }
-
-    // NetworkList deðiþtiðinde otomatik olarak tetiklenir.
-    private void OnIngredientsChanged(NetworkListEvent<ushort> changeEvent)
+    public void Interact(HandInteractor interactor)
     {
-        // Önce istasyon üzerindeki eski görselleri temizle.
-        foreach (var visualObject in visualIngredientObjects)
-        {
-            Destroy(visualObject);
-        }
-        visualIngredientObjects.Clear();
-
-        Debug.Log($"Görseller güncelleniyor. Ýstasyonda {ingredientsOnStation.Count} adet malzeme var.");
-
-        // Þimdi güncel listedeki her bir malzeme ID'si için yeni bir görsel oluþtur.
-        for (int i = 0; i < ingredientsOnStation.Count; i++)
-        {
-            // Eðer slot sayýsýndan fazla malzeme varsa daha fazla görsel oluþturma.
-            if (i >= visualSlots.Length) break;
-
-            ushort ingredientId = ingredientsOnStation[i];
-            Ingredient ingredientData = ingredientDatabase.GetIngredientById(ingredientId);
-
-            if (ingredientData != null)
-            {
-                // Malzemenin prefab'ýný doðru slotun içine oluþtur.
-                GameObject visualInstance = Instantiate(ingredientData.prefab, visualSlots[i]);
-                visualInstance.transform.localPosition = Vector3.zero; // Slot'un tam ortasýna yerleþtir.
-                visualInstance.transform.localRotation = Quaternion.identity;
-
-                // --- ÇOK ÖNEMLÝ ADIM: Görsel kopyayý "etkisizleþtirme" ---
-                // Bu kopya sadece bir görüntü olmalý, tekrar tutulmamalý veya fizikle etkileþmemeli.
-                if (visualInstance.GetComponent<NetworkObject>()) Destroy(visualInstance.GetComponent<NetworkObject>());
-                if (visualInstance.GetComponent<GrabbableItem>()) Destroy(visualInstance.GetComponent<GrabbableItem>());
-                if (visualInstance.GetComponent<Rigidbody>()) Destroy(visualInstance.GetComponent<Rigidbody>());
-                if (visualInstance.GetComponent<Collider>()) Destroy(visualInstance.GetComponent<Collider>());
-
-                // Oluþturulan bu görsel objeyi daha sonra silebilmek için listeye ekle.
-                visualIngredientObjects.Add(visualInstance);
-            }
-        }
+        // Bu metot artÄ±k kullanÄ±lmÄ±yor, trigger sistemi ile otomatik Ã§alÄ±ÅŸÄ±yor.
     }
-
 
     public void ValidateAndCook()
     {
-        Debug.Log("Piþirme isteði alýndý. Sunucuya gönderiliyor...");
+        Debug.Log("PiÅŸirme isteÄŸi alÄ±ndÄ±. Sunucuya gÃ¶nderiliyor...");
         ValidateAndCookServerRpc();
     }
 
-    /// <summary>
-    /// Sunucu üzerinde çalýþýr, tarifi doðrular, puan ekler ve istasyonu temizler.
-    /// </summary>
     [ServerRpc(RequireOwnership = false)]
     private void ValidateAndCookServerRpc()
     {
-        // Hedef tarif atanmamýþsa iþlem yapma.
+        // Hedef tarif atanmamÄ±ÅŸsa iÅŸlem yapma.
         if (currentTargetRecipe == null)
         {
-            Debug.LogError("CookingStation'da currentTargetRecipe atanmamýþ!");
+            Debug.LogError("CookingStation'da currentTargetRecipe atanmamÄ±ÅŸ!");
             return;
         }
 
-        // 1. NetworkList'teki ID'leri gerçek Ingredient listesine dönüþtür.
+        // 1. NetworkList'teki NetworkObjectId'leri gerÃ§ek Ingredient listesine dÃ¶nÃ¼ÅŸtÃ¼r.
         List<Ingredient> submittedIngredients = new List<Ingredient>();
-        foreach (ushort id in ingredientsOnStation)
+        List<NetworkObject> objectsToDestroy = new List<NetworkObject>();
+        
+        foreach (ulong networkObjectId in objectsOnStation)
         {
-            Ingredient ingredient = ingredientDatabase.GetIngredientById(id);
-            if (ingredient != null)
+            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
             {
-                submittedIngredients.Add(ingredient);
+                GrabbableItem grabbable = networkObject.GetComponent<GrabbableItem>();
+                if (grabbable != null)
+                {
+                    Ingredient ingredient = ingredientDatabase.GetIngredientById(grabbable.data.ID);
+                    if (ingredient != null)
+                    {
+                        submittedIngredients.Add(ingredient);
+                        objectsToDestroy.Add(networkObject); // AynÄ± zamanda destroy listesine ekle
+                    }
+                }
             }
         }
 
-        // 2. RecipeValidator'ý kullanarak tarifi doðrula.
+        Debug.Log($"Submitted ingredients are : [ {string.Join(" , ", submittedIngredients.Select(x => x.Name))} ]");
+
+        // 2. RecipeValidator'Ä± kullanarak tarifi doÄŸrula.
         bool isCorrect = RecipeValidator.ValidateRecipe(currentTargetRecipe, submittedIngredients);
 
         if (isCorrect)
         {
-            // 3. Tarif DOÐRUYSA: Puan ekle!
-            Debug.Log($"Tarif doðru! {currentTargetRecipe.scoreValue} puan ekleniyor.");
+            // 3. Tarif DOÄžRUYSA: Puan ekle!
+            Debug.Log($"Tarif doÄŸru! {currentTargetRecipe.scoreValue} puan ekleniyor.");
             ScoringManager.Instance.AddScoreServerRpc(currentTargetRecipe.scoreValue);
 
             SoundManager.PlaySound(SoundType.RECIPE_COMPLETE);
@@ -193,11 +210,30 @@ public class CookingStation : NetworkBehaviour, IInteractable
         }
         else
         {
-            // 4. Tarif YANLIÞSA: Hata mesajý ver. (Gelecekte buraya ceza mekaniði eklenebilir)
-            Debug.Log("Tarif yanlýþ! Malzemeler ziyan oldu.");
+            // 4. Tarif YANLIÅžSA: Hata mesajÄ± ver. (Gelecekte buraya ceza mekaniÄŸi eklenebilir)
+            Debug.Log("Tarif yanlÄ±ÅŸ! Malzemeler ziyan oldu.");
         }
 
         // 5. Her iki durumda da istasyonu temizle.
-        ingredientsOnStation.Clear();
+        // Bulunan objeleri yok et (artÄ±k exact objeleri biliyoruz)
+        foreach (NetworkObject obj in objectsToDestroy)
+        {
+            // Objenin hala spawn edilmiÅŸ olduÄŸunu kontrol et
+            if (obj != null && obj.IsSpawned)
+            {
+                obj.Despawn(true); // true = destroy on despawn
+            }
+            else
+            {
+                Debug.LogWarning("Despawn edilmeye Ã§alÄ±ÅŸÄ±lan obje zaten spawn edilmemiÅŸ veya null!");
+            }
+        }
+        
+        // Listeyi temizle
+        objectsOnStation.Clear();
+    }
+
+    public void Grab(HandInteractor interactor)
+    {
     }
 }
