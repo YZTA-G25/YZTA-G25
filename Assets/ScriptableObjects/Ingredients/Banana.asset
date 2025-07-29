@@ -17,3 +17,6 @@ MonoBehaviour:
   prefab: {fileID: 2230530226155236490, guid: 869b55c0dc2962d41a835b0eeb3c4b36, type: 3}
   isSafe: 0
   cookTime: 0
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 16384

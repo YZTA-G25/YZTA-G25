@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class PageTurnButton : Interactable
+public class PageTurnButton : MonoBehaviour, IInteractable
 {
     [SerializeField] private NotebookController notebookController;
     [SerializeField] private bool isNextButton;
 
-    public override void Interact(HandInteractor interactor)
+    public void Interact(HandInteractor interactor)
     {
         Debug.Log("Buton, deftere sayfa çevirme komutu gönderiyor.");
         if (notebookController == null) return;
@@ -19,5 +19,15 @@ public class PageTurnButton : Interactable
         {
             notebookController.TurnToPreviousPage();
         }
+    }
+
+    public void Grab(HandInteractor interactor)
+    {
+    }
+
+    public void Release()
+    {
+        // PageTurnButton doesn't need any release functionality
+        // This is only for grabbable objects
     }
 }
