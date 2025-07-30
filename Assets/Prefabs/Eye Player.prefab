@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: -3952270589571999894}
   - component: {fileID: 8327702528252651419}
   - component: {fileID: 1329783114491598974}
+  - component: {fileID: 1179512493407101496}
   m_Layer: 6
   m_Name: Eye Player
   m_TagString: Eye Player
@@ -502,6 +503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  footstepInterval: 0.5
   moveSpeed: 3
   mouseSensitivity: 0.1
   pitchLimit: 85
@@ -557,6 +559,18 @@ MonoBehaviour:
   isEyePlayer: 1
   cameraOutputChannel: 4
   enableDebugLogs: 1
+--- !u!114 &1179512493407101496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6818570024144399171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52b1820eebd62941b7cf77ca1e5b012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7062586062123699546
 GameObject:
   m_ObjectHideFlags: 0

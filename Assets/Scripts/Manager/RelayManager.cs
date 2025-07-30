@@ -41,7 +41,7 @@ public class RelayManager : MonoBehaviour
         }
     }
 
-    public async Task JoinRelay(string joinCode)
+    public async Task<bool> JoinRelay(string joinCode)
     {
         try
         {
@@ -57,10 +57,12 @@ public class RelayManager : MonoBehaviour
             );
 
             NetworkManager.Singleton.StartClient();
+            return true; // Baþarýlý
         }
         catch (RelayServiceException e)
         {
             Debug.LogError("Relay join failed: " + e.Message);
+            return false; // Baþarýsýz
         }
     }
 }

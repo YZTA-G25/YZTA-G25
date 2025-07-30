@@ -18,6 +18,7 @@ public class MainMenuUIManager : MonoBehaviour
     [SerializeField] private GameObject createLobbyPanel;
     [SerializeField] private GameObject hostLobbyPanel;
     [SerializeField] private GameObject lobbyListPanel;
+    [SerializeField] private GameObject clientLobbyPanel;
 
     [Header("Main Menu Buttons")]
     [SerializeField] private Button hostButton;
@@ -34,6 +35,8 @@ public class MainMenuUIManager : MonoBehaviour
     [Header("Host Lobby UI")]
     [SerializeField] private TextMeshProUGUI joinCodeText;
     [SerializeField] private Button startGameButton;
+    [SerializeField] private TextMeshProUGUI hostPlayerListText;
+    [SerializeField] private TextMeshProUGUI clientPlayerListText;
 
     [Header("Lobby List UI")]
     [SerializeField] private TMP_InputField joinCodeInputField;
@@ -75,6 +78,7 @@ public class MainMenuUIManager : MonoBehaviour
         refreshLobbyListButton.onClick.AddListener(async () => await RefreshLobbyList());
         lobbyListBackButton.onClick.AddListener(ShowMainMenuPanel);
         joinWithCodeButton.onClick.AddListener(OnJoinWithCodeClicked);
+
     }
 
     private void Start()
@@ -82,9 +86,9 @@ public class MainMenuUIManager : MonoBehaviour
         ShowMainMenuPanel(); // Oyun baþladýðýnda sadece ana menü görünsün.
 
         // Að olaylarýný dinle
-        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
-
+        //NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        //NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+        LobbyManager.Instance.OnLobbyUpdated += UpdatePlayerListUIFromLobby;
         #region Settings Initialization
         // --- SES EFEKTÝ SLIDER'I KURULUMU ---
         float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
@@ -126,8 +130,24 @@ public class MainMenuUIManager : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
         resolutionDropdown.onValueChanged.AddListener(SetResolution);
 
+        LobbyManager.Instance.OnJoinedLobby += HandleJoinedLobby;
         isSettingsInitialized = true;
+
+        
+
+        
         #endregion
+    }
+
+    private void OnDestroy()
+    {
+
+        if (LobbyManager.Instance != null)
+        {
+            // Hem OnJoinedLobby hem de OnLobbyUpdated aboneliklerini iptal et.
+            LobbyManager.Instance.OnJoinedLobby -= HandleJoinedLobby;
+            LobbyManager.Instance.OnLobbyUpdated -= UpdatePlayerListUIFromLobby;
+        }
     }
 
     private void Update()
@@ -154,6 +174,7 @@ public class MainMenuUIManager : MonoBehaviour
         createLobbyPanel.SetActive(targetPanel == createLobbyPanel);
         hostLobbyPanel.SetActive(targetPanel == hostLobbyPanel);
         lobbyListPanel.SetActive(targetPanel == lobbyListPanel);
+        clientLobbyPanel.SetActive(targetPanel == clientLobbyPanel);
     }
     #endregion
 
@@ -164,12 +185,18 @@ public class MainMenuUIManager : MonoBehaviour
         bool isPrivate = isPrivateToggle.isOn;
         if (string.IsNullOrEmpty(lobbyName)) lobbyName = "My Friendslop Lobby";
 
+        // LobbyManager'a lobi oluþturmasýný söylüyoruz.
         await LobbyManager.Instance.CreateLobby(lobbyName, isPrivate);
 
+        // Eðer lobi baþarýyla oluþturulduysa...
         if (LobbyManager.Instance.JoinedLobby != null)
         {
             SetActivePanel(hostLobbyPanel);
-            joinCodeText.text = "Katýlým Kodu: " + LobbyManager.Instance.JoinedLobby.Data["JoinCodeKey"].Value;
+
+            // --- DEÐÝÞÝKLÝK BURADA ---
+            // Ekrana Relay Kodu yerine, Lobi Servisi'nin verdiði LOBÝ KODU'nu yazdýr.
+            joinCodeText.text = "Katýlým Kodu: " + LobbyManager.Instance.JoinedLobby.LobbyCode;
+
             startGameButton.interactable = false;
         }
     }
@@ -214,20 +241,27 @@ public class MainMenuUIManager : MonoBehaviour
             return;
         }
 
-        // LobbyManager üzerinden deðil, doðrudan RelayManager ile katýlmayý dene
-        await RelayManager.Instance.JoinRelay(joinCode);
+        // Doðrudan LobbyManager'daki yeni metodu çaðýrýyoruz.
+        // Panel deðiþtirme iþini burasý yapmýyor, event dinleyicisi yapacak.
+        await LobbyManager.Instance.JoinLobbyByCode(joinCode);
     }
 
     private void HandleClientConnected(ulong clientId)
     {
-        if (!NetworkManager.Singleton.IsHost) return;
-        startGameButton.interactable = NetworkManager.Singleton.ConnectedClients.Count == 2;
+        
+        if (NetworkManager.Singleton.IsHost)
+        {
+            startGameButton.interactable = NetworkManager.Singleton.ConnectedClients.Count == 2;
+        }
     }
 
     private void HandleClientDisconnect(ulong clientId)
     {
-        if (!NetworkManager.Singleton.IsHost) return;
-        startGameButton.interactable = false;
+        
+        if (NetworkManager.Singleton.IsHost)
+        {
+            startGameButton.interactable = false;
+        }
     }
     #endregion
 
@@ -260,4 +294,57 @@ public class MainMenuUIManager : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
+
+    public async void JoinLobbyFromList(Lobby lobby)
+    {
+        // LobbyItemUI bu metodu çaðýrabilir.
+        // Panel deðiþtirme iþini burasý yapmýyor, event dinleyicisi yapacak.
+        await LobbyManager.Instance.JoinLobby(lobby);
+    }
+
+
+    private void UpdatePlayerListUIFromLobby(Lobby lobby)
+    {
+        string playerListTextContent = "";
+        int playerCount = 1;
+
+        // Lobideki her bir oyuncu için...
+        foreach (Player player in lobby.Players)
+        {
+            // Oyuncunun ismini listeye ekle.
+            // Þimdilik basit bir isim kullanýyoruz. Gelecekte oyuncunun kendi ismini
+            // lobi verisine ekleyerek daha dinamik hale getirebiliriz.
+            playerListTextContent += $"Oyuncu {playerCount}\n";
+            playerCount++;
+        }
+
+        // Hem Host'un hem de Client'ýn listesini güncelle
+        hostPlayerListText.text = playerListTextContent;
+        clientPlayerListText.text = playerListTextContent;
+
+        // Host ise ve oyuncu sayýsý 2 ise baþlatma butonunu aktif et.
+        // Aksi takdirde deaktif et.
+        if (NetworkManager.Singleton.IsHost)
+        {
+            startGameButton.interactable = lobby.Players.Count == 2;
+        }
+    }
+
+
+
+    private void HandleJoinedLobby(Lobby joinedLobby)
+    {
+        Debug.Log("--- MainMenuUIManager: OnJoinedLobby event'i baþarýyla alýndý!");
+
+        if (clientLobbyPanel == null)
+        {
+            Debug.LogError("--- MainMenuUIManager HATA: ClientLobbyPanel Inspector'da atanmamýþ! Panel gösterilemiyor.");
+            return;
+        }
+
+        Debug.Log("--- MainMenuUIManager: ClientLobbyPanel aktif ediliyor.");
+        SetActivePanel(clientLobbyPanel);
+    }
+
+
 }
