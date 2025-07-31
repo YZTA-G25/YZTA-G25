@@ -344,6 +344,7 @@ GameObject:
   - component: {fileID: 40616201}
   - component: {fileID: 40616200}
   - component: {fileID: 40616202}
+  - component: {fileID: 40616203}
   m_Layer: 5
   m_Name: BackButton2
   m_TagString: Untagged
@@ -453,6 +454,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &40616203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40616198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &121475245
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,6 +890,7 @@ GameObject:
   - component: {fileID: 242291081}
   - component: {fileID: 242291080}
   - component: {fileID: 242291082}
+  - component: {fileID: 242291083}
   m_Layer: 5
   m_Name: RefreshButton
   m_TagString: Untagged
@@ -982,6 +1000,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &242291083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242291078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &299312382
 GameObject:
   m_ObjectHideFlags: 0
@@ -2027,6 +2061,7 @@ GameObject:
   - component: {fileID: 691798225}
   - component: {fileID: 691798224}
   - component: {fileID: 691798226}
+  - component: {fileID: 691798227}
   m_Layer: 5
   m_Name: StartGameButton
   m_TagString: Untagged
@@ -2136,6 +2171,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &691798227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691798222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &698413199
 GameObject:
   m_ObjectHideFlags: 0
@@ -2274,6 +2325,77 @@ MonoBehaviour:
   clickSound: 2
   hoverVolume: 0.05
   clickVolume: 1
+--- !u!1 &846031703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 846031706}
+  - component: {fileID: 846031704}
+  - component: {fileID: 846031705}
+  m_Layer: 0
+  m_Name: SceneLoadManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &846031704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846031703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1634584755
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &846031705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846031703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53a272cce6d15b449b785e9951adede9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!4 &846031706
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846031703}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &853730169 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3691338428843568104, guid: 2afe5004cfdce31489fb77e85d9d0a44, type: 3}
@@ -3608,6 +3730,7 @@ GameObject:
   - component: {fileID: 1518542401}
   - component: {fileID: 1518542400}
   - component: {fileID: 1518542402}
+  - component: {fileID: 1518542403}
   m_Layer: 5
   m_Name: JoinWithCodeButton
   m_TagString: Untagged
@@ -3717,6 +3840,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1518542403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518542398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &1523725776
 GameObject:
   m_ObjectHideFlags: 0
@@ -4353,8 +4492,9 @@ GameObject:
   - component: {fileID: 1575901917}
   - component: {fileID: 1575901916}
   - component: {fileID: 1575901918}
+  - component: {fileID: 1575901919}
   m_Layer: 5
-  m_Name: BackButton
+  m_Name: CreateLobbyBackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4462,6 +4602,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1575901919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575901914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &1586937434
 GameObject:
   m_ObjectHideFlags: 0
@@ -6108,6 +6264,7 @@ GameObject:
   - component: {fileID: 1977171277}
   - component: {fileID: 1977171276}
   - component: {fileID: 1977171278}
+  - component: {fileID: 1977171279}
   m_Layer: 5
   m_Name: CreateLobbyConfirmButton
   m_TagString: Untagged
@@ -6217,6 +6374,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1977171279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977171274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bc49479469b2ee4ea282570651ac315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: 3
+  clickSound: 2
+  hoverVolume: 0.01
+  clickVolume: 1
 --- !u!1 &2021620754
 GameObject:
   m_ObjectHideFlags: 0
@@ -6882,3 +7055,4 @@ SceneRoots:
   - {fileID: 1773082162}
   - {fileID: 2072857577}
   - {fileID: 627747902}
+  - {fileID: 846031706}
