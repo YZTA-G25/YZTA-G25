@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c397604919ae9f04da855abac5cce434, type: 3}
   m_Name: Steak
   m_EditorClassIdentifier: 
-  ingredientName: Steak
+  _id: 8
   icon: {fileID: 0}
   prefab: {fileID: 8202614754564459210, guid: 10ab30527b9bc8a4995e798ac0706a37, type: 3}
   isSafe: 1
   cookTime: 0
-  displayPrefab: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 16384

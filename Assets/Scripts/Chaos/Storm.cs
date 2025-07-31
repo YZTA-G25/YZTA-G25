@@ -51,6 +51,11 @@ public class Storm : ChaosBehaviour
                 Vector3 vortexForce = (tangentialDirection - radialDirection * 0.5f).normalized;
 
                 rb.AddForce(vortexForce * windForce + upwardDirection, ForceMode.Force);
+
+                if (rb.linearVelocity == Vector3.zero)
+                {
+                    rb.AddForce(vortexForce * 2, ForceMode.VelocityChange);
+                }
             }
         }
     }

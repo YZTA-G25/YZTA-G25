@@ -47,6 +47,10 @@ public class CabinetController : NetworkBehaviour, IInteractable
         }
     }
 
+    public void Grab(HandInteractor interactor)
+    {
+    }
+
     public void Release()
     {
         // Cabinet doesn't need any release functionality
@@ -75,7 +79,7 @@ public class CabinetController : NetworkBehaviour, IInteractable
     {
         if (ingredient?.prefab == null) return;
 
-        Debug.Log($"Spawning {ingredient.ingredientName} for player");
+        Debug.Log($"Spawning {ingredient.Name} for player");
 
         // Instantiate the ingredient
         GameObject ingredientInstance = Instantiate(ingredient.prefab);

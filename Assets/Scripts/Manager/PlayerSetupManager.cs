@@ -10,6 +10,8 @@ public class PlayerSetupManager : NetworkBehaviour
     [Header("Camera Configuration")]
     [SerializeField] private Unity.Cinemachine.OutputChannels cameraOutputChannel;
     private GameObject eyePlayerCamera;
+    [Header("UI Setup")]
+    public Canvas crossHairCanvas;
     
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = true;
@@ -42,6 +44,21 @@ public class PlayerSetupManager : NetworkBehaviour
         }
     }
 
+    private void HandleUISetup()
+    {
+        if (!isEyePlayer)
+        {
+            if (crossHairCanvas != null)
+            {
+                crossHairCanvas.enabled = false;
+            }
+            else
+            {
+                Debug.LogError("CROOSHAİR CANVAS IS NULL");
+            }
+        }
+    }
+
     private void HandleLocalCameraSetup()
     {
         // Only affect cameras when this is a HandPlayer owner
@@ -49,8 +66,8 @@ public class PlayerSetupManager : NetworkBehaviour
         {
             // Find Eye Player Camera only if this is the HandPlayer
             eyePlayerCamera = GameObject.FindGameObjectWithTag("Eye Player Camera");
-            
-            if (eyePlayerCamera != null) 
+
+            if (eyePlayerCamera != null)
             {
                 eyePlayerCamera.SetActive(false);
                 if (enableDebugLogs)
