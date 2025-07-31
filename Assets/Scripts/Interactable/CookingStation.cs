@@ -203,7 +203,17 @@ public class CookingStation : NetworkBehaviour, IInteractable
         {
             // 3. Tarif DOĞRUYSA: Puan ekle!
             Debug.Log($"Tarif doğru! {currentTargetRecipe.scoreValue} puan ekleniyor.");
-            ScoringManager.Instance.AddScoreServerRpc(currentTargetRecipe.scoreValue);
+            
+            // Try to deliver to customer first
+            if (CustomerManager.Instance != null)
+            {
+                CustomerManager.Instance.TryDeliverOrder(currentTargetRecipe);
+            }
+            else
+            {
+                // Fallback to old scoring system if no CustomerManager
+                ScoringManager.Instance.AddScoreServerRpc(currentTargetRecipe.scoreValue);
+            }
 
             SoundManager.PlaySound(SoundType.RECIPE_COMPLETE);
 

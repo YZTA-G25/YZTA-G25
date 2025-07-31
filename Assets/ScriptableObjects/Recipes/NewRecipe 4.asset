@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f92444872950794ba91e58667c0dd8c, type: 3}
   m_Name: NewRecipe 4
   m_EditorClassIdentifier: 
-  recipeName: 
-  requiredIngredients: []
+  recipeName: hamburger
+  requiredIngredients:
+  - {fileID: 11400000, guid: d1eca489c67729e4c9f8d0f209752a68, type: 2}
+  - {fileID: 11400000, guid: 890669f64bfd2994aa006009460d5ed8, type: 2}
+  - {fileID: 11400000, guid: d1eca489c67729e4c9f8d0f209752a68, type: 2}
+  - {fileID: 11400000, guid: 06e5cb0a0088ed9418d689f656e6b070, type: 2}
+  - {fileID: 11400000, guid: f21007f5b1ad272499c08f6f9f1704bb, type: 2}
+  recipeImage: {fileID: 0}
   cookingInstructions: 
+  scoreValue: 35

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "NewIngredient", menuName = "ScriptableObjects/Ingredient")]
 public class Ingredient : ScriptableObject, IScriptableObject
@@ -7,7 +8,7 @@ public class Ingredient : ScriptableObject, IScriptableObject
     [SerializeField] private ulong _id;
     public ulong ID => _id;
     public string Name => name;
-    public Sprite icon;
+    public Image icon;
     public GameObject prefab;
     public bool isSafe;
     public float cookTime;
