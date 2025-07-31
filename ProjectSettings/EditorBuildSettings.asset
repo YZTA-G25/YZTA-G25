@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: f7772d6104a338146bb3f20300cdb634
   - enabled: 1
-    path: Assets/Scenes/YZTA25.unity
+    path: Assets/Scenes/GameScene.unity
     guid: 6281e182cdcdb854db71ee6d5b94a892
   - enabled: 1
     path: Assets/Scenes/Yigit.unity

@@ -1,6 +1,4 @@
-using Unity.Cinemachine;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : NetworkBehaviour
@@ -13,142 +11,88 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private Transform handPlayerSpawnPoint;
     [SerializeField] private Transform eyePlayerSpawnPoint;
 
-    void Start()
-    {
-        Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
-    }
-
+    /// <summary>
+    /// Bu obje (GameManager) ağ üzerinde spawn olduğunda çalışır.
+    /// Tüm oyuncu spawn etme mantığını sadece sunucu yönetir.
+    /// </summary>
     public override void OnNetworkSpawn()
     {
-        Debug.Log($"[GameManager] OnNetworkSpawn called! IsServer: {IsServer}, LocalClientId: {NetworkManager.LocalClientId}");
-        
-        if (!IsServer) 
+        Debug.Log($"[GameManager] OnNetworkSpawn çağrıldı! IsServer: {IsServer}");
+
+        // Eğer bu kod sunucuda çalışmıyorsa, hiçbir işlem yapma.
+        if (!IsServer) return;
+
+        // GameManager başladığı anda, o an bağlı olan TÜM client'ları döngüye al
+        // ve her biri için bir oyuncu spawn et. Bu, zamanlama sorununu çözer.
+        Debug.Log("[GameManager] Mevcut bağlı client'lar için oyuncular spawn ediliyor...");
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            Debug.Log("[GameManager] Not server, skipping player spawning logic");
-            return; // Only server handles spawning
+            SpawnPlayerForClient(client.ClientId);
         }
 
-        Debug.Log("[GameManager] Setting up client connection callback");
-        
-        // Handle player spawning based on client connection
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-
-        // Spawn host player immediately as Eye Player
-        Debug.Log("[GameManager] About to spawn host player");
-        SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId, true);
+        // Oyuna sonradan katılan bir oyuncu olursa onu da spawn etmek için bu olayı dinle.
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
     }
 
-    private void OnClientConnected(ulong clientId)
-    {
-        if (clientId == NetworkManager.Singleton.LocalClientId) return; // Skip host
-
-        // First client becomes Hand Player
-        SpawnPlayerForClient(clientId, false);
-    }
-
-    private void SpawnPlayerForClient(ulong clientId, bool isHost)
-    {
-        Debug.Log($"[GameManager] SpawnPlayerForClient called for clientId: {clientId}, isHost: {isHost}");
-        
-        GameObject playerPrefab;
-        Transform spawnPoint;
-
-        if (isHost)
-        {
-            // Host = Eye Player
-            playerPrefab = eyePlayerPF;
-            spawnPoint = eyePlayerSpawnPoint;
-            Debug.Log($"[GameManager] Spawning Eye Player for Host (Client {clientId})");
-        }
-        else
-        {
-            // Client = Hand Player
-            playerPrefab = handPlayerPF;
-            spawnPoint = handPlayerSpawnPoint;
-            Debug.Log($"[GameManager] Spawning Hand Player for Client {clientId})");
-        }
-
-        // Validate the prefab has a NetworkObject component
-        if (playerPrefab == null)
-        {
-            Debug.LogError($"[GameManager] {(isHost ? "Eye" : "Hand")} Player prefab is NULL! Cannot spawn player.");
-            return;
-        }
-        
-        if (playerPrefab.GetComponent<NetworkObject>() == null)
-        {
-            Debug.LogError($"[GameManager] {(isHost ? "Eye" : "Hand")} Player prefab is missing NetworkObject component! Cannot spawn network player.");
-            return;
-        }
-
-        if (spawnPoint == null)
-        {
-            Debug.LogError($"[GameManager] {(isHost ? "Eye" : "Hand")} Player spawn point is NULL! Cannot spawn player.");
-            return;
-        }
-
-        Debug.Log($"[GameManager] Instantiating {(isHost ? "Eye" : "Hand")} Player at position {spawnPoint.position}");
-        GameObject playerInstance = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
-        
-        if (networkObject == null)
-        {
-            Debug.LogError($"[GameManager] Instantiated {(isHost ? "Eye" : "Hand")} Player instance is missing NetworkObject component!");
-            Destroy(playerInstance);
-            return;
-        }
-        
-        // Check NetworkManager state before spawning
-        if (NetworkManager.Singleton == null)
-        {
-            Debug.LogError("[GameManager] NetworkManager.Singleton is null! Cannot spawn player.");
-            Destroy(playerInstance);
-            return;
-        }
-        
-        if (!NetworkManager.Singleton.IsListening)
-        {
-            Debug.LogError("[GameManager] NetworkManager is not listening! Cannot spawn player.");
-            Destroy(playerInstance);
-            return;
-        }
-        
-        // Check if the prefab is registered in NetworkManager
-        var networkPrefabs = NetworkManager.Singleton.NetworkConfig.Prefabs;
-        
-        // Check if prefab is in the spawnable prefabs list
-        if (networkPrefabs.Contains(playerPrefab))
-        {
-            Debug.Log($"[GameManager] {(isHost ? "Eye" : "Hand")} Player prefab is registered in NetworkManager ✓");
-        }
-        else
-        {
-            Debug.LogError($"[GameManager] {(isHost ? "Eye" : "Hand")} Player prefab is NOT registered in NetworkManager! Add it to the Network Prefabs list in NetworkManager.");
-            Destroy(playerInstance);
-            return;
-        }
-        
-        // Spawn with proper ownership
-        Debug.Log($"[GameManager] About to spawn {(isHost ? "Eye" : "Hand")} Player NetworkObject for Client {clientId}");
-        
-        try
-        {
-            networkObject.SpawnAsPlayerObject(clientId);
-            Debug.Log($"[GameManager] Successfully called SpawnAsPlayerObject for Client {clientId}");
-            Debug.Log($"[GameManager] NetworkObject state - IsSpawned: {networkObject.IsSpawned}, NetworkObjectId: {networkObject.NetworkObjectId}");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[GameManager] Failed to spawn player: {e.Message}\n{e.StackTrace}");
-            Destroy(playerInstance);
-        }
-    }
-
+    /// <summary>
+    /// Obje ağdan kaldırıldığında, hafıza sızıntısını önlemek için event aboneliğini iptal et.
+    /// </summary>
     public override void OnNetworkDespawn()
     {
         if (NetworkManager.Singleton != null)
         {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+        }
+    }
+
+    /// <summary>
+    /// Oyuna sonradan bağlanan bir client olursa bu metot tetiklenir.
+    /// </summary>
+    private void HandleClientConnected(ulong clientId)
+    {
+        Debug.Log($"[GameManager] Yeni bir client bağlandı: {clientId}. Oyuncu spawn ediliyor...");
+        SpawnPlayerForClient(clientId);
+    }
+
+    /// <summary>
+    /// Verilen clientId için doğru oyuncu prefab'ını, doğru rolde spawn eder.
+    /// </summary>
+    private void SpawnPlayerForClient(ulong clientId)
+    {
+        // Bu client için zaten bir oyuncu objesi spawn edilmiş mi diye kontrol et.
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var networkedClient) && networkedClient.PlayerObject != null)
+        {
+            Debug.Log($"[GameManager] Client {clientId} için zaten bir oyuncu spawn edilmiş. Atlanıyor.");
+            return;
+        }
+
+        // Rol belirleme: Host (sunucu olan) EyePlayer'dır, diğeri HandPlayer'dır.
+        bool isHost = clientId == NetworkManager.Singleton.LocalClientId;
+        GameObject playerPrefab = isHost ? eyePlayerPF : handPlayerPF;
+        Transform spawnPoint = isHost ? eyePlayerSpawnPoint : handPlayerSpawnPoint;
+
+        Debug.Log($"[GameManager] Client {clientId} için spawn işlemi hazırlanıyor. Rol: {(isHost ? "EyePlayer" : "HandPlayer")}");
+
+        if (playerPrefab == null || spawnPoint == null)
+        {
+            Debug.LogError($"[GameManager] {(isHost ? "Eye" : "Hand")} Player prefab veya spawn noktası atanmamış! Spawn işlemi başarısız.");
+            return;
+        }
+
+        // Prefab'ı sahnede oluştur.
+        GameObject playerInstance = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+
+        // Oluşturulan objeyi, doğru client'ın sahibi olacağı şekilde ağ üzerinde spawn et.
+        try
+        {
+            NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
+            networkObject.SpawnAsPlayerObject(clientId);
+            Debug.Log($"[GameManager] Client {clientId} için oyuncu başarıyla spawn edildi. NetworkObjectId: {networkObject.NetworkObjectId}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[GameManager] Client {clientId} için oyuncu spawn edilirken hata oluştu: {e.Message}");
+            Destroy(playerInstance);
         }
     }
 }
