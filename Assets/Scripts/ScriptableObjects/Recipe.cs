@@ -9,4 +9,6 @@ public class Recipe : ScriptableObject
     public Sprite recipeImage;
     [TextArea]
     public string cookingInstructions;
+
+    public int scoreValue;
 }

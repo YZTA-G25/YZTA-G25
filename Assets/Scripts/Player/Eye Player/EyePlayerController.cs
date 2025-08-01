@@ -5,6 +5,8 @@ using Unity.Netcode;
 #if UNITY_EDITOR
 using UnityEditor.EditorTools;
 using Unity.VisualScripting;
+using UnityEngine.Events;
+
 #endif
 
 
@@ -15,6 +17,10 @@ using UnityEditor.Rendering;
 [RequireComponent(typeof(CharacterController))]
 public class EyePlayerController : NetworkBehaviour
 {
+    [Header("Footstep Settings")]
+    [SerializeField] private float footstepInterval = 0.5f; // Adım sesleri arasındaki saniye
+    private float footstepTimer = 0f;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float mouseSensitivity = 0.1f;
@@ -44,6 +50,8 @@ public class EyePlayerController : NetworkBehaviour
 
     private float jumpCooldown = 0.05f;
 
+    public static UnityEvent OnSpawned = new UnityEvent();
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -53,6 +61,24 @@ public class EyePlayerController : NetworkBehaviour
         UnityEngine.Cursor.visible = false;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        OnSpawned.Invoke();
+
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused += HandleGamePaused;
+        }
+    }
+    public override void OnNetworkDespawn()
+    {
+        // ... mevcut OnNetworkDespawn kodlarınızın sonuna ekleyin ...
+
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused -= HandleGamePaused;
+        }
+    }
     public void Start()
     {
         // Only initialize input for the owner
@@ -123,6 +149,21 @@ public class EyePlayerController : NetworkBehaviour
         
         // Move the character
         characterController.Move(finalMovement * Time.deltaTime);
+
+        footstepTimer -= Time.deltaTime;
+
+        // Yatay hareketin büyüklüğünü hesapla (y eksenini yok sayarak)
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+
+        // Eğer oyuncu yerde, yatay olarak hareket ediyor ve zamanlayıcı sıfırlandıysa...
+        if (characterController.isGrounded && horizontalVelocity.magnitude > 0.1f && footstepTimer <= 0f)
+        {
+            // ...ayak sesini çal.
+            SoundManager.PlaySound(SoundType.FOOTSTEP);
+
+            // ...ve zamanlayıcıyı yeniden başlat.
+            footstepTimer = footstepInterval;
+        }
     }
 
     private void HandleLook()
@@ -200,5 +241,11 @@ public class EyePlayerController : NetworkBehaviour
         }
         
         base.OnDestroy();
+    }
+
+    private void HandleGamePaused(bool isPaused)
+    {
+        // isPaused true ise bu script'i devre dışı bırak, değilse etkinleştir.
+        this.enabled = !isPaused;
     }
 }

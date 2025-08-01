@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c397604919ae9f04da855abac5cce434, type: 3}
   m_Name: Banana
   m_EditorClassIdentifier: 
-  ingredientName: Banana
+  _id: 1
   icon: {fileID: 0}
   prefab: {fileID: 2230530226155236490, guid: 869b55c0dc2962d41a835b0eeb3c4b36, type: 3}
-  isSafe: 0
+  isSafe: 1
   cookTime: 0
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 16384

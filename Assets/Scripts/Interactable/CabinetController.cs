@@ -1,107 +1,179 @@
-// CabinetController.cs (SAÐLAM VE NÝHAÝ VERSÝYON)
-using System.Collections.Generic;
+// CabinetController.cs (SIMPLIFIED SINGLE INGREDIENT VERSION)
+using Unity.Netcode;
 using UnityEngine;
 
-public class CabinetController : MonoBehaviour
+public class CabinetController : NetworkBehaviour, IInteractable
 {
     [Header("Cabinet Contents")]
-    [Tooltip("Bu dolabýn içinde görünecek malzemelerin listesi.")]
-    [SerializeField] private List<Ingredient> availableIngredients;
-
-    [Tooltip("Her malzemenin duracaðý yerlerin listesi. Sayýsý malzeme listesiyle ayný olmalý.")]
-    [SerializeField] private List<Transform> itemDisplayPoints;
-
-    // Bu dolabýn ana etkileþim alaný
-    private Collider interactionTrigger;
+    [Tooltip("Bu dolabÄ±n iÃ§indeki tek malzeme tÃ¼rÃ¼.")]
+    [SerializeField] private Ingredient ingredient;
 
     private void Awake()
     {
-        // Dolabýn üzerindeki ana Collider'ý al ve Trigger moduna ayarla
-        interactionTrigger = GetComponent<Collider>();
-        if (interactionTrigger != null)
+        // Ensure cabinet has a collider for physics-based interaction
+        Collider interactionCollider = GetComponent<Collider>();
+        if (interactionCollider != null)
         {
-            interactionTrigger.isTrigger = true;
+            // Cabinet should have a normal collider for physics-based detection
+            interactionCollider.isTrigger = false;
         }
     }
 
-    private void Start()
+    public void Interact(HandInteractor interactor)
     {
-        CreateDisplayItems();
-    }
-
-    // Vitrin malzemelerini oluþturan metot
-    private void CreateDisplayItems()
-    {
-        if (availableIngredients.Count != itemDisplayPoints.Count)
+        // Only spawn if we have an ingredient and player isn't holding anything
+        if (ingredient == null || interactor.IsHoldingSomething())
         {
-            Debug.LogError(gameObject.name + " dolabýnda malzeme sayýsý ile spawn noktasý sayýsý uyuþmuyor!");
+            Debug.Log("Cannot give ingredient: " + 
+                    (ingredient == null ? "No ingredient set" : "Player already holding something"));
             return;
         }
 
-        for (int i = 0; i < availableIngredients.Count; i++)
+        // Request server to spawn the ingredient
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
         {
-            Ingredient ingredient = availableIngredients[i];
-            Transform spawnPoint = itemDisplayPoints[i];
-
-            GameObject displayItem = Instantiate(ingredient.prefab, spawnPoint.position, spawnPoint.rotation);
-            displayItem.transform.SetParent(spawnPoint);
-
-            // --- YENÝ EKLENEN VE SORUNU ÇÖZEN KISIM ---
-
-            // 1. Görsel objenin Rigidbody'sini bul.
-            Rigidbody itemRb = displayItem.GetComponent<Rigidbody>();
-            if (itemRb != null)
-            {
-                // 2. Onu Kinematik yap ve yerçekimini kapat.
-                // Bu, onun bir heykel gibi sabit kalmasýný ve aþaðý düþmemesini saðlar.
-                itemRb.isKinematic = true;
-                itemRb.useGravity = false;
-            }
-
-            // 3. Collider'ýný kapat.
-            // Bu, elin yanlýþlýkla bu görsel objeyi algýlamasýný engeller.
-            // El, sadece dolabýn ana trigger'ýný algýlamalý.
-            Collider itemCollider = displayItem.GetComponent<Collider>();
-            if (itemCollider != null)
-            {
-                itemCollider.enabled = false;
-            }
-            // --- YENÝ KISIM BÝTTÝ ---
+            // We're the server, spawn directly
+            SpawnIngredientForPlayer(interactor);
+        }
+        else if (NetworkManager.Singleton != null)
+        {
+            // We're a client, request from server
+            RequestIngredientRpc(NetworkManager.Singleton.LocalClientId);
+        }
+        else
+        {
+            // Fallback for non-networked play
+            SpawnIngredientForPlayer(interactor);
         }
     }
 
-    // HandInteractor bu metodu çaðýrarak bir item talep edecek
-    public void RequestItem(HandInteractor interactor)
+    public void Grab(HandInteractor interactor)
     {
-        if (availableIngredients.Count == 0) return;
+    }
 
-        // Elin pozisyonuna en yakýn olan malzemeyi bul
-        Ingredient closestIngredient = GetClosestIngredientTo(interactor.transform.position);
+    public void Release()
+    {
+        // Cabinet doesn't need any release functionality
+    }
 
-        if (closestIngredient != null)
+    [Rpc(SendTo.Server)]
+    private void RequestIngredientRpc(ulong requestingClientId)
+    {
+        // Find the requesting player's hand interactor
+        // Look for the hand interactor belonging to this client
+        foreach (var spawnedObject in NetworkManager.Singleton.SpawnManager.SpawnedObjects.Values)
         {
-            Debug.Log($"{closestIngredient.ingredientName} için klonlama talebi alýndý.");
-            GameObject clone = Instantiate(closestIngredient.prefab);
-            clone.AddComponent<GrabbableItem>();
-            interactor.HoldItem(clone);
+            if (spawnedObject.OwnerClientId == requestingClientId)
+            {
+                HandInteractor handInteractor = spawnedObject.GetComponentInChildren<HandInteractor>();
+                if (handInteractor != null && !handInteractor.IsHoldingSomething())
+                {
+                    SpawnIngredientForPlayer(handInteractor);
+                    break;
+                }
+            }
         }
     }
 
-    // Elin pozisyonuna en yakýn spawn noktasýný ve dolayýsýyla malzemeyi bulan metot
-    private Ingredient GetClosestIngredientTo(Vector3 handPosition)
+    private void SpawnIngredientForPlayer(HandInteractor interactor)
     {
-        float closestDistance = float.MaxValue;
-        Ingredient closestIngredient = null;
+        if (ingredient?.prefab == null) return;
 
-        for (int i = 0; i < itemDisplayPoints.Count; i++)
+        Debug.Log($"Spawning {ingredient.Name} for player");
+
+        // Instantiate the ingredient
+        GameObject ingredientInstance = Instantiate(ingredient.prefab);
+        
+        // Set up the ingredient for grabbing
+        SetupIngredientObject(ingredientInstance);
+        
+        // If networked, spawn the object with the requesting client as owner
+        NetworkObject networkObject = ingredientInstance.GetComponent<NetworkObject>();
+        if (NetworkManager.Singleton != null && networkObject != null && 
+            (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost))
         {
-            float distance = Vector3.Distance(handPosition, itemDisplayPoints[i].position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestIngredient = availableIngredients[i];
-            }
+            // Get the client ID of the requesting player
+            ulong requestingClientId = GetClientIdFromHandInteractor(interactor);
+            
+            // Spawn with the requesting client as owner so they can parent it
+            networkObject.SpawnWithOwnership(requestingClientId, true);
         }
-        return closestIngredient;
+
+        // Give it to the player using the new interaction system
+        GrabbableItem grabbableComponent = ingredientInstance.GetComponent<GrabbableItem>();
+        if (grabbableComponent != null)
+        {
+            grabbableComponent.Interact(interactor);
+        }
+        else
+        {
+            // If no GrabbableItem component, add one
+            grabbableComponent = ingredientInstance.AddComponent<GrabbableItem>();
+            grabbableComponent.Interact(interactor);
+        }
+    }
+
+    private ulong GetClientIdFromHandInteractor(HandInteractor interactor)
+    {
+        // Find the NetworkObject that contains this HandInteractor
+        NetworkObject playerNetworkObject = interactor.GetComponentInParent<NetworkObject>();
+        if (playerNetworkObject != null)
+        {
+            return playerNetworkObject.OwnerClientId;
+        }
+        
+        // Fallback to server if we can't find the client ID
+        Debug.LogWarning("Could not find client ID for HandInteractor, defaulting to server");
+        return NetworkManager.ServerClientId;
+    }
+
+    private void SetupIngredientObject(GameObject ingredientObj)
+    {
+        // Set the correct layer
+        if (ingredient.layerMask.value > 0)
+        {
+            int layerIndex = 0;
+            int layerMaskValue = ingredient.layerMask.value;
+            while (layerMaskValue > 1)
+            {
+                layerMaskValue >>= 1;
+                layerIndex++;
+            }
+            ingredientObj.layer = layerIndex;
+        }
+
+        // Ensure proper physics setup
+        Rigidbody rb = ingredientObj.GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = ingredientObj.AddComponent<Rigidbody>();
+        }
+        
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.mass = 1f;
+
+        // Ensure collider is set up properly
+        Collider col = ingredientObj.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+            col.isTrigger = false;
+        }
+
+        // Add GrabbableItem component if it doesn't exist
+        if (ingredientObj.GetComponent<GrabbableItem>() == null)
+        {
+            ingredientObj.AddComponent<GrabbableItem>();
+        }
+    }
+
+    // Validation in editor
+    private void OnValidate()
+    {
+        if (ingredient == null)
+        {
+            Debug.LogWarning($"Cabinet '{name}' has no ingredient assigned!", this);
+        }
     }
 }

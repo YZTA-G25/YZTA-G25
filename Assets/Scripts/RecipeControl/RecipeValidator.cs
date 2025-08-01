@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+using Unity.Collections;
 
 public static class RecipeValidator
 {
@@ -17,13 +19,13 @@ public static class RecipeValidator
             return false;
         }
 
-        var checklist = new List<Ingredient>(targetRecipe.requiredIngredients);
+        var checklist = new List<string>(targetRecipe.requiredIngredients.Select(x => x.Name));
 
         foreach (var submittedIngredient in submittedIngredients)
         {
-            if (checklist.Contains(submittedIngredient))
+            if (checklist.Contains(submittedIngredient.Name) && submittedIngredient.isSafe)
             {
-                checklist.Remove(submittedIngredient);
+                checklist.Remove(submittedIngredient.Name);
             }
             else
             {

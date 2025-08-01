@@ -1,144 +1,279 @@
 using UnityEngine;
+using Unity.Netcode;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class HandInteractor : MonoBehaviour
 {
-    [Header("Holding Settings")]
+    [Header("Kinematic Grabbing Settings")]
     [Tooltip("Elin objeyi tutacağı nokta.")]
     [SerializeField] private Transform handHoldPoint;
+    
+    [Tooltip("Ne kadar uzağa erişebiliriz")]
+    [SerializeField] private float grabRange = 1.5f;
+    
+    [Tooltip("Hangi layer'daki objeler tutulabilir")]
+    [SerializeField] private LayerMask grabbableLayer = -1;
+    [SerializeField] private LayerMask seeableLayer = -1;
+    
+    [Tooltip("Fırlatma kuvveti çarpanı")]
+    [SerializeField] private float throwForceMultiplier = 5f;
+    
+    [Tooltip("Bırakma/fırlatma hassasiyeti")]
+    [SerializeField] private float velocityThreshold = 2f;
+    
+    [Tooltip("Hız takip örnek sayısı")]
+    [SerializeField] private int velocitySamples = 5;
 
-    // Elin etkileşim alanındaki objeleri tutar
-    private CabinetController _cabinetInRange;
-    private GrabbableItem _grabbableInRange;
+    // Current grabbed object (for tracking and IsHoldingSomething() method)
+    private GameObject grabbedObject;
+    private Rigidbody grabbedRigidbody;
+    
+    // Hand velocity tracking for throwing
+    private List<Vector3> handPositions = new List<Vector3>();
+    private List<float> handTimes = new List<float>();
 
-    //Tarif defteri butonu için
-    private PageTurnButton _buttonInRange;
+    private Vector3 originalScale;
 
-    // Elin şu anda tuttuğu obje
-    private GameObject _heldItem;
-    private Rigidbody _heldItemRb;
-
-    // El bir objenin etkileşim alanına girdiğinde...
-    private void OnTriggerEnter(Collider other)
+    private void Start()
     {
-        // Girdiği obje bir dolap mı?
-        if (other.TryGetComponent(out CabinetController cabinet))
-        {
-            _cabinetInRange = cabinet;
-            Debug.Log("Dolap alanına girildi: " + cabinet.gameObject.name);
-        }
-        // Girdiği obje yerden alınabilir bir malzeme mi?
-        else if (other.TryGetComponent(out GrabbableItem item))
-        {
-            _grabbableInRange = item;
-            Debug.Log("Yerden alınabilir obje algılandı: " + item.gameObject.name);
-        }
-        //Defterin butonu algılandı mı?
-        else if (other.TryGetComponent(out PageTurnButton button))
-        {
-            _buttonInRange = button;
-            Debug.Log("Defter butonu algılandı: " + button.gameObject.name);
-        }
+        originalScale = transform.localScale;
     }
 
-    // El etkileşim alanından çıktığında...
-    private void OnTriggerExit(Collider other)
+    private void Update()
     {
-        if (other.TryGetComponent(out CabinetController cabinet) && _cabinetInRange == cabinet)
-        {
-            _cabinetInRange = null;
-            Debug.Log("Dolap alanından çıkıldı.");
-        }
-        else if (other.TryGetComponent(out GrabbableItem item) && _grabbableInRange == item)
-        {
-            _grabbableInRange = null;
-            Debug.Log("Yerden alınabilir obje menzilden çıktı.");
-        }
-        else if (other.TryGetComponent(out PageTurnButton button) && _buttonInRange == button)
-        {
-            _buttonInRange = null;
-            Debug.Log("Defter butonu menzilden çıktı.");
-        }
+        // Track hand position for velocity calculation
+        TrackHandVelocity();
     }
 
-    // Elimizdeki objenin pozisyonunu her frame sonunda güncelleyerek takılmayı önler.
-    private void LateUpdate()
-    {
-        if (_heldItem != null && handHoldPoint != null)
-        {
-            _heldItem.transform.position = handHoldPoint.position;
-            _heldItem.transform.rotation = handHoldPoint.rotation;
-        }
-    }
-
-    // Input'tan gelen "Grab" eylemi bu metodu çağırır.
     public void OnGrab(InputAction.CallbackContext context)
-    {
-        if (context.performed) // Tuşa ilk basıldığında
+    {   
+        if (context.performed)
         {
-            if (_heldItem == null) // Eğer elimiz boşsa
+            // Check which interaction triggered this
+            if (context.interaction is UnityEngine.InputSystem.Interactions.HoldInteraction)
             {
-                // Elimiz bir defter butonunun menzilinde mi?
-                if (_buttonInRange != null)
-                {
-                    // Evet, o zaman butonla etkileşime gir (sayfayı çevir).
-                    _buttonInRange.Interact(this);
-                }
-                // Eğer buton menzilinde değilsek, diğer kontrollere geç.
-
-                // Öncelik: Yerdeki bir objeyi al
-                else if (_grabbableInRange != null)
-                {
-                    _grabbableInRange.Interact(this);
-                }
-                // Eğer yerde bir şey yoksa ama dolap alanındaysak, dolaptan iste
-                else if (_cabinetInRange != null)
-                {
-                    _cabinetInRange.RequestItem(this);
-                }
+                // Hold interaction - start grabbing
+                TryGrabClosest();
+            }
+            else if (context.interaction is UnityEngine.InputSystem.Interactions.TapInteraction)
+            {
+                // Tap interaction - single click
+                TryInteractWithClosest();
+            }
+            else
+            {
+                // Fallback for default interaction
+                TryInteractWithClosest();
             }
         }
-        else if (context.canceled) // Tuş bırakıldığında
+        else if (context.canceled)
         {
-            if (_heldItem != null) // Eğer elimiz doluysa
+            // Release any held object
+            if (currentInteractable != null)
             {
-                ReleaseItem();
+                currentInteractable.Release();
             }
         }
     }
 
-    // Diğer script'lerin (Cabinet, GrabbableItem) eline obje vermesi için kullandığı metot
-    public void HoldItem(GameObject item)
+    private void TryGrabClosest()
     {
-        _heldItem = item;
-        _heldItemRb = _heldItem.GetComponent<Rigidbody>();
+        // Find closest interactable object
+        IInteractable closestInteractable = FindClosestInteractable();
+        
+        if (closestInteractable != null)
+        {
+            closestInteractable.Grab(this); // Use Grab instead of Interact
+        }
+        else
+        {
+            Debug.Log("No interactable objects found in range");
+        }
+    }
 
-        // Fiziğini kapat
-        if (_heldItemRb != null) _heldItemRb.isKinematic = true;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = false;
+    #region IInteractable System
 
-        // Anında elin pozisyonuna ışınla
+    private void TryInteractWithClosest()
+    {
+        // Find closest interactable object
+        IInteractable closestInteractable = FindClosestInteractable();
+        
+        if (closestInteractable != null)
+        {
+            closestInteractable.Interact(this);
+        }
+        else
+        {
+            Debug.Log("No interactable objects found in range");
+        }
+    }
+
+    private IInteractable FindClosestInteractable()
+    {
+        // Find objects detected by physics
+        return FindClosestPhysicsInteractable();
+    }
+
+    private IInteractable FindClosestPhysicsInteractable()
+    {
+        // Combine both layers for detection
+        LayerMask combinedLayers = grabbableLayer | seeableLayer;
+        Collider[] nearbyObjects = Physics.OverlapSphere(handHoldPoint.position, grabRange, combinedLayers);
+        
+        IInteractable closest = null;
+        float closestDistance = float.MaxValue;
+        
+        foreach (Collider col in nearbyObjects)
+        {
+            IInteractable interactable = col.GetComponent<IInteractable>();
+            if (interactable == null) continue;
+            
+            float distance = Vector3.Distance(handHoldPoint.position, col.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = interactable;
+            }
+        }
+        
+        if (closest != null)
+        {
+            Debug.Log($"Found closest physics interactable: {((MonoBehaviour)closest).name} at distance {closestDistance}");
+        }
+        
+        return closest;
+    }
+
+    #endregion
+
+    #region Hand Velocity Tracking
+
+    private void TrackHandVelocity()
+    {
+        // Add current position and time
+        handPositions.Add(handHoldPoint.position);
+        handTimes.Add(Time.time);
+        
+        // Remove old samples
+        while (handPositions.Count > velocitySamples)
+        {
+            handPositions.RemoveAt(0);
+            handTimes.RemoveAt(0);
+        }
+    }
+
+    private Vector3 CalculateHandVelocityInternal()
+    {
+        if (handPositions.Count < 2) return Vector3.zero;
+        
+        // Calculate average velocity over recent samples
+        Vector3 totalVelocity = Vector3.zero;
+        int velocityCount = 0;
+        
+        for (int i = 1; i < handPositions.Count; i++)
+        {
+            float deltaTime = handTimes[i] - handTimes[i - 1];
+            if (deltaTime > 0)
+            {
+                Vector3 velocity = (handPositions[i] - handPositions[i - 1]) / deltaTime;
+                totalVelocity += velocity;
+                velocityCount++;
+            }
+        }
+        
+        return velocityCount > 0 ? totalVelocity / velocityCount : Vector3.zero;
+    }
+
+    #endregion
+
+    #region Utility Methods
+
+    public bool IsHoldingSomething()
+    {
+        return grabbedObject != null;
+    }
+
+    public GameObject GetHeldObject()
+    {
+        return grabbedObject;
+    }
+
+    public void ForceRelease()
+    {
+        if (currentInteractable != null)
+        {
+            currentInteractable.Release();
+        }
+    }
+
+    // Public methods for IInteractable objects to access
+    public Transform GetHandHoldPoint()
+    {
+        return handHoldPoint;
+    }
+
+    public float GetGrabRange()
+    {
+        return grabRange;
+    }
+
+    public LayerMask GetGrabbableLayer()
+    {
+        return grabbableLayer;
+    }
+
+    public float GetVelocityThreshold()
+    {
+        return velocityThreshold;
+    }
+
+    public float GetThrowForceMultiplier()
+    {
+        return throwForceMultiplier;
+    }
+
+    public Vector3 CalculateHandVelocity()
+    {
+        return CalculateHandVelocityInternal();
+    }
+
+    // Current interactable tracking
+    private IInteractable currentInteractable;
+    private GameObject currentInteractableObject;
+
+    public void SetCurrentInteractable(IInteractable interactable)
+    {
+        currentInteractable = interactable;
+        
+        if (interactable != null && interactable is GrabbableItem grabbable)
+        {
+            grabbedObject = grabbable.gameObject;
+            grabbedRigidbody = grabbable.GetComponent<Rigidbody>();
+        }
+    }
+
+    public void ClearCurrentInteractable()
+    {
+        currentInteractable = null;
+        grabbedObject = null;
+        grabbedRigidbody = null;
+    }
+
+    public IInteractable GetCurrentInteractable()
+    {
+        return currentInteractable;
+    }
+
+    #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        // Draw grab range
         if (handHoldPoint != null)
         {
-            _heldItem.transform.position = handHoldPoint.position;
-            _heldItem.transform.rotation = handHoldPoint.rotation;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(handHoldPoint.position, grabRange);
         }
-
-        Debug.Log(_heldItem.name + " tutuluyor.");
-    }
-
-    // Elimizdeki objeyi bırakma metodu
-    private void ReleaseItem()
-    {
-        if (_heldItem == null) return;
-        Debug.Log(_heldItem.name + " bırakıldı.");
-
-        // Fiziğini tekrar aç
-        if (_heldItemRb != null) _heldItemRb.isKinematic = false;
-        if (_heldItem.TryGetComponent(out Collider col)) col.enabled = true;
-
-        // Referansları temizle
-        _heldItem = null;
-        _heldItemRb = null;
     }
 }

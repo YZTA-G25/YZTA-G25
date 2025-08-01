@@ -8,9 +8,15 @@ using Unity.VisualScripting;
 // ağ üzerinde bir kimliğe sahip olmasını sağlar.
 public class HandController : NetworkBehaviour
 {
+    [Header("Footstep Settings")]
+    [SerializeField] private float footstepInterval = 0.5f; // Adım sesleri arasındaki saniye
+    private float footstepTimer = 0f;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float mouseSensitivity = 1f;
+    [SerializeField] private float pitchLimit = 85f;
+    [SerializeField] private Transform lookAtTarget;
     [SerializeField] private float handSensitivity = 0.1f;
     [SerializeField] private float handVerticalSpeed = 2f;
     [SerializeField] private float handRotationSpeed = 45f;
@@ -23,13 +29,19 @@ public class HandController : NetworkBehaviour
     [SerializeField] private Transform handTransform; // El pozisyonunu kontrol edeceğimiz obje
     [SerializeField] private CharacterController characterController; // Karakterin bedeni için
     [SerializeField] private HandInteractor handInteractor; // El etkileşim sistemi
+    
+    [Header("Hand Constraints")]
+    [Tooltip("Elin karakterden ne kadar uzaklaşabileceği maksimum mesafe")]
+    [SerializeField] private float maxHandDistance = 2f;
 
     private PlayerControls playerControls;
     private Vector2 moveInput;
+    private Vector2 lookInput; // For mouse look input like EyePlayer
     private Vector2 handMoveInput;
     private float handVerticalInput;
     private bool alternateModeActive;
     private bool grabActive;
+    private float currentPitch = 0f; // Track vertical rotation like EyePlayer
     
     // Gravity and jumping variables
     private Vector3 velocity;
@@ -40,12 +52,20 @@ public class HandController : NetworkBehaviour
     // Bir objenin ağ üzerindeki yaşam döngüsünün başlangıcıdır.
     public override void OnNetworkSpawn()
     {
+        Debug.Log($"HandController OnNetworkSpawn called! IsOwner: {IsOwner}, IsServer: {IsServer}, IsClient: {IsClient}");
+        Debug.Log($"NetworkObjectId: {NetworkObjectId}, IsSpawned: {IsSpawned}");
+        
         // Kodun sadece bu objenin "sahibi" olan client'ta çalışmasını sağlar
         // Böylece bir oyuncu, diğer oyuncunun karakterini kontrol edemez.
         if (!IsOwner)
         {
+            Debug.Log("Not owner, disabling HandController");
             this.enabled = false;
             return;
+        }
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused += HandleGamePaused;
         }
 
         // Sahibi olan client için yapılacak başlangıç ayarları
@@ -70,6 +90,10 @@ public class HandController : NetworkBehaviour
         playerControls.HandPlayer.Move.performed += OnMoveInput;
         playerControls.HandPlayer.Move.canceled += OnMoveInput;
 
+        // Add Look input binding (assuming it exists in HandPlayer input actions)
+        playerControls.HandPlayer.Look.performed += OnLookInput;
+        playerControls.HandPlayer.Look.canceled += OnLookInput;
+
         playerControls.HandPlayer.HandMove.performed += OnHandMoveInput;
         playerControls.HandPlayer.HandMove.canceled += OnHandMoveInput;
 
@@ -79,6 +103,7 @@ public class HandController : NetworkBehaviour
         playerControls.HandPlayer.AlternateMode.performed += OnAlternateModeInput;
         playerControls.HandPlayer.AlternateMode.canceled += OnAlternateModeInput;
 
+        playerControls.HandPlayer.Grab.started += OnGrabInput;
         playerControls.HandPlayer.Grab.performed += OnGrabInput;
         playerControls.HandPlayer.Grab.canceled += OnGrabInput;
         
@@ -94,17 +119,22 @@ public class HandController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        if (IsOwner)
+        {
+            InGameUIManager.OnGamePaused -= HandleGamePaused;
+        }
         // Input'ları devre dışı bırakarak hafıza sızıntısını önlüyoruz
         playerControls.HandPlayer.Disable();
     }
 
-    // Her frame'de çalışacak olan ana güncelleme fonksiyonu
+    // Every frame'de çalışacak olan ana güncelleme fonksiyonu
     private void Update()
     {
         if (!IsOwner) return;
         if (!Application.isFocused) return;
 
         HandleMovement();
+        HandleLook();
         HandleHandControl();
     }
 
@@ -134,11 +164,51 @@ public class HandController : NetworkBehaviour
         // Move the character
         characterController.Move(finalMovement);
 
+        footstepTimer -= Time.deltaTime;
+
+        // Yatay hareketin büyüklüğünü hesapla (y eksenini yok sayarak)
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+
+        // Eğer oyuncu yerde, yatay olarak hareket ediyor ve zamanlayıcı sıfırlandıysa...
+        if (characterController.isGrounded && horizontalVelocity.magnitude > 0.1f && footstepTimer <= 0f)
+        {
+            // ...ayak sesini çal.
+            SoundManager.PlaySound(SoundType.FOOTSTEP);
+
+            // ...ve zamanlayıcıyı yeniden başlat.
+            footstepTimer = footstepInterval;
+        }
+    }
+
+    // Karakterin bakış/dönüş mantığı (Similar to EyePlayerController)
+    private void HandleLook()
+    {
         // Normal mode'da karakterin dönmesi
         if (!alternateModeActive)
         {
-            Vector3 _rotationAmount = new Vector3(0, handMoveInput.x, 0) * mouseSensitivity * Time.deltaTime;
-            transform.Rotate(_rotationAmount, Space.Self);
+            // Horizontal rotation (Y-axis) - frame rate independent
+            float yaw = lookInput.x * mouseSensitivity;
+            transform.Rotate(0, yaw, 0, Space.Self);
+
+            // Vertical rotation (X-axis) - using pitch tracking with limits
+            currentPitch += lookInput.y * mouseSensitivity;
+            currentPitch = Mathf.Clamp(currentPitch, -pitchLimit, pitchLimit);
+
+            // Calculate look target position based on clamped pitch (if lookAtTarget is assigned)
+            if (lookAtTarget != null)
+            {
+                const float fixedDistance = 10f; // Use a fixed distance to avoid NaN issues
+                float radianPitch = currentPitch * Mathf.Deg2Rad;
+                
+                Vector3 forward = transform.forward;
+                Vector3 targetPosition = transform.position + forward * fixedDistance;
+                
+                // Use Sin instead of Tan to avoid infinite values at extreme angles
+                float heightOffset = Mathf.Sin(radianPitch) * fixedDistance;
+                targetPosition.y = transform.position.y + heightOffset;
+                
+                lookAtTarget.position = targetPosition;
+            }
         }
     }
 
@@ -175,6 +245,22 @@ public class HandController : NetworkBehaviour
             float _verticalMovement = handVerticalInput * handVerticalSpeed * Time.deltaTime;
             handTransform.Translate(0, _verticalMovement, 0, Space.World);
         }
+
+        // Apply hand distance constraint
+        ApplyHandDistanceConstraint();
+    }
+
+    private void ApplyHandDistanceConstraint()
+    {
+        // Calculate distance from character center to hand
+        float currentDistance = Vector3.Distance(transform.position, handTransform.position);
+        
+        if (currentDistance > maxHandDistance)
+        {
+            // Constrain hand position to max distance
+            Vector3 directionToHand = (handTransform.position - transform.position).normalized;
+            handTransform.position = transform.position + directionToHand * maxHandDistance;
+        }
     }
     #endregion
 
@@ -182,6 +268,11 @@ public class HandController : NetworkBehaviour
     private void OnMoveInput(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
+    }
+
+    private void OnLookInput(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
     }
 
     private void OnHandMoveInput(InputAction.CallbackContext context)
@@ -224,4 +315,11 @@ public class HandController : NetworkBehaviour
     }
 
     #endregion
+
+
+    private void HandleGamePaused(bool isPaused)
+    {
+        // isPaused true ise bu script'i devre dışı bırak, değilse etkinleştir.
+        this.enabled = !isPaused;
+    }
 }
