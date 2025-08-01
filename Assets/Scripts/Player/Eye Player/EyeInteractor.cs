@@ -20,17 +20,32 @@ public class EyeInteractor : MonoBehaviour
     private LeverController leverInRange;
     private LeverController controlledLever;
 
+    private bool canInteract = false; // Yeni bayrak değişkeni
+
+    private void Start()
+    {
+        // Sahne yükleme event'ini dinle
+        SceneLoadManager.OnGameSceneLoaded += OnGameSceneReady;
+    }
+
+    private void OnDestroy()
+    {
+        SceneLoadManager.OnGameSceneLoaded -= OnGameSceneReady;
+    }
     private void Update()
     {
-        // Safety check for input system
-        if (Mouse.current == null) return;
+        // Sahne henüz hazır değilse veya fare bağlı değilse, hiçbir işlem yapma.
+        if (!canInteract || Mouse.current == null) return;
 
+        // Eğer şu an bir kol kontrol ETMİYORSAK, etrafta bir kol ara.
         if (controlledLever == null)
         {
             FindLever();
         }
+        // Eğer bir kol kontrol EDİYORSAK, fare hareketini o kola gönder.
         else
         {
+            // Farenin yatay hareketini al ve hassasiyetle çarparak kola ilet.
             float mouseXInput = Mouse.current.delta.x.ReadValue();
             controlledLever.UpdateRotation(mouseXInput * leverSensitivity * Time.deltaTime);
         }
@@ -87,5 +102,12 @@ public class EyeInteractor : MonoBehaviour
         {
             Debug.LogError("Error in OnInteract: " + e.Message);
         }
+    }
+
+
+    private void OnGameSceneReady()
+    {
+        // GameScene yüklendiğinde, artık etkileşime girebiliriz.
+        canInteract = true;
     }
 }

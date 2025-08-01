@@ -29,7 +29,32 @@ public class RoleManager : NetworkBehaviour
             if (playerInput != null) playerInput.enabled = false;
             if (characterControllerScript != null) characterControllerScript.enabled = false;
         }
-        if (eyePlayerFeedCamera == null) eyePlayerFeedCamera = GameObject.FindGameObjectWithTag("EyePlayer Feed CM").GetComponent<CinemachineCamera>();
-        if (isHandPlayer) eyePlayerFeedCamera.Follow = this.gameObject.transform;
+
+        // Kamera arama kodunu buradan kaldırıyoruz.
+        // Yeni event'i dinlemeye başlıyoruz.
+        SceneLoadManager.OnGameSceneLoaded += InitializeCamera;
+    }
+
+    // Obje yok olduğunda event aboneliğini iptal etmeyi unutmayın.
+    public override void OnNetworkDespawn()
+    {
+        SceneLoadManager.OnGameSceneLoaded -= InitializeCamera;
+    }
+
+    // Bu metot sadece GameScene yüklendiğinde çağrılacak.
+    private void InitializeCamera()
+    {
+        if (IsOwner && isHandPlayer)
+        {
+            var cameraObject = GameObject.FindGameObjectWithTag("EyePlayer Feed CM");
+            if (cameraObject != null)
+            {
+                eyePlayerFeedCamera = cameraObject.GetComponent<CinemachineCamera>();
+                if (eyePlayerFeedCamera != null)
+                {
+                    eyePlayerFeedCamera.Follow = this.transform;
+                }
+            }
+        }
     }
 }
