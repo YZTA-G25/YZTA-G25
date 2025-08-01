@@ -14,6 +14,10 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
     [Tooltip("Custom grab point offset for this item")]
     public Vector3 customGrabOffset = Vector3.zero;
 
+    [Header("Visibilty Settings")]
+    public LayerMask grabbableLayer = -1;
+    public LayerMask seeableLayer = -1;
+
     // Network Variables for synchronization
     private NetworkVariable<Vector3> networkPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<bool> networkIsGrabbed = new NetworkVariable<bool>();
@@ -222,6 +226,9 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
 
     private void SetupGrabbedState()
     {
+        // Convert LayerMask to layer index
+        int seeableLayerIndex = Mathf.RoundToInt(Mathf.Log(seeableLayer.value, 2));
+        gameObject.layer = seeableLayerIndex;
         // Store original properties for restoration (do this right before changing them)
         if (itemRigidbody != null)
         {
@@ -248,6 +255,9 @@ public class GrabbableItem : NetworkBehaviour, IInteractable
     public void Release()
     {
         Debug.Log($"Releasing: {gameObject.name}");
+        // Convert LayerMask to layer index
+        int grabbableLayerIndex = Mathf.RoundToInt(Mathf.Log(grabbableLayer.value, 2));
+        gameObject.layer = grabbableLayerIndex;
 
         // Stop transform tracking
         isBeingGrabbed = false;

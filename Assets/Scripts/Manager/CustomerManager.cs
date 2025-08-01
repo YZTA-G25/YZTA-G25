@@ -27,7 +27,7 @@ public class CustomerManager : NetworkBehaviour
     // Customer management
     private List<Customer> activeCustomers = new List<Customer>();
     private List<Customer> waitingCustomers = new List<Customer>(); // Customers who have placed orders
-    private const int MAX_CUSTOMERS = 7;
+    private const int MAX_CUSTOMERS = 5;
     
     // Timing
     private float nextSpawnTime;

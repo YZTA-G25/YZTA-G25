@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3655521842484358603}
-  m_Layer: 15
+  m_Layer: 7
   m_Name: HandHoldPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ Transform:
   m_GameObject: {fileID: 6041850321651202394}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.21636245, y: -0.29370373, z: 0.174}
+  m_LocalPosition: {x: -0.21636245, y: -0.91, z: 0.369}
   m_LocalScale: {x: 3.3806627, y: 6.118828, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 7544691108855062268}
   - component: {fileID: 8986550731188141467}
   - component: {fileID: 989099499298201783}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Hand Player
   m_TagString: Hand Player
   m_Icon: {fileID: 0}
@@ -480,6 +480,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isEyePlayer: 0
   cameraOutputChannel: 2
+  crossHairCanvas: {fileID: 0}
   enableDebugLogs: 1
 --- !u!1 &9006520116669081007
 GameObject:
@@ -604,7 +605,7 @@ GameObject:
   - component: {fileID: 1124374180893771628}
   - component: {fileID: 598656007246612551}
   - component: {fileID: 1998558582772689149}
-  m_Layer: 15
+  m_Layer: 7
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
