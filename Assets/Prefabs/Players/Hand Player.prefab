@@ -463,7 +463,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   playerInput: {fileID: 7138004682473484260}
   characterControllerScript: {fileID: 7544691108855062268}
-  isHandPlayer: 0
+  isHandPlayer: 1
   eyePlayerFeedCamera: {fileID: 0}
 --- !u!114 &989099499298201783
 MonoBehaviour:
@@ -748,6 +748,9 @@ MonoBehaviour:
   grabbableLayer:
     serializedVersion: 2
     m_Bits: 16384
+  seeableLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
   throwForceMultiplier: 1
   velocityThreshold: 2
   velocitySamples: 5
