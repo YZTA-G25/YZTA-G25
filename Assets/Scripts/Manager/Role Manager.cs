@@ -1,6 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor.EditorTools;
@@ -46,14 +47,30 @@ public class RoleManager : NetworkBehaviour
     {
         if (IsOwner && isHandPlayer)
         {
-            var cameraObject = GameObject.FindGameObjectWithTag("EyePlayer Feed CM");
-            if (cameraObject != null)
+            StartCoroutine(InitializeCameraCoroutine());
+        }
+    }
+
+    private IEnumerator InitializeCameraCoroutine()
+    {
+        // Wait until the EyePlayer Feed CM camera is found
+        while (GameObject.FindGameObjectWithTag("EyePlayer Feed CM") == null)
+        {
+            yield return null;
+        }
+
+        var cameraObject = GameObject.FindGameObjectWithTag("EyePlayer Feed CM");
+        if (cameraObject != null)
+        {
+            eyePlayerFeedCamera = cameraObject.GetComponent<CinemachineCamera>();
+            if (eyePlayerFeedCamera != null)
             {
-                eyePlayerFeedCamera = cameraObject.GetComponent<CinemachineCamera>();
-                if (eyePlayerFeedCamera != null)
-                {
-                    eyePlayerFeedCamera.Follow = this.transform;
-                }
+                eyePlayerFeedCamera.Follow = this.transform;
+                Debug.Log($"[RoleManager] HandPlayer successfully set as follow target for EyePlayer Feed Camera");
+            }
+            else
+            {
+                Debug.LogError("[RoleManager] Found EyePlayer Feed CM but missing CinemachineCamera component!");
             }
         }
     }
