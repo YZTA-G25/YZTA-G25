@@ -305,28 +305,29 @@ public class MainMenuUIManager : MonoBehaviour
 
     private void UpdatePlayerListUIFromLobby(Lobby lobby)
     {
-        string playerListTextContent = "";
-        int playerCount = 1;
+        if (lobby == null) return;
 
-        // Lobideki her bir oyuncu için...
-        foreach (Player player in lobby.Players)
+        // --- DEÐÝÞÝKLÝK BURADA ---
+        // Artýk oyuncu isimlerini listelemek yerine,
+        // mevcut oyuncu sayýsýný ve maksimum oyuncu sayýsýný alýyoruz.
+        int playerCount = lobby.Players.Count;
+        int maxPlayers = lobby.MaxPlayers;
+
+        // Ekranda "Oyuncular: 1/2" gibi görünecek metni oluþturuyoruz.
+        string playerCountText = $"Oyuncular: {playerCount} / {maxPlayers}";
+
+        // Hem Host'un hem de Client'ýn listesini bu yeni metinle güncelle
+        // (Ayný Text objesini kullandýðýmýzý varsayýyoruz)
+        if (hostPlayerListText != null)
+            hostPlayerListText.text = playerCountText;
+
+        if (clientPlayerListText != null)
+            clientPlayerListText.text = playerCountText;
+
+        // "Start Game" butonunu, Host ise ve lobide 2 kiþi varsa aktif et.
+        if (NetworkManager.Singleton.IsHost && startGameButton != null)
         {
-            // Oyuncunun ismini listeye ekle.
-            // Þimdilik basit bir isim kullanýyoruz. Gelecekte oyuncunun kendi ismini
-            // lobi verisine ekleyerek daha dinamik hale getirebiliriz.
-            playerListTextContent += $"Oyuncu {playerCount}\n";
-            playerCount++;
-        }
-
-        // Hem Host'un hem de Client'ýn listesini güncelle
-        hostPlayerListText.text = playerListTextContent;
-        clientPlayerListText.text = playerListTextContent;
-
-        // Host ise ve oyuncu sayýsý 2 ise baþlatma butonunu aktif et.
-        // Aksi takdirde deaktif et.
-        if (NetworkManager.Singleton.IsHost)
-        {
-            startGameButton.interactable = lobby.Players.Count == 2;
+            startGameButton.interactable = playerCount == maxPlayers;
         }
     }
 
