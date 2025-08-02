@@ -12,13 +12,15 @@ public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager Instance { get; private set; }
 
-    // Bir lobiye ilk kez katýldýðýnda tetiklenir.
+    // Bir lobiye ilk kez katï¿½ldï¿½ï¿½ï¿½nda tetiklenir.
     public event Action<Lobby> OnJoinedLobby;
-    // Lobi her güncellendiðinde (yeni oyuncu katýlmasý vb.) tetiklenir.
+    // Lobi her gï¿½ncellendiï¿½inde (yeni oyuncu katï¿½lmasï¿½ vb.) tetiklenir.
     public event Action<Lobby> OnLobbyUpdated;
 
     public Lobby JoinedLobby { get; private set; }
     private float pollTimer;
+    // Exponential backoff timer for rate limit
+    private float backoffTime = 0f;
 
     private void Awake()
     {
@@ -38,7 +40,7 @@ public class LobbyManager : MonoBehaviour
 
     private void Update()
     {
-        // Lobi durumunu düzenli olarak kontrol et.
+        // Lobi durumunu dï¿½zenli olarak kontrol et.
         HandleLobbyPolling();
     }
 
@@ -61,7 +63,7 @@ public class LobbyManager : MonoBehaviour
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, 2, options);
             JoinedLobby = lobby;
 
-            // Host olarak lobi oluþturduktan sonra NetworkManager'ý baþlat.
+            // Host olarak lobi oluï¿½turduktan sonra NetworkManager'ï¿½ baï¿½lat.
             NetworkManager.Singleton.StartHost();
         }
         catch (LobbyServiceException e)
@@ -131,12 +133,30 @@ public class LobbyManager : MonoBehaviour
         pollTimer -= Time.deltaTime;
         if (pollTimer < 0f)
         {
-            float pollInterval = 1.1f;
+            // Recommended poll interval is 5-10 seconds to avoid rate limit
+            float pollInterval = 7.5f;
             pollTimer = pollInterval;
-            JoinedLobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
-
-            // Lobi güncellendiðinde haber ver.
-            OnLobbyUpdated?.Invoke(JoinedLobby);
+            try
+            {
+                JoinedLobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
+                // Lobi gncellendiinde haber ver.
+                OnLobbyUpdated?.Invoke(JoinedLobby);
+                backoffTime = 0f; // Reset backoff on success
+            }
+            catch (LobbyServiceException e)
+            {
+                if (e.Message.Contains("Rate limit has been exceeded") || e.Message.Contains("429"))
+                {
+                    // Exponential backoff: increase poll interval if rate limited
+                    backoffTime = backoffTime == 0f ? pollInterval * 2f : Mathf.Min(backoffTime * 2f, 60f);
+                    pollTimer = backoffTime;
+                    Debug.LogWarning($"Lobby polling rate limited. Backing off for {backoffTime} seconds.");
+                }
+                else
+                {
+                    Debug.LogError("Lobby polling error: " + e.Message);
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
+using System.Collections;
 
 // HandController, bir NetworkBehaviour'dur. Bu, onun
 // ağ üzerinde bir kimliğe sahip olmasını sağlar.
@@ -110,8 +111,26 @@ public class HandController : NetworkBehaviour
         // Add jump input if you have a jump action in your input actions
         playerControls.HandPlayer.Jump.performed += OnJumpInput;
 
+        StartCoroutine(FeedCamRoutine());
+    }
+
+    IEnumerator FeedCamRoutine()
+    {
+        // Wait until the camera is found
+        while (GameObject.FindGameObjectWithTag("EyePlayer Feed CM") == null)
+        {
+            yield return null;
+        }
+
         eyePlayerFeedCm = GameObject.FindGameObjectWithTag("EyePlayer Feed CM").GetComponent<CinemachineCamera>();
-        eyePlayerFeedCm.Follow = this.gameObject.transform;
+        if (eyePlayerFeedCm != null)
+        {
+            eyePlayerFeedCm.Follow = this.gameObject.transform;
+        }
+        else
+        {
+            Debug.LogError("EyePlayer Feed CM found but CinemachineCamera component is missing!");
+        }
     }
 
     // OnNetworkDespawn, obje ağdan kaldırıldığında çalışır.

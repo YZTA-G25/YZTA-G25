@@ -37,6 +37,7 @@ public class PlayerSetupManager : NetworkBehaviour
         SetupCameras();
         // Remove input setup - controllers handle their own input
         SetupNetworkOwnership();
+        HandleUISetup();
 
         if (enableDebugLogs)
         {
