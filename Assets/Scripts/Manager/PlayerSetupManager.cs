@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Cinemachine;
+using System.Collections;
 
 public class PlayerSetupManager : NetworkBehaviour
 {
@@ -32,16 +33,53 @@ public class PlayerSetupManager : NetworkBehaviour
         }
 
         // Handle specific camera setup for local player only
-        HandleLocalCameraSetup();
-        
-        SetupCameras();
-        // Remove input setup - controllers handle their own input
-        SetupNetworkOwnership();
-        HandleUISetup();
+        StartCoroutine(HandlePlayerSetupSequence());
 
         if (enableDebugLogs)
         {
             Debug.Log($"[PlayerSetup] {(isEyePlayer ? "Eye" : "Hand")} Player setup complete for Client {OwnerClientId}");
+        }
+    }
+
+    private IEnumerator HandlePlayerSetupSequence()
+    {
+        // Setup sequence in order
+        yield return StartCoroutine(HandleLocalCameraSetupCoroutine());
+        yield return StartCoroutine(SetupCamerasCoroutine());
+        yield return StartCoroutine(SetupNetworkOwnershipCoroutine());
+        yield return StartCoroutine(HandleUISetupCoroutine());
+    }
+
+    private IEnumerator HandleUISetupCoroutine()
+    {
+        if (!isEyePlayer)
+        {
+            // Wait until crossHairCanvas is available
+            while (crossHairCanvas == null)
+            {
+                crossHairCanvas = GetComponentInChildren<Canvas>();
+                if (crossHairCanvas == null)
+                {
+                    yield return null; // Wait one frame and try again
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (crossHairCanvas != null)
+            {
+                crossHairCanvas.enabled = false;
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerSetup] Disabled crosshair canvas for HandPlayer");
+                }
+            }
+            else
+            {
+                Debug.LogError("CROOSHAİR CANVAS IS NULL");
+            }
         }
     }
 
@@ -56,6 +94,29 @@ public class PlayerSetupManager : NetworkBehaviour
             else
             {
                 Debug.LogError("CROOSHAİR CANVAS IS NULL");
+            }
+        }
+    }
+
+    private IEnumerator HandleLocalCameraSetupCoroutine()
+    {
+        // Only affect cameras when this is a HandPlayer owner
+        if (!isEyePlayer)
+        {
+            // Wait until Eye Player Camera is found
+            while (GameObject.FindGameObjectWithTag("Eye Player Camera") == null)
+            {
+                yield return null; // Wait one frame and try again
+            }
+
+            eyePlayerCamera = GameObject.FindGameObjectWithTag("Eye Player Camera");
+            if (eyePlayerCamera != null)
+            {
+                eyePlayerCamera.SetActive(false);
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerSetup] Local HandPlayer (Client {OwnerClientId}) disabled Eye Player Camera");
+                }
             }
         }
     }
@@ -111,6 +172,51 @@ public class PlayerSetupManager : NetworkBehaviour
         }
     }
     
+    private IEnumerator SetupCamerasCoroutine()
+    {
+        // Wait one frame to ensure components are initialized
+        yield return null;
+        
+        var virtualCameras = GetComponentsInChildren<CinemachineCamera>();
+        
+        // Wait until we have cameras or confirm there are none
+        int attempts = 0;
+        while (virtualCameras.Length == 0 && attempts < 60) // Max 1 second wait
+        {
+            yield return null;
+            virtualCameras = GetComponentsInChildren<CinemachineCamera>();
+            attempts++;
+        }
+        
+        if (enableDebugLogs)
+        {
+            Debug.Log($"[PlayerSetup] Found {virtualCameras.Length} virtual cameras on {(isEyePlayer ? "Eye" : "Hand")} Player");
+        }
+        
+        foreach (var vcam in virtualCameras)
+        {
+            vcam.OutputChannel = cameraOutputChannel;
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerSetup] Set {(isEyePlayer ? "Eye" : "Hand")} Player camera '{vcam.name}' to output channel {cameraOutputChannel}");
+            }
+        }
+        
+        // Also set up regular cameras if any
+        var cameras = GetComponentsInChildren<Camera>();
+        foreach (var cam in cameras)
+        {
+            // Enable the camera for the owner
+            cam.enabled = true;
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerSetup] Enabled camera '{cam.name}' for {(isEyePlayer ? "Eye" : "Hand")} Player owner");
+            }
+        }
+    }
+
     private void SetupCameras()
     {
         var virtualCameras = GetComponentsInChildren<CinemachineCamera>();
@@ -147,6 +253,60 @@ public class PlayerSetupManager : NetworkBehaviour
     // Input system setup removed - controllers handle their own input
     // private void SetupInputSystem() { ... }
     
+    private IEnumerator SetupNetworkOwnershipCoroutine()
+    {
+        // Wait one frame to ensure components are ready
+        yield return null;
+        
+        // Wait until we have the required controllers
+        EyePlayerController eyeController = null;
+        HandController handController = null;
+        
+        int attempts = 0;
+        while (attempts < 60) // Max 1 second wait
+        {
+            eyeController = GetComponent<EyePlayerController>();
+            handController = GetComponent<HandController>();
+            
+            if (isEyePlayer && eyeController != null) break;
+            if (!isEyePlayer && handController != null) break;
+            
+            yield return null;
+            attempts++;
+        }
+        
+        if (isEyePlayer)
+        {
+            if (eyeController == null)
+            {
+                Debug.LogError("[PlayerSetup] Eye Player prefab missing EyePlayerController!");
+            }
+            if (handController != null)
+            {
+                handController.enabled = false;
+                if (enableDebugLogs)
+                {
+                    Debug.Log("[PlayerSetup] Disabled HandController on Eye Player prefab");
+                }
+            }
+        }
+        else
+        {
+            if (handController == null)
+            {
+                Debug.LogError("[PlayerSetup] Hand Player prefab missing HandController!");
+            }
+            if (eyeController != null)
+            {
+                eyeController.enabled = false;
+                if (enableDebugLogs)
+                {
+                    Debug.Log("[PlayerSetup] Disabled EyePlayerController on Hand Player prefab");
+                }
+            }
+        }
+    }
+
     private void SetupNetworkOwnership()
     {
         // Ensure proper controller setup based on player type
