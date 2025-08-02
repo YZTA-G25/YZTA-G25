@@ -14,6 +14,7 @@ public class HandInteractor : MonoBehaviour
     
     [Tooltip("Hangi layer'daki objeler tutulabilir")]
     [SerializeField] private LayerMask grabbableLayer = -1;
+    [SerializeField] private LayerMask seeableLayer = -1;
     
     [Tooltip("Fırlatma kuvveti çarpanı")]
     [SerializeField] private float throwForceMultiplier = 5f;
@@ -116,7 +117,9 @@ public class HandInteractor : MonoBehaviour
 
     private IInteractable FindClosestPhysicsInteractable()
     {
-        Collider[] nearbyObjects = Physics.OverlapSphere(handHoldPoint.position, grabRange, grabbableLayer);
+        // Combine both layers for detection
+        LayerMask combinedLayers = grabbableLayer | seeableLayer;
+        Collider[] nearbyObjects = Physics.OverlapSphere(handHoldPoint.position, grabRange, combinedLayers);
         
         IInteractable closest = null;
         float closestDistance = float.MaxValue;

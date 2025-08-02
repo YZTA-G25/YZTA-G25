@@ -180,6 +180,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 2b89f49ef99947e43aaed5772a6bbe8d, type: 2}
   inFood: 0
   customGrabOffset: {x: 0, y: 0, z: 0}
+  grabbableLayer:
+    serializedVersion: 2
+    m_Bits: 16384
+  seeableLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &3462788485907869611
 MonoBehaviour:
   m_ObjectHideFlags: 0

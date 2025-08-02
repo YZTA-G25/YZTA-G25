@@ -27,13 +27,23 @@ public class Customer : NetworkBehaviour
     
     [Header("Customer Settings")]
     [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private float queueCheckDistance = 2f; // How far to raycast for queue detection
+    [SerializeField] private LayerMask customerLayerMask = -1; // Layer mask for customer detection
+    [SerializeField] private float visionAngle = 60f; // Total angle of vision cone in degrees
+    [SerializeField] private int rayCount = 5; // Number of rays in the vision cone
     public Transform orderPosition;
     public Transform exitPosition;
     
     // Private variables
     private Recipe currentOrder;
+    private bool canMove;
     private bool hasReachedOrderPosition = false;
     private bool isMovingToExit = false;
+    private UnityEngine.AI.NavMeshAgent navAgent;
+    private float originalSpeed;
+    private int frameCounter = 0;
+    private const int QUEUE_CHECK_INTERVAL = 50; // Check every 50 frames
+    private float rayHeight = 1f;
     
     // Properties for external access
     public float PatienceTime => patienceTime.Value;
@@ -48,6 +58,18 @@ public class Customer : NetworkBehaviour
     
     public override void OnNetworkSpawn()
     {
+        // Initialize NavMeshAgent
+        navAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (navAgent != null)
+        {
+            navAgent.speed = moveSpeed;
+            originalSpeed = navAgent.speed;
+        }
+        else
+        {
+            originalSpeed = moveSpeed;
+        }
+        
         if (IsServer)
         {
             // Server handles movement and timer logic
@@ -73,60 +95,177 @@ public class Customer : NetworkBehaviour
     {
         if (!IsServer) return;
         
+        // Increment frame counter for queue checking
+        frameCounter++;
+        
         HandleMovement();
         HandlePatience();
+        
+        // Check queue every 50 frames (for performance)
+        if (frameCounter >= QUEUE_CHECK_INTERVAL)
+        {
+            HandleQueueing();
+            frameCounter = 0;
+        }
     }
     
-    private void HandleMovement()
+    private void HandleQueueing()
     {
-        if (isMovingToExit)
+        // Only check queue when moving towards order position and not reached it yet
+        if (isMovingToExit || hasReachedOrderPosition) return;
+        
+        // Multi-ray vision system to detect customers in a cone
+        Vector3 rayOrigin = transform.position + Vector3.up * rayHeight;
+        bool customerInFront = false;
+        
+        // Calculate angle step between rays
+        float angleStep = rayCount > 1 ? visionAngle / (rayCount - 1) : 0f;
+        float startAngle = -visionAngle / 2f;
+        
+        // Cast multiple rays in a cone formation
+        for (int i = 0; i < rayCount; i++)
         {
-            // Move to exit
-            if (exitPosition != null)
+            float currentAngle = startAngle + (angleStep * i);
+            
+            // Calculate ray direction based on forward direction + angle offset
+            Vector3 rayDirection = Quaternion.AngleAxis(currentAngle, Vector3.up) * transform.forward;
+
+            // Cast the ray
+            RaycastHit hit;
+            bool hitDetected = Physics.Raycast(rayOrigin, rayDirection, out hit, queueCheckDistance, customerLayerMask);
+            
+            if (hitDetected)
             {
-                Vector3 targetPosition = exitPosition.position;
-                Vector3 currentPosition = transform.position;
-                
-                // Calculate movement direction and face that direction
-                Vector3 direction = (targetPosition - currentPosition).normalized;
-                if (direction != Vector3.zero)
-                {
-                    transform.rotation = Quaternion.LookRotation(direction);
-                }
-                
-                transform.position = Vector3.MoveTowards(currentPosition, targetPosition, moveSpeed * Time.deltaTime);
-                
-                if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
-                {
-                    // Customer has left, notify manager then despawn after a small delay
-                    CustomerManager.Instance.OnCustomerLeft(this);
-                    Invoke(nameof(DespawnSelf), 0.1f); // Small delay to ensure event processing
-                }
+                customerInFront = true;
+                Debug.Log($"[Customer] {gameObject.name} detected customer in ray {i} at angle {currentAngle:F1}° detected: {hit.collider.name}");
             }
-            return;
+            
+            // Debug visualization for each ray
+            Color rayColor = hitDetected ? Color.red : Color.green;
+            Debug.DrawRay(rayOrigin, rayDirection * queueCheckDistance, rayColor, 1f);
         }
         
-        if (!hasReachedOrderPosition && orderPosition != null)
+        // Apply movement logic based on detection results
+        if (navAgent != null)
         {
-            // Move to order position
-            Vector3 targetPosition = orderPosition.position;
-            Vector3 currentPosition = transform.position;
-            
-            // Calculate movement direction and face that direction
-            Vector3 direction = (targetPosition - currentPosition).normalized;
-            if (direction != Vector3.zero)
+            if (customerInFront)
             {
-                transform.rotation = Quaternion.LookRotation(direction);
+                // Stop moving - someone is in front
+                navAgent.speed = 0f;
+                canMove = false;
             }
-            
-            transform.position = Vector3.MoveTowards(currentPosition, targetPosition, moveSpeed * Time.deltaTime);
-            
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            else
             {
-                hasReachedOrderPosition = true;
-                // Customer has reached ordering position, they can now place their order
-                CustomerManager.Instance.OnCustomerReachedOrderPosition(this);
+                // Resume normal speed - path is clear
+                navAgent.speed = originalSpeed;
+                canMove = true;
             }
+        }
+        else
+        {
+            // Fallback for non-NavMesh movement
+            if (customerInFront)
+            {
+                moveSpeed = 0f;
+                canMove = false;
+            }
+            else
+            {
+                moveSpeed = originalSpeed;
+                canMove = true;
+            }
+        }
+    }
+
+    private void HandleMovement()
+    {
+        if (canMove)
+        {
+            if (isMovingToExit)
+            {
+                // Move to exit
+                if (exitPosition != null)
+                {
+                    if (navAgent != null)
+                    {
+                        // Use NavMeshAgent for pathfinding
+                        navAgent.speed = originalSpeed; // Full speed when leaving
+                        navAgent.SetDestination(exitPosition.position);
+
+                        // Check if reached destination
+                        if (!navAgent.pathPending && navAgent.remainingDistance < 0.1f)
+                        {
+                            // Customer has left, notify manager then despawn after a small delay
+                            CustomerManager.Instance.OnCustomerLeft(this);
+                            Invoke(nameof(DespawnSelf), 0.1f);
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to manual movement
+                        Vector3 targetPosition = exitPosition.position;
+                        Vector3 currentPosition = transform.position;
+
+                        Vector3 direction = (targetPosition - currentPosition).normalized;
+                        if (direction != Vector3.zero)
+                        {
+                            transform.rotation = Quaternion.LookRotation(direction);
+                        }
+
+                        transform.position = Vector3.MoveTowards(currentPosition, targetPosition, originalSpeed * Time.deltaTime);
+
+                        if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+                        {
+                            CustomerManager.Instance.OnCustomerLeft(this);
+                            Invoke(nameof(DespawnSelf), 0.1f);
+                        }
+                    }
+                }
+                return;
+            }
+
+            if (!hasReachedOrderPosition && orderPosition != null)
+            {
+                 navAgent.speed = originalSpeed; // Full speed when leaving
+                // Move to order position
+                if (navAgent != null)
+                {
+                    // Use NavMeshAgent for pathfinding
+                    navAgent.SetDestination(orderPosition.position);
+
+                    // Check if reached destination
+                    if (!navAgent.pathPending && navAgent.remainingDistance < 0.5f)
+                    {
+                        hasReachedOrderPosition = true;
+                        navAgent.speed = 0f; // Stop moving when reached order position
+                        CustomerManager.Instance.OnCustomerReachedOrderPosition(this);
+                    }
+                }
+                else
+                {
+                    // Fallback to manual movement
+                    Vector3 targetPosition = orderPosition.position;
+                    Vector3 currentPosition = transform.position;
+
+                    Vector3 direction = (targetPosition - currentPosition).normalized;
+                    if (direction != Vector3.zero)
+                    {
+                        transform.rotation = Quaternion.LookRotation(direction);
+                    }
+
+                    transform.position = Vector3.MoveTowards(currentPosition, targetPosition, moveSpeed * Time.deltaTime);
+
+                    if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+                    {
+                        hasReachedOrderPosition = true;
+                        CustomerManager.Instance.OnCustomerReachedOrderPosition(this);
+                    }
+                }
+            }
+        }
+        else
+        {
+            navAgent.speed = 0;
         }
     }
     
@@ -162,7 +301,7 @@ public class Customer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SetPositionServerRpc(Vector3 position)
     {
-        if (TryGetComponent<UnityEngine.AI.NavMeshAgent>(out var navAgent))
+        if (navAgent != null)
         {
             navAgent.Warp(position);
         }
@@ -210,6 +349,17 @@ public class Customer : NetworkBehaviour
         
         currentState.Value = CustomerState.Leaving;
         isMovingToExit = true;
+        
+        // Restore full speed for leaving
+        if (navAgent != null)
+        {
+            navAgent.speed = originalSpeed;
+        }
+        else
+        {
+            moveSpeed = originalSpeed;
+        }
+        
         OnCustomerLeave.Invoke();
         CustomerManager.Instance.OnCustomerStartedLeaving(this);
         
@@ -223,6 +373,17 @@ public class Customer : NetworkBehaviour
         
         currentState.Value = CustomerState.Leaving;
         isMovingToExit = true;
+        
+        // Restore full speed for leaving
+        if (navAgent != null)
+        {
+            navAgent.speed = originalSpeed;
+        }
+        else
+        {
+            moveSpeed = originalSpeed;
+        }
+        
         OnCustomerLeave.Invoke();
         CustomerManager.Instance.OnCustomerStartedLeaving(this);
         
@@ -281,6 +442,49 @@ public class Customer : NetworkBehaviour
         {
             // Find the recipe from the database or CustomerManager
             currentOrder = CustomerManager.Instance.GetRecipeById(newRecipeId);
+        }
+    }
+    
+    // Helper method to visualize queue detection in Scene view
+    private void OnDrawGizmosSelected()
+    {
+        if (!isMovingToExit && !hasReachedOrderPosition)
+        {
+            Vector3 rayOrigin = transform.position + Vector3.up * rayHeight;
+            
+            // Calculate angle step between rays
+            float angleStep = rayCount > 1 ? visionAngle / (rayCount - 1) : 0f;
+            float startAngle = -visionAngle / 2f;
+            
+            // Draw each ray in the vision cone
+            for (int i = 0; i < rayCount; i++)
+            {
+                float currentAngle = startAngle + (angleStep * i);
+                
+                // Calculate ray direction based on forward direction + angle offset
+                Vector3 rayDirection = Quaternion.AngleAxis(currentAngle, Vector3.up) * transform.forward;
+                Vector3 rayEnd = rayOrigin + rayDirection * queueCheckDistance;
+                
+                // Set color based on ray position (center ray different color)
+                Gizmos.color = (i == rayCount / 2) ? Color.yellow : Color.cyan;
+                
+                // Draw the ray line
+                Gizmos.DrawLine(rayOrigin, rayEnd);
+                
+                // Draw a small sphere at the end of each ray
+                Gizmos.DrawWireSphere(rayEnd, 0.05f);
+            }
+            
+            // Draw vision cone edges to show the detection area
+            if (rayCount > 1)
+            {
+                Gizmos.color = Color.white;
+                Vector3 leftEdge = Quaternion.AngleAxis(-visionAngle / 2f, Vector3.up) * transform.forward;
+                Vector3 rightEdge = Quaternion.AngleAxis(visionAngle / 2f, Vector3.up) * transform.forward;
+                
+                Gizmos.DrawLine(rayOrigin, rayOrigin + leftEdge * queueCheckDistance);
+                Gizmos.DrawLine(rayOrigin, rayOrigin + rightEdge * queueCheckDistance);
+            }
         }
     }
 }

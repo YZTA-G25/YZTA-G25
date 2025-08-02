@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -8097567199909060378}
   - component: {fileID: 2336770890448292264}
   - component: {fileID: 7976196201311837064}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Customer_Type1_PF
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,6 +175,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 2
+  queueCheckDistance: 1.8
+  customerLayerMask:
+    serializedVersion: 2
+    m_Bits: 131072
+  visionAngle: 120
+  rayCount: 11
   orderPosition: {fileID: 0}
   exitPosition: {fileID: 0}
 --- !u!114 &7976196201311837064
