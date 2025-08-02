@@ -26,13 +26,9 @@ public class EyeInteractor : MonoBehaviour
     private void Start()
     {
         // Sahne yükleme event'ini dinle
-        SceneLoadManager.OnGameSceneLoaded += OnGameSceneReady;
+        OnGameSceneReady();
     }
 
-    private void OnDestroy()
-    {
-        SceneLoadManager.OnGameSceneLoaded -= OnGameSceneReady;
-    }
     private void Update()
     {
         // Sahne henüz hazır değilse veya fare bağlı değilse, hiçbir işlem yapma.
