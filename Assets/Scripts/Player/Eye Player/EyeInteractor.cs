@@ -21,6 +21,7 @@ public class EyeInteractor : MonoBehaviour
     private LeverController controlledLever;
 
     private bool canInteract = false; // Yeni bayrak değişkeni
+    private int frameCounter = 0; // Frame sayacı
 
     private void Start()
     {
@@ -38,9 +39,15 @@ public class EyeInteractor : MonoBehaviour
         if (!canInteract || Mouse.current == null) return;
 
         // Eğer şu an bir kol kontrol ETMİYORSAK, etrafta bir kol ara.
-        if (controlledLever == null)
+        if (controlledLever == null )
         {
-            FindLever();
+            // Her 10 frame'de bir FindLever çalıştır
+            frameCounter++;
+            if (frameCounter >= 10)
+            {
+                FindLever();
+                frameCounter = 0; // Sayacı sıfırla
+            }
         }
         // Eğer bir kol kontrol EDİYORSAK, fare hareketini o kola gönder.
         else
