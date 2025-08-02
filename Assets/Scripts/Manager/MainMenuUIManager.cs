@@ -56,6 +56,10 @@ public class MainMenuUIManager : MonoBehaviour
     [SerializeField] private TMP_Dropdown qualityDropdown;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private Toggle fullscreenToggle;
+    [SerializeField] private Image sfxVolumeIcon;
+    [SerializeField] private Image musicVolumeIcon;
+    [SerializeField] private Sprite soundOnIcon;    // Ses açýk ikonu (audioIcon.PNG)
+    [SerializeField] private Sprite soundOffIcon;
 
     private List<Resolution> resolutions;
     private bool isSettingsInitialized = false;
@@ -272,6 +276,15 @@ public class MainMenuUIManager : MonoBehaviour
         float dbVolume = (volume <= 0.0001f) ? -80f : Mathf.Log10(volume) * 20;
         mainMixer.SetFloat("SFXVolume", dbVolume);
         PlayerPrefs.SetFloat("MasterVolume", volume);
+
+        if (volume <= 0.0001f)
+        {
+            sfxVolumeIcon.sprite = soundOffIcon;
+        }
+        else
+        {
+            sfxVolumeIcon.sprite = soundOnIcon;
+        }
     }
 
     public void SetMusicVolume(float volume)
@@ -280,6 +293,15 @@ public class MainMenuUIManager : MonoBehaviour
         float dbVolume = (volume <= 0.0001f) ? -80f : Mathf.Log10(volume) * 20;
         mainMixer.SetFloat("MusicVolume", dbVolume);
         PlayerPrefs.SetFloat("MusicVolume", volume);
+
+        if (volume <= 0.0001f)
+        {
+            musicVolumeIcon.sprite = soundOffIcon;
+        }
+        else
+        {
+            musicVolumeIcon.sprite = soundOnIcon;
+        }
     }
 
     public void SetQuality(int qualityIndex) => QualitySettings.SetQualityLevel(qualityIndex);

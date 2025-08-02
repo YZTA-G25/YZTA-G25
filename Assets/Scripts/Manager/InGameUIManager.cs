@@ -14,6 +14,7 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject disconnectPanel;
+    [SerializeField] private GameObject relationBar;
 
     [Header("Buttons")]
     [SerializeField] private Button resumeButton;
@@ -91,6 +92,11 @@ public class InGameUIManager : MonoBehaviour
         settingsPanel.SetActive(false);
         disconnectPanel.SetActive(false);
 
+        if (relationBar != null) // <-- BU KONTROLÜ VE
+        {
+            relationBar.SetActive(true); // <-- BU SATIRI EKLE
+        }
+
         // Kayýtlý ses ayarýný yükle ve uygula
         float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
         volumeSlider.value = savedVolume;
@@ -150,7 +156,10 @@ public class InGameUIManager : MonoBehaviour
 
         isPaused = !isPaused;
         pausePanel.SetActive(isPaused);
-
+        if (relationBar != null)
+        {
+            relationBar.SetActive(!isPaused); // isPaused'ýn tersini ata
+        }
         // Ýmleci yönet
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isPaused;
