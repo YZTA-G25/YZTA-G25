@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: -3952270589571999894}
   - component: {fileID: 8327702528252651419}
   - component: {fileID: 1329783114491598974}
+  - component: {fileID: 1179512493407101496}
   m_Layer: 6
   m_Name: Eye Player
   m_TagString: Eye Player
@@ -494,7 +495,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionDistance: 5
-  leverSensitivity: 2
+  leverSensitivity: 10
   raycastOrigin: {fileID: 3307809374512962716}
 --- !u!114 &1329783114491598974
 MonoBehaviour:
@@ -511,7 +512,90 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isEyePlayer: 1
   cameraOutputChannel: 4
+  crossHairCanvas: {fileID: 0}
   enableDebugLogs: 1
+--- !u!114 &1179512493407101496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6818570024144399171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52b1820eebd62941b7cf77ca1e5b012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerName:
+    m_InternalValue:
+      utf8LengthInBytes: 20
+      bytes:
+        offset0000:
+          byte0000: 79
+          byte0001: 121
+          byte0002: 117
+          byte0003: 110
+          byte0004: 99
+          byte0005: 117
+          byte0006: 32
+          byte0007: 66
+          byte0008: 101
+          byte0009: 107
+          byte0010: 108
+          byte0011: 101
+          byte0012: 110
+          byte0013: 105
+          byte0014: 121
+          byte0015: 111
+        offset0016:
+          byte0000: 114
+          byte0001: 46
+          byte0002: 46
+          byte0003: 46
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0048: 0
+        byte0049: 0
+        byte0050: 0
+        byte0051: 0
+        byte0052: 0
+        byte0053: 0
+        byte0054: 0
+        byte0055: 0
+        byte0056: 0
+        byte0057: 0
+        byte0058: 0
+        byte0059: 0
+        byte0060: 0
+        byte0061: 0
 --- !u!1 &7062586062123699546
 GameObject:
   m_ObjectHideFlags: 0
