@@ -7,12 +7,14 @@ public class PageTurnButton : MonoBehaviour, IInteractable
 
     public void Interact(HandInteractor interactor)
     {
+        Debug.Log("Buton, deftere sayfa çevirme komutu gönderiyor.");
         if (notebookController == null) return;
 
         if (isNextButton)
         {
             notebookController.TurnToNextPage();
         }
+
         else
         {
             notebookController.TurnToPreviousPage();
