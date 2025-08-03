@@ -296,7 +296,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 **Daily Scrum**: Toplantılar Discord üzerinden düzenli gerçekleştirildi, kritik bug'lar Slack'te hızlıca paylaşıldı. 
 
 ### Ürün Durumu: Ekran Görüntüleri ve Videolar
-[YZTA-G25 Sprint 3 Media Folder](https://drive.google.com/file/d/1V_ZoPcXgQMIxFKcymhhSd-23cU97aZVv/view?usp=sharing)
+[YZTA-G25 Sprint 3 Media Folder](https://drive.google.com/drive/folders/1UQlYtGBiET3GFD6cGGasp8oMk7fQhv34?usp=sharing)
 - Tam multiplayer gameplay experience
 - Recipe defteri ve cooking mechanics
 - Storm, levitation ve diğer chaos event'ler
