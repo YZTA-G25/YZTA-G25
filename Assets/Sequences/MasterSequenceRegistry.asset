@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70e090b0de0a5e44ca6b2d437c25bed1, type: 3}
+  m_Name: MasterSequenceRegistry
+  m_EditorClassIdentifier: 
+  m_MasterSequences:
+  - timeline: {fileID: 11400000, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
+    masterScene:
+      m_SceneAsset: {fileID: 102900000, guid: c1aaf930ba780b940959263f8b0f338f, type: 3}
+      m_ScenePath: Assets/Scenes/Trailer Recording Scene.unity
+  - timeline: {fileID: 11400000, guid: b1b6a14730fded2448e403f9aaad1b68, type: 2}
+    masterScene:
+      m_SceneAsset: {fileID: 102900000, guid: 6281e182cdcdb854db71ee6d5b94a892, type: 3}
+      m_ScenePath: Assets/Scenes/GameScene.unity

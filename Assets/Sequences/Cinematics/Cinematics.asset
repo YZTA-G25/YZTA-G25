@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 713e0022c0ffe974bb14d5e0611b0797, type: 3}
+  m_Name: Cinematics
+  m_EditorClassIdentifier: 
+  m_RootIndex: 0
+  m_Manager:
+    rid: 8343585776253534978
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8343585776253534978
+      type: {class: SequenceManager, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Data:
+        - rid: 8343585776253534979
+        - rid: 8343585776253534982
+        - rid: -2
+        m_AvailableIndices:
+          rid: 8343585776253535012
+    - rid: 8343585776253534979
+      type: {class: TimelineSequence, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Name: Cinematics
+        m_Fps: 60
+        m_Start: 0
+        m_Duration: 2
+        m_Parent: -1
+        m_Children: 01000000
+        m_Timeline: {fileID: 11400000, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
+        m_ChildrenTrack: {fileID: 8518479862779179934, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
+        m_DefaultChildrenTrackName: Sequences
+        m_EditorialClipAsset: {fileID: 0}
+    - rid: 8343585776253534982
+      type: {class: TimelineSequence, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Name: Enter
+        m_Fps: -1
+        m_Start: 0
+        m_Duration: 2
+        m_Parent: 0
+        m_Children: 
+        m_Timeline: {fileID: 11400000, guid: a5a34bd415e76534ca9bef7f4d27105b, type: 2}
+        m_ChildrenTrack: {fileID: 0}
+        m_DefaultChildrenTrackName: Sequences
+        m_EditorialClipAsset: {fileID: 7095524119896202447, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
+    - rid: 8343585776253535012
+      type: {class: StackInt, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data: 
