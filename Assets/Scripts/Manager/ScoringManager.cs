@@ -1,19 +1,19 @@
 using UnityEngine;
-using Unity.Netcode; // <-- AÐ ÖZELLÝKLERÝ ÝÇÝN GEREKLÝ
+using Unity.Netcode; // <-- Aï¿½ ï¿½ZELLï¿½KLERï¿½ ï¿½ï¿½ï¿½N GEREKLï¿½
 using System;
 
-// SINIF ARTIK NETWORKBEHAVIOUR'DAN MÝRAS ALIYOR
+// SINIF ARTIK NETWORKBEHAVIOUR'DAN Mï¿½RAS ALIYOR
 public class ScoringManager : NetworkBehaviour
 {
     public static ScoringManager Instance { get; private set; }
 
-    // Skoru tutan deðiþkeni NetworkVariable yapýyoruz.
+    // Skoru tutan deï¿½iï¿½keni NetworkVariable yapï¿½yoruz.
     // Sadece sunucu yazabilir (WritePermission.Server), herkes okuyabilir (ReadPermission.Everyone).
     private NetworkVariable<int> networkScore = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    // Event'i hala kullanabiliriz, UI'ý güncellemek için çok kullanýþlý.
+    // Event'i hala kullanabiliriz, UI'ï¿½ gï¿½ncellemek iï¿½in ï¿½ok kullanï¿½ï¿½lï¿½.
     public event Action<int> OnScoreChanged;
 
     private void Awake()
@@ -22,26 +22,26 @@ public class ScoringManager : NetworkBehaviour
         else { Instance = this; }
     }
 
-    // OnNetworkSpawn, obje aðda doðduðunda çalýþýr.
+    // OnNetworkSpawn, obje aï¿½da doï¿½duï¿½unda ï¿½alï¿½ï¿½ï¿½r.
     public override void OnNetworkSpawn()
     {
-        // Skor deðiþtiðinde, OnScoreChanged event'ini tetikle.
+        // Skor deï¿½iï¿½tiï¿½inde, OnScoreChanged event'ini tetikle.
         networkScore.OnValueChanged += (int previousValue, int newValue) =>
         {
             OnScoreChanged?.Invoke(newValue);
         };
 
-        // Oyuna yeni baðlanan client'lar için mevcut skoru bir kez tetikle
+        // Oyuna yeni baï¿½lanan client'lar iï¿½in mevcut skoru bir kez tetikle
         OnScoreChanged?.Invoke(networkScore.Value);
     }
 
-    // Puan ekleme iþlemini sunucuda yapan bir ServerRpc
+    // Puan ekleme iï¿½lemini sunucuda yapan bir ServerRpc
     [ServerRpc(RequireOwnership = false)]
     public void AddScoreServerRpc(int amount)
     {
         if (amount <= 0) return;
 
-        // Bu kod sadece sunucuda çalýþýr.
+        // Bu kod sadece sunucuda ï¿½alï¿½ï¿½ï¿½r.
         networkScore.Value += amount;
         Debug.Log($"Skor sunucuda eklendi: +{amount}. Yeni Toplam Skor: {networkScore.Value}");
     }
