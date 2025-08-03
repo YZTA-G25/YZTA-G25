@@ -126,6 +126,6 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
-    m_DisplayName: "FROM START TO F\u0130N\u0130SH"
+    m_DisplayName: Eye
   m_Markers:
     m_Objects: []

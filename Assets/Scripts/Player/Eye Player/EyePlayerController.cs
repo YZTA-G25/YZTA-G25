@@ -1,17 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor.EditorTools;
 using Unity.VisualScripting;
-using UnityEngine.Events;
-
-#endif
-
-
-#if UNITY_EDITOR
 using UnityEditor.Rendering;
+
 #endif
 
 [RequireComponent(typeof(CharacterController))]

@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+
+#if UNITY_EDITOR
 using UnityEditor.Rendering;
+#endif
+
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
@@ -22,7 +26,7 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField] private Button mainMenuButton;
 
     [Header("Audio")]
-    [SerializeField] private float sliderSoundInterval = 0.1f; // Sesler arasý minimum saniye
+    [SerializeField] private float sliderSoundInterval = 0.1f; // Sesler arasï¿½ minimum saniye
     [SerializeField] private Slider musicVolumeSlider;
     private float sliderSoundTimer = 0f;
 
@@ -41,7 +45,7 @@ public class InGameUIManager : MonoBehaviour
 
     private bool isPaused = false;
 
-    // Oyuncu kontrolünü durdurmak için kullanýlacak static event
+    // Oyuncu kontrolï¿½nï¿½ durdurmak iï¿½in kullanï¿½lacak static event
     public static event Action<bool> OnGamePaused;
     
 
@@ -53,12 +57,12 @@ public class InGameUIManager : MonoBehaviour
             MusicManager.Instance.PlayMusic(MusicTrack.GameScene);
         }
 
-        // Butonlara týklandýðýnda ne olacaðýný belirle
-        // Her týklamada ÖNCE sesi çal, SONRA ilgili fonksiyonu çalýþtýr.
+        // Butonlara tï¿½klandï¿½ï¿½ï¿½nda ne olacaï¿½ï¿½nï¿½ belirle
+        // Her tï¿½klamada ï¿½NCE sesi ï¿½al, SONRA ilgili fonksiyonu ï¿½alï¿½ï¿½tï¿½r.
 
         musicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
 
-        // Kayýtlý müzik sesini yükle
+        // Kayï¿½tlï¿½ mï¿½zik sesini yï¿½kle
         float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
         musicVolumeSlider.value = savedMusicVolume;
         SetMusicVolume(savedMusicVolume);
@@ -83,15 +87,15 @@ public class InGameUIManager : MonoBehaviour
             HideSettingsPanel();
         });
 
-        // Slider'ýn deðeri deðiþtiðinde SetVolume metodunu çaðýr
+        // Slider'ï¿½n deï¿½eri deï¿½iï¿½tiï¿½inde SetVolume metodunu ï¿½aï¿½ï¿½r
         volumeSlider.onValueChanged.AddListener(SetVolume);
 
-        // Baþlangýçta tüm panellerin kapalý olduðundan emin ol
+        // Baï¿½langï¿½ï¿½ta tï¿½m panellerin kapalï¿½ olduï¿½undan emin ol
         pausePanel.SetActive(false);
         settingsPanel.SetActive(false);
         disconnectPanel.SetActive(false);
 
-        // Kayýtlý ses ayarýný yükle ve uygula
+        // Kayï¿½tlï¿½ ses ayarï¿½nï¿½ yï¿½kle ve uygula
         float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
         volumeSlider.value = savedVolume;
         SetVolume(savedVolume);
@@ -105,7 +109,7 @@ public class InGameUIManager : MonoBehaviour
         fullscreenToggle.isOn = Screen.fullScreen;
         fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
 
-        // --- Çözünürlük Ayarlarý Baþlangýcý ---
+        // --- ï¿½ï¿½zï¿½nï¿½rlï¿½k Ayarlarï¿½ Baï¿½langï¿½cï¿½ ---
         resolutions = new List<Resolution>(Screen.resolutions);
         resolutionDropdown.ClearOptions();
         List<string> options = new List<string>();
@@ -151,26 +155,26 @@ public class InGameUIManager : MonoBehaviour
         isPaused = !isPaused;
         pausePanel.SetActive(isPaused);
 
-        // Ýmleci yönet
+        // ï¿½mleci yï¿½net
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isPaused;
 
-        // Eðer menü kapanýyorsa ve ayarlar paneli açýksa, onu da kapat
+        // Eï¿½er menï¿½ kapanï¿½yorsa ve ayarlar paneli aï¿½ï¿½ksa, onu da kapat
         if (!isPaused)
         {
             settingsPanel.SetActive(false);
         }
 
-        // Tüm dinleyicilere oyunun duraklatýlma durumunu (true/false) gönder
+        // Tï¿½m dinleyicilere oyunun duraklatï¿½lma durumunu (true/false) gï¿½nder
         OnGamePaused?.Invoke(isPaused);
     }
 
     public void ResumeGame()
     {
-        // Eðer zaten oyun devam ediyorsa bir þey yapma
+        // Eï¿½er zaten oyun devam ediyorsa bir ï¿½ey yapma
         if (!isPaused) return;
 
-        // TogglePauseMenu'yü çaðýrmak, tüm mantýðý tek bir yerde tutar.
+        // TogglePauseMenu'yï¿½ ï¿½aï¿½ï¿½rmak, tï¿½m mantï¿½ï¿½ï¿½ tek bir yerde tutar.
         TogglePauseMenu();
     }
 
@@ -180,14 +184,14 @@ public class InGameUIManager : MonoBehaviour
         {
             MusicManager.Instance.PlayMusic(MusicTrack.MainMenu);
         }
-        // Að oturumunu güvenli bir þekilde kapat
+        // Aï¿½ oturumunu gï¿½venli bir ï¿½ekilde kapat
         NetworkManager.Singleton.Shutdown();
 
-        // Kalýcý objeleri temizle
+        // Kalï¿½cï¿½ objeleri temizle
         if (SoundManager.Instance != null) Destroy(SoundManager.Instance.gameObject);
         if (ScoringManager.Instance != null) Destroy(ScoringManager.Instance.gameObject);
 
-        // Ana menü sahnesine dön
+        // Ana menï¿½ sahnesine dï¿½n
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -205,7 +209,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        // Önce zamanlayýcýyý kontrol edip sesi çalýyor
+        // ï¿½nce zamanlayï¿½cï¿½yï¿½ kontrol edip sesi ï¿½alï¿½yor
         if (isSettingsInitialized)
         {
             if (sliderSoundTimer <= 0f)
@@ -223,9 +227,9 @@ public class InGameUIManager : MonoBehaviour
     public void ShowDisconnectPanel(float duration)
     {
         disconnectPanel.SetActive(true);
-        // Ýsteðe baðlý: Geri sayým metnini burada güncelleyebilirsiniz.
+        // ï¿½steï¿½e baï¿½lï¿½: Geri sayï¿½m metnini burada gï¿½ncelleyebilirsiniz.
         if (countdownText != null)
-            countdownText.text = $"Diðer oyuncunun baðlantýsý koptu. Ana menüye dönmek için bekleniyor: {duration}";
+            countdownText.text = $"Diï¿½er oyuncunun baï¿½lantï¿½sï¿½ koptu. Ana menï¿½ye dï¿½nmek iï¿½in bekleniyor: {duration}";
     }
 
     public void SetQuality(int qualityIndex)
@@ -246,7 +250,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void SetMusicVolume(float volume)
     {
-        // Ses çalma mantýðý
+        // Ses ï¿½alma mantï¿½ï¿½ï¿½
         if (isSettingsInitialized)
         {
             if (sliderSoundTimer <= 0f)
@@ -256,13 +260,13 @@ public class InGameUIManager : MonoBehaviour
             }
         }
 
-        // Sýfýr deðeri için matematiksel düzeltme
+        // Sï¿½fï¿½r deï¿½eri iï¿½in matematiksel dï¿½zeltme
         float dbVolume = (volume <= 0.0001f) ? -80f : Mathf.Log10(volume) * 20;
 
-        // Mixer'a doðru parametre adýyla doðru deðeri gönderme
+        // Mixer'a doï¿½ru parametre adï¿½yla doï¿½ru deï¿½eri gï¿½nderme
         mainMixer.SetFloat("MusicVolume", dbVolume);
 
-        // Ayarý kaydetme
+        // Ayarï¿½ kaydetme
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 

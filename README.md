@@ -225,4 +225,122 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 </details>
 
+---
+
+## Sprint 2
+
+<details>
+<summary>🔥 Sprint 2 - Core Systems</summary>
+
+**Sprint Notları**: Network optimization ve core gameplay mechanics üzerine odaklanıldı. Player interaction sistemleri geliştirildi ve ilk chaos event implementasyonları tamamlandı.
+
+**Sprint içinde tamamlanması tahmin edilen puan**: 45 Puan -> Sprint 1 deneyimimize dayanarak daha gerçekçi bir hedef belirledik.
+
+**Sprint içerisinde ulaşılan puan**: 52
+
+**Daily Scrum**: Toplantılar Discord üzerinden gerçekleştirildi, günlük progress Slack'te paylaşıldı. [Daily Scrum Chats](https://imgur.com/a/S2UMZgp)
+
+**Sprint board update**: ![Sprint Board](assets/sprint2-board.png)
+
+### Ürün Durumu: Ekran Görüntüleri
+[YZTA-G25 Sprint 2 Media Folder](https://drive.google.com/drive/folders/1YZTAg25Sprint2Media/view?usp=sharing)
+- Network multiplayer gameplay demonstration
+- Score system ve UI implementasyonu
+
+### Jira Ekran Görüntüleri
+![Screenshot 1](assets/sprint2-jira1.png)
+![Screenshot 2](assets/sprint2-jira2.png)
+
+**Sprint Review**:
+- Network synchronization optimize edildi ✔️
+- Score system NetworkVariable ile implement edildi ✔️
+- Player setup management coroutine'ler ile geliştirildi ✔️
+- Eye-Hand player camera coordination düzeltildi ✔️
+- Basic UI score bar sistemi eklendi ✔️
+- Lever interaction system optimize edildi (10 frame polling) ✔️
+- Lobby rate limiting ve backoff mechanism eklendi ✔️
+
+**Sprint Retrospective**:
+
+**Yapılan Doğrular**:
+- Sprint 1'den çıkarılan dersler uygulandı
+- Network issues proaktif şekilde çözüldü
+- Code review süreçleri iyileştirildi
+- Task dağılımında daha iyi iletişim kuruldu
+
+**Hatalar**:
+- Bazı network timing issues daha uzun sürdü
+- UI tasarım kararları geç alındı
+- Test coverage yetersiz kaldı
+
+**Planlar**:
+- Chaos event sistemlerine odaklanılacak ❗
+- Recipe system expansion ❗
+- Polish ve optimization ❗
+
+</details>
+
+---
+
+## Sprint 3
+
+<details>
+<summary>🎯 Sprint 3 - Recipe Flow & Polish</summary>
+
+**Sprint Notları**: Recipe system'in tamamlanması, chaos event implementation'ları ve oyun deneyiminin polish edilmesi üzerine odaklanıldı. Oyunun core loop'u tamamlandı.
+
+**Sprint içinde tamamlanması tahmin edilen puan**: 48 Puan -> Önceki sprint performansımıza göre optimistik ama gerçekçi bir hedef.
+
+**Sprint içerisinde ulaşılan puan**: 55
+
+**Daily Scrum**: Toplantılar Discord üzerinden düzenli gerçekleştirildi, kritik bug'lar Slack'te hızlıca paylaşıldı. [Daily Scrum Chats](https://imgur.com/a/S3UMZgx)
+
+**Sprint board update**: ![Sprint Board](assets/sprint3-board.png)
+
+### Ürün Durumu: Ekran Görüntüleri ve Videolar
+[YZTA-G25 Sprint 3 Media Folder](https://drive.google.com/drive/folders/1YZTAg25Sprint3Media/view?usp=sharing)
+- Tam multiplayer gameplay experience
+- Recipe defteri ve cooking mechanics
+- Storm, levitation ve diğer chaos event'ler
+- Oyun içi ekran görüntüleri ve UI screenshots
+
+### Jira Ekran Görüntüleri
+![Screenshot 1](assets/sprint3-jira1.png)
+![Screenshot 2](assets/sprint3-jira2.png)
+![Screenshot 3](assets/sprint3-jira3.png)
+
+**Sprint Review**:
+- Complete recipe system implemented ✔️
+- Interactive recipe notebook mechanics ✔️
+- Storm chaos event sistemi tamamlandı ✔️
+- Object levitation chaos event eklendi ✔️
+- Networked scoring system fully functional ✔️
+- Performance optimization ve frame rate iyileştirmeleri ✔️
+- Audio feedback sistemleri eklendi ✔️
+- UI/UX polish ve visual improvements ✔️
+- Multiplayer stability artırıldı ✔️
+- Hand-Eye coordination mechanics refined ✔️
+
+**Sprint Retrospective**:
+
+**Yapılan Doğrular**:
+- Recipe system tasarımı kullanıcı deneyimi odaklı geliştirildi
+- Chaos event'ler oyun deneyimini zenginleştirdi
+- Network performance önemli ölçüde iyileştirildi
+- Team coordination en iyi seviyesinde
+- Code quality standards uygulandı
+
+**Hatalar**:
+- Bazı chaos event'lerin balancing'i geç fark edildi
+- Audio integration planlanandan daha uzun sürdü
+- Visual feedback sistemleri son dakikada eklendi
+
+**Planlar**:
+- Final polish ve bug fixing ❗
+- Performance optimization son tuşları ❗
+- Playtesting feedback integration ❗
+- Release preparation ❗
+
+</details>
+
 **© 2025 [Place Holder] - GameJam 2025 Project**

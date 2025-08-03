@@ -14,9 +14,19 @@ public class ScoreUI : MonoBehaviour
     private void Start()
     {
         UpdateScoreDisplay(0);
+        SubscribeToScoringManager();
+    }
+
+    private void SubscribeToScoringManager()
+    {
         if (ScoringManager.Instance != null)
         {
             ScoringManager.Instance.OnScoreChanged += UpdateScoreText;
+        }
+        else
+        {
+            // If ScoringManager isn't ready yet, try again next frame
+            Invoke(nameof(SubscribeToScoringManager), 0.1f);
         }
     }
 
