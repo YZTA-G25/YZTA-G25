@@ -289,29 +289,21 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 
 **Sprint Notları**: Recipe system'in tamamlanması, chaos event implementation'ları ve oyun deneyiminin polish edilmesi üzerine odaklanıldı. Oyunun core loop'u tamamlandı.
 
-**Sprint içinde tamamlanması tahmin edilen puan**: 48 Puan -> Önceki sprint performansımıza göre optimistik ama gerçekçi bir hedef.
+**Sprint içinde tamamlanması tahmin edilen puan**: 80
 
-**Sprint içerisinde ulaşılan puan**: 55
+**Sprint içerisinde ulaşılan puan**: 72
 
-**Daily Scrum**: Toplantılar Discord üzerinden düzenli gerçekleştirildi, kritik bug'lar Slack'te hızlıca paylaşıldı. [Daily Scrum Chats](https://imgur.com/a/S3UMZgx)
-
-**Sprint board update**: ![Sprint Board](assets/sprint3-board.png)
+**Daily Scrum**: Toplantılar Discord üzerinden düzenli gerçekleştirildi, kritik bug'lar Slack'te hızlıca paylaşıldı. 
 
 ### Ürün Durumu: Ekran Görüntüleri ve Videolar
-[YZTA-G25 Sprint 3 Media Folder](https://drive.google.com/drive/folders/1YZTAg25Sprint3Media/view?usp=sharing)
+[YZTA-G25 Sprint 3 Media Folder](https://drive.google.com/file/d/1V_ZoPcXgQMIxFKcymhhSd-23cU97aZVv/view?usp=sharing)
 - Tam multiplayer gameplay experience
 - Recipe defteri ve cooking mechanics
 - Storm, levitation ve diğer chaos event'ler
 - Oyun içi ekran görüntüleri ve UI screenshots
 
-### Jira Ekran Görüntüleri
-![Screenshot 1](assets/sprint3-jira1.png)
-![Screenshot 2](assets/sprint3-jira2.png)
-![Screenshot 3](assets/sprint3-jira3.png)
-
 **Sprint Review**:
 - Complete recipe system implemented ✔️
-- Interactive recipe notebook mechanics ✔️
 - Storm chaos event sistemi tamamlandı ✔️
 - Object levitation chaos event eklendi ✔️
 - Networked scoring system fully functional ✔️
@@ -320,6 +312,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 - UI/UX polish ve visual improvements ✔️
 - Multiplayer stability artırıldı ✔️
 - Hand-Eye coordination mechanics refined ✔️
+- Sinematik Çekimler Yapıldı ✔️
 
 **Sprint Retrospective**:
 
@@ -328,6 +321,7 @@ Büyülü bir partner bulma sitesine üye olan iki kişi birbileri ile eşleşti
 - Chaos event'ler oyun deneyimini zenginleştirdi
 - Network performance önemli ölçüde iyileştirildi
 - Team coordination en iyi seviyesinde
+- Günlük toplantı alındı
 - Code quality standards uygulandı
 
 **Hatalar**:
