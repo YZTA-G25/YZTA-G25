@@ -7,7 +7,6 @@
 
 - [Takım Elemanları](#takım-elemanları)
 - [Oyun İsmi](#oyun-i̇smi)
-- [Oyun Logosu](#oyun-logosu)
 - [Oyun Açıklaması](#oyun-açıklaması)
 - [Oyun Hikayesi](#oyun-hikayesi)
 
@@ -43,9 +42,6 @@
 
 ---
 
-## Takım Logosu
-![Logo](assets/team-logo.png)
-
 ## Takım Elemanları
 
 | Photo | Name | Title |
@@ -58,15 +54,11 @@
 ---
 
 # Oyun İsmi
-## **[Place Holder]**
-
-## Oyun Logosu
-![Oyun Logo](assets/game-logo.png)
-![Text Logo](assets/text-logo.png)
+## **CookMate**
 
 ## Oyun Açıklaması
 
-**[Place Holder]**, kooperatif oynanış mekanikleriyle öne çıkan, heyecan verici ve komik bir **Arcade Party Game**'dir. İki oyuncu tamamen farklı roller üstlenerek birlikte yemek tarifleri hazırlar: bir oyuncu elleri kontrol ederek malzemeleri toplar ve yemekleri hazırlarken, diğer oyuncu gözleri kontrol ederek çevreyi gözlemler ve partnerine rehberlik eder. Oyuncular, sürekli değişen kaotik olaylarla mücadele ederken, işbirliği ve iletişim becerilerini test eden benzersiz bir deneyim yaşarlar.
+**CookMate**, kooperatif oynanış mekanikleriyle öne çıkan, heyecan verici ve komik bir **Arcade Party Game**'dir. İki oyuncu tamamen farklı roller üstlenerek birlikte yemek tarifleri hazırlar: bir oyuncu elleri kontrol ederek malzemeleri toplar ve yemekleri hazırlarken, diğer oyuncu gözleri kontrol ederek çevreyi gözlemler ve partnerine rehberlik eder. Oyuncular, sürekli değişen kaotik olaylarla mücadele ederken, işbirliği ve iletişim becerilerini test eden benzersiz bir deneyim yaşarlar.
 
 ## Oyun Hikayesi
 
