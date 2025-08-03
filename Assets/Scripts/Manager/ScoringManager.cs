@@ -1,48 +1,88 @@
 using UnityEngine;
-using Unity.Netcode; // <-- AĞ ÖZELLİKLERİ İÇİN GEREKLİ
+using Unity.Netcode; // <-- AÄ Ã–ZELLÄ°KLERÄ° Ä°Ã‡Ä°N GEREKLÄ°
 using System;
 
-// SINIF ARTIK NETWORKBEHAVIOUR'DAN MİRAS ALIYOR
+// SINIF ARTIK NETWORKBEHAVIOUR'DAN MÄ°RAS ALIYOR
 public class ScoringManager : NetworkBehaviour
 {
     public static ScoringManager Instance { get; private set; }
 
-    // Skoru tutan değişkeni NetworkVariable yapıyoruz.
+    // Skoru tutan deÄŸiÅŸkeni NetworkVariable yapÄ±yoruz.
     // Sadece sunucu yazabilir (WritePermission.Server), herkes okuyabilir (ReadPermission.Everyone).
     private NetworkVariable<int> networkScore = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    // Event'i hala kullanabiliriz, UI'ı güncellemek için çok kullanışlı.
+    // Event'i hala kullanabiliriz, UI'Ä± gÃ¼ncellemek iÃ§in Ã§ok kullanÄ±ÅŸlÄ±.
     public event Action<int> OnScoreChanged;
 
     private void Awake()
     {
         if (Instance != null) { Destroy(gameObject); }
-        else { Instance = this; }
+        else 
+        { 
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
     }
 
-    // OnNetworkSpawn, obje ağda doğduğunda çalışır.
+    // OnNetworkSpawn, obje aÄŸda doÄŸduÄŸunda Ã§alÄ±ÅŸÄ±r.
     public override void OnNetworkSpawn()
     {
-        // Skor değiştiğinde, OnScoreChanged event'ini tetikle.
+        // Skor deÄŸiÅŸtiÄŸinde, OnScoreChanged event'ini tetikle.
         networkScore.OnValueChanged += (int previousValue, int newValue) =>
         {
             OnScoreChanged?.Invoke(newValue);
         };
 
-        // Oyuna yeni bağlanan client'lar için mevcut skoru bir kez tetikle
+        // Oyuna yeni baÅŸlanan client'lar iÃ§in mevcut skoru bir kez tetikle
         OnScoreChanged?.Invoke(networkScore.Value);
     }
 
-    // Puan ekleme işlemini sunucuda yapan bir ServerRpc
+    // OnNetworkDespawn, obje aÄŸdan kaldÄ±rÄ±ldÄ±ÄŸÄ±nda Ã§alÄ±ÅŸÄ±r.
+    public override void OnNetworkDespawn()
+    {
+        // Event aboneliklerini temizle
+        OnScoreChanged = null;
+    }
+
+    // Puan ekleme iÅŸlemini sunucuda yapan bir ServerRpc
     [ServerRpc(RequireOwnership = false)]
     public void AddScoreServerRpc(int amount)
     {
         if (amount <= 0) return;
 
-        // Bu kod sadece sunucuda çalışır.
+        // Bu kod sadece sunucuda Ã§alÄ±ÅŸÄ±r.
         networkScore.Value += amount;
         Debug.Log($"Skor sunucuda eklendi: +{amount}. Yeni Toplam Skor: {networkScore.Value}");
+    }
+
+    // Skoru sÄ±fÄ±rlama iÅŸlemi (sadece sunucu)
+    [ServerRpc(RequireOwnership = false)]
+    public void ResetScoreServerRpc()
+    {
+        networkScore.Value = 0;
+        Debug.Log("Skor sunucuda sÄ±fÄ±rlandÄ±.");
+    }
+
+    // Mevcut skoru almak iÃ§in public property
+    public int CurrentScore => networkScore.Value;
+
+    // Skor Ã§Ä±karma iÅŸlemi (isteÄŸe baÄŸlÄ±)
+    [ServerRpc(RequireOwnership = false)]
+    public void SubtractScoreServerRpc(int amount)
+    {
+        if (amount <= 0) return;
+
+        networkScore.Value = Mathf.Max(0, networkScore.Value - amount);
+        Debug.Log($"Skor sunucuda Ã§Ä±karÄ±ldÄ±: -{amount}. Yeni Toplam Skor: {networkScore.Value}");
+    }
+
+    // Belirli bir skora set etme iÅŸlemi (admin/debug iÃ§in)
+    [ServerRpc(RequireOwnership = false)]
+    public void SetScoreServerRpc(int newScore)
+    {
+        networkScore.Value = Mathf.Max(0, newScore);
+        Debug.Log($"Skor sunucuda ayarlandÄ±: {networkScore.Value}");
     }
 }

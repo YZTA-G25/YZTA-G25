@@ -27,6 +27,7 @@ MonoBehaviour:
         - rid: 8343585776253534979
         - rid: 8343585776253534982
         - rid: -2
+        - rid: 8343585796639949329
         m_AvailableIndices:
           rid: 8343585776253535012
     - rid: 8343585776253534979
@@ -35,9 +36,9 @@ MonoBehaviour:
         m_Name: Cinematics
         m_Fps: 60
         m_Start: 0
-        m_Duration: 2
+        m_Duration: 15.999999999999
         m_Parent: -1
-        m_Children: 01000000
+        m_Children: 0100000003000000
         m_Timeline: {fileID: 11400000, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
         m_ChildrenTrack: {fileID: 8518479862779179934, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
         m_DefaultChildrenTrackName: Sequences
@@ -58,3 +59,16 @@ MonoBehaviour:
     - rid: 8343585776253535012
       type: {class: StackInt, ns: UnityEngine.Sequences, asm: Unity.Sequences}
       data: 
+    - rid: 8343585796639949329
+      type: {class: TimelineSequence, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Name: NewSequence
+        m_Fps: -1
+        m_Start: 15.999999999999
+        m_Duration: 2
+        m_Parent: 0
+        m_Children: 
+        m_Timeline: {fileID: 11400000, guid: 1b596f01d5e0f064da7beb42faaae61a, type: 2}
+        m_ChildrenTrack: {fileID: 0}
+        m_DefaultChildrenTrackName: Sequences
+        m_EditorialClipAsset: {fileID: 5805900860291712259, guid: 698315afab23b8346a3f1debe0d80245, type: 2}
